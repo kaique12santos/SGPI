@@ -1,0 +1,171 @@
+*{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.header-content{
+    background-color: #970000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1%;
+    padding-left: 1%;
+    color:#ffff;
+    font-size: larger;
+}
+
+.logo-image{
+    width: 10%;
+    height: 10dvh;
+}
+
+.container{
+    width: 100%;
+    height: 650px;
+    display: flex;
+    flex-direction: row;
+}
+
+body{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#semestre {
+    height: 35px;
+}
+
+.signup-box{
+    background-color: #f3f3f3;
+    padding: 10px;
+    margin: 5px;
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.signup-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 30px;
+    background-color: #f3f3f3;
+    padding: 10px;
+    width: 100%;
+}
+
+.signup-actions{
+    display: flex;
+    justify-content: space-between;
+    font-size: smaller;
+    padding: 10px;
+}
+
+.signup-form{
+    display: flex;
+    flex-direction: column;
+    background-color: #f3f3f3;
+    padding: 0px;
+    color: #000000;
+}
+
+.signup-input{
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+    border: solid #7e7e7e 0.5px;
+    background-color: #ffffff;
+    height: 20px;
+}
+
+
+
+.signup-button{
+    background-color: #970000;
+    border: none;
+    border-radius: 15px;
+    padding: 5px;
+    width: 22%;
+    color: #ffff;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.greeting{
+    background-color: #EFDEDE;
+    padding:10px;
+    text-align: right;
+    width: 100%;
+    height: 97%;
+    font-size: x-large;
+    color: #A32025;
+    font-weight: 800;
+}
+
+.greeting-paragraph{
+    font-size: medium;
+    color: #000000;
+    font-weight: 100;
+}
+
+.greeting-paragraph a{
+    color: #000000;
+}
+.div_theme{
+    display: flex;
+    justify-content: right;
+    align-items: flex-end;
+}
+.wrapper {
+    display: flex;
+    justify-content: left;
+    align-items: center; 
+    width: 100%; 
+    max-width: 100%; 
+    
+}
+.theme{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    
+}
+
+html { /* ou :root  */
+    background-color: #f4f4f4; /* Tema claro padrão */
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark-mode {
+    background-color: #121212;
+    color: #eee;
+}
+html.dark-mode .greeting{
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* ... outros estilos de dark mode com html.dark-mode como seletor */
+
+html.dark-mode .header-content {
+  background-color: #000;
+  border-bottom: 1px solid #ffffff;
+}
+
+/* ... outros estilos para light-mode (se necessário, geralmente o padrão) */
+
+html.light-mode .header-content {
+    background-color: #970000; /* Sua cor original */
+}
+html.dark-mode .greeting-paragraph{
+    color: #ffffff;
+}
+html.dark-mode .greeting-paragraph a{
+    color: #ffffff;
+}
+
+
