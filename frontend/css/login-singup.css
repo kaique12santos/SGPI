@@ -135,7 +135,7 @@ button{
 }
 
 
-html { /* ou :root  */
+html { 
     background-color: #f4f4f4; /* Tema claro padrão */
     color: #333;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -150,17 +150,16 @@ html.dark-mode .greeting{
     color: #ffffff;
 }
 
-/* ... outros estilos de dark mode com html.dark-mode como seletor */
 
 html.dark-mode .header-content {
   background-color: #000;
   border-bottom: 1px solid #ffffff;
 }
 
-/* ... outros estilos para light-mode (se necessário, geralmente o padrão) */
+
 
 html.light-mode .header-content {
-    background-color: #970000; /* Sua cor original */
+    background-color: #970000; 
 }
 
 

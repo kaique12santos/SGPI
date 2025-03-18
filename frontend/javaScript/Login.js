@@ -8,11 +8,11 @@ function ativar(msg, tipo = 'info', redirectUrl = null) {
     //o tipo de alert definira a cor a ser trocada atraves do css, 
     // manter o css padrao para eventuais erros a cor padrao se manter
     switch (tipo) {
-        case 'erro':
+        case 'erro': // Para erros de servidor,cadastro, login, etc.
             message.style.backgroundColor = '#da4444b9';
             break;
         case 'sucesso': // Para login, cadastro, etc.
-            message.style.backgroundColor = '#00da00b9'; //variação  de verde claro
+            message.style.backgroundColor = '#00da00b9'; 
             break;
         case 'info': // Cor padrão, caso nenhum tipo seja especificado
         default:       

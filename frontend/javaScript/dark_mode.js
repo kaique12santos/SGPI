@@ -9,16 +9,16 @@ function applyTheme() {
   if (savedTheme) {
       document.documentElement.className = savedTheme;
   } else {
-      document.documentElement.className = 'light-mode'; // Tema padrão
+      document.documentElement.className = 'light-mode'; 
   }
 }
 
-applyTheme(); // Aplicar tema ao carregar
+applyTheme(); 
 
 const themeButton = document.querySelector('.theme');
 if (themeButton) {
   themeButton.addEventListener('click', () => {
-      // Alternar entre 'dark-mode' e 'light-mode'
+      
       if (document.documentElement.classList.contains('dark-mode')) {
           setTheme('light-mode');
       } else {
