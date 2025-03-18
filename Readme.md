@@ -70,7 +70,7 @@ O <b>Sistema de Gestão de PIS</b> é uma plataforma web projetada para centrali
   <li><p><b>Scrum Master</b> - <a href="https://github.com/yMistikTK">Luiz Carlos Gimenes Fernandes de Sousa</a></p></li>
   <li><p><b>Documentação</b> - <a href="https://github.com/nome_colaborador">Diego Marques da Costa</a></p></li>
   <li><p><b>Banco de Dados</b> - <a href="https://github.com/nome_colaborador">Vinicius de Morais Crepaldi</a></p></li>
-  <li><p><b>Desenvolvedora Back-End</b> - <a href="https://github.com/kaique12santos">Kaique Caitano dos Santos</a></p></li>
+  <li><p><b>Desenvolvedor Back-End</b> - <a href="https://github.com/kaique12santos">Kaique Caitano dos Santos</a></p></li>
 </ul>
 
 ---
