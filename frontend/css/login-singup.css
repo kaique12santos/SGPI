@@ -2,6 +2,54 @@
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
+body{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+span{
+    color: #ff0000;
+}
+
+button{
+    cursor: pointer;
+}
+
+html { 
+    background-color: #f4f4f4; /* Tema claro padrão */
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark-mode {
+    background-color: #121212;
+    color: #eee;
+}
+
+html.dark-mode .greeting{
+    background-color: #121212;
+    color: #ffffff;
+}
+
+html.dark-mode .header-content {
+  background-color: #000;
+  border-bottom: 1px solid #ffffff;
+}
+
+html.light-mode .header-content {
+    background-color: #970000; 
+}
+
+html.dark-mode .greeting-paragraph a{
+    color: #ffffff;
+}
+
+html.dark-mode .greeting-paragraph{
+    color: #ffffff;
+}
+
 .header-content{
     background-color: #970000;
     display: flex;
@@ -27,19 +75,6 @@
     justify-content: right;
 }
 
-body{
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-span{
-    color: #ff0000;
-}
-button{
-    cursor: pointer;
-}
-
 .login-box{
     background-color: #f3f3f3;
     padding: 5px;
@@ -49,9 +84,7 @@ button{
     height: 80dvh;
     display: flex;
     align-items: center;
-    
-    border-radius: 10px;
-    
+    border-radius: 10px; 
 }
 
 .login-info{
@@ -98,7 +131,6 @@ button{
     font-size: 1rem;
 }
 
-
 .greeting{
     background-color: #EFDEDE;
     padding:10px;
@@ -119,50 +151,17 @@ button{
 .greeting-paragraph a{
     color: #000000;
 }
+
 .theme{
     background-color: transparent;
     border: none;
-    cursor: pointer;
-    
+    cursor: pointer;  
 }
+
 .wrapper {
     display: flex;
     justify-content: left;
     align-items: center; 
     width: 100%; 
-    max-width: 100%; 
-    
+    max-width: 100%;  
 }
-
-
-html { 
-    background-color: #f4f4f4; /* Tema claro padrão */
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html.dark-mode {
-    background-color: #121212;
-    color: #eee;
-}
-html.dark-mode .greeting{
-    background-color: #121212;
-    color: #ffffff;
-}
-
-
-html.dark-mode .header-content {
-  background-color: #000;
-  border-bottom: 1px solid #ffffff;
-}
-
-
-
-html.light-mode .header-content {
-    background-color: #970000; 
-}
-
-
-
-
-

@@ -1,11 +1,14 @@
 .message {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: bold;
     padding: 19px 60px;
     position: fixed;
     top: 20px;
     right: 105px;
     /* background-color: chocolate; */
-    background-color: #da4444b9;
+    background-color: rgb(255, 190, 190);
     border-radius: 3px;
+
     color: #fff;
     animation: slidein 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   }

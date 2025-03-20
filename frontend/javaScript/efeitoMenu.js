@@ -8,13 +8,11 @@ function toggleMenu(button) {
         b.blur(); 
     });
 
-    
     if (!isOpen) {
         menu.classList.add("show");
         button.setAttribute("aria-expanded", "true");
     }
 }
-
 
 window.onclick = function(event) {
     

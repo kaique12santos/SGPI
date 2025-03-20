@@ -37,7 +37,7 @@ app.post('/login', async (req, res) => {
 
         // console.log("Parâmetros bind (strings):", { username: usernameString, password: passwordString });
         const result = await connection.execute(
-          `SELECT * FROM loginn WHERE UPPER(email) = UPPER(:1) AND UPPER(senha) = UPPER(:2)`,
+          `SELECT * FROM Usuarios WHERE UPPER(email) = UPPER(:1) AND UPPER(senha) = UPPER(:2)`,
           [usernameString, passwordString], 
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
@@ -67,28 +67,56 @@ app.post('/login', async (req, res) => {
 
 // Rota de cadastro
 app.post('/cadastro', async (req, res) => {
-    const { username, password, email } = req.body;
+    const { nome, email, senha } = req.body;
+    let { semestre, tipo } = req.body;
+    
+    tipo = tipo || 'Aluno'; // Valor padrão para tipo
+    semestre = semestre ? parseInt(semestre, 10) : null; // Garante que semestre seja um número ou null
 
+    const connection = await getConnection();
+    
     try {
-        const connection = await getConnection();
+        
+
+        // Verificar se o email já existe
+        const emailExistsResult = await connection.execute(
+            `SELECT COUNT(*) FROM Usuarios WHERE email = :1`,
+            [email]
+        );
+        const emailExists = emailExistsResult.rows[0][0] > 0;
+
+        if (emailExists) {
+            if (connection) await connection.close();
+            
+            return res.status(400).json({ success: false, message: 'Este e-mail já está cadastrado.' });
+            
+        }
+
+        // Inserir usuário
         const result = await connection.execute(
-            `INSERT INTO loginn (username, senha, email) VALUES (:1, :2, :3)`,
-            [username, password, email]
+            `INSERT INTO Usuarios (nome, email, senha, tipo, semestre) VALUES (:1, :2, :3, :4, :5)`,
+            [nome, email, senha, tipo, semestre],
+            { autoCommit: true } // Confirmação automática da transação
         );
 
         if (result.rowsAffected > 0) {
-            res.json({ success: true, message: 'Usuário cadastrado com sucesso!' });
+            if (connection) await connection.close();
+            return res.json({ success: true, message: 'Usuário cadastrado com sucesso!' });
         } else {
-            res.json({ success: false, message: 'Erro ao cadastrar usuário.' });
+            if (connection) await connection.close();
+            return res.json({ success: false, message: 'Erro ao cadastrar usuário.' });
         }
-
-        if (connection) await connection.close();
 
     } catch (error) {
         console.error('Erro ao cadastrar usuário:', error);
-        res.status(500).json({ success: false, message: 'Erro no servidor.' });
+        if (connection) { 
+            try { await connection.close(); } catch(innerError) { console.error("Erro fechando conexão:", innerError); } 
+        }
+
+        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
     }
 });
+
 
 
 // Rota de atualização de dados
