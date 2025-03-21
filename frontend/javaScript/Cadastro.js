@@ -1,5 +1,6 @@
 import { ativar } from "./alerts.js";
 
+
 const form = document.querySelector('.signup-info'); 
 
 form.addEventListener('submit', (event) => {
@@ -59,7 +60,7 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {  
         if (response.ok) {
-          ativar('Cadastro realizado com sucesso!','sucesso','/login.html')
+          ativar('Cadastro realizado com sucesso!','sucesso','/index.html')
         } else {
             response.json().then(data => {
                 //Pegar a resposta do back-end e fornecer a resposta 

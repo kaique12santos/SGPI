@@ -4,6 +4,7 @@ const { getConnection, oracledb } = require('./connectOracle.js');
 const path = require('path');
 const app = express();
 const port = 3000;
+const bcrypt = require('bcrypt');
 
 // Define o caminho absoluto para a pasta 'frontend'
 const frontendPath = path.join(__dirname, '..', 'frontend'); //  <-- Correção aqui
@@ -77,7 +78,6 @@ app.post('/cadastro', async (req, res) => {
     
     try {
         
-
         // Verificar se o email já existe
         const emailExistsResult = await connection.execute(
             `SELECT COUNT(*) FROM Usuarios WHERE email = :1`,
@@ -88,25 +88,31 @@ app.post('/cadastro', async (req, res) => {
         if (emailExists) {
             if (connection) await connection.close();
             
-            return res.status(400).json({ success: false, message: 'Este e-mail já está cadastrado.' });
-            
+            return res.status(400).json({ success: false, message: 'Este e-mail já está cadastrado.' });    
         }
+        // variavel saltRounds para definir complexidade da criptografia
+        //variavel hashedSenha para receber a criptografia
+        const saltRounds = 10;
+        const hashedSenha = await bcrypt.hash(senha, saltRounds);
 
         // Inserir usuário
         const result = await connection.execute(
             `INSERT INTO Usuarios (nome, email, senha, tipo, semestre) VALUES (:1, :2, :3, :4, :5)`,
-            [nome, email, senha, tipo, semestre],
-            { autoCommit: true } // Confirmação automática da transação
+            [nome, email, hashedSenha, tipo, semestre],
+            { autoCommit: true } 
         );
 
         if (result.rowsAffected > 0) {
+
+            const usuariosResult = await connection.execute(`SELECT * FROM Usuarios`);
+            console.log('Lista de usuários:', usuariosResult.rows);
             if (connection) await connection.close();
             return res.json({ success: true, message: 'Usuário cadastrado com sucesso!' });
         } else {
             if (connection) await connection.close();
             return res.json({ success: false, message: 'Erro ao cadastrar usuário.' });
         }
-
+        
     } catch (error) {
         console.error('Erro ao cadastrar usuário:', error);
         if (connection) { 
@@ -117,7 +123,8 @@ app.post('/cadastro', async (req, res) => {
     }
 });
 
-
+//atualizações futuras
+//---------------------------------------------------------------------------------------------
 
 // Rota de atualização de dados
 app.put('/atualizar', async (req, res) => {
