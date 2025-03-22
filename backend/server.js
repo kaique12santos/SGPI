@@ -5,12 +5,9 @@ const path = require('path');
 const app = express();
 const port = 3000;
 const bcrypt = require('bcrypt');
-
-// Define o caminho absoluto para a pasta 'frontend'
-const frontendPath = path.join(__dirname, '..', 'frontend'); //  <-- Correção aqui
+const frontendPath = path.join(__dirname, '..', 'frontend');
 
 app.use(cors());
-// Define a pasta 'frontend' como a pasta de arquivos estáticos
 app.use(express.static(frontendPath)); 
 app.use(express.json()); 
 
@@ -22,13 +19,11 @@ app.get('/', (req, res) => {
 
 app.listen(port, async () => { 
     console.log(`Servidor rodando em http://localhost:${port}/`);
-  
-    
-  });
+
+});
 
 //rota do login
 app.post('/login', async (req, res) => {
-//   console.log("Corpo da requisição:",req.body)
     const { username, password } = req.body;
 
     try {
@@ -36,23 +31,29 @@ app.post('/login', async (req, res) => {
         const usernameString = String(username);
         const passwordString = String(password);
 
-        // console.log("Parâmetros bind (strings):", { username: usernameString, password: passwordString });
-        const result = await connection.execute(
-          `SELECT * FROM Usuarios WHERE UPPER(email) = UPPER(:1) AND UPPER(senha) = UPPER(:2)`,
-          [usernameString, passwordString], 
-          { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-    //   console.log("Resultado da consulta:", result);
         
-        if (result.rows.length > 0) {
-            // Login bem-sucedido
-            res.json({ success: true });
+        const result = await connection.execute(
+            `SELECT * FROM Usuarios WHERE UPPER(email) = UPPER(:1)`,
+            [usernameString], 
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
 
+        if (result.rows.length > 0) {
+            const storedHashedPassword = result.rows[0].SENHA;
+
+            // Comparando a senha digitada com a senha criptografada
+            const passwordMatch = await bcrypt.compare(passwordString, storedHashedPassword);
+
+            if (passwordMatch) {
+                res.json({ success: true });
+            } else {
+                res.json({ success: false, message: 'Usuário ou senha incorretos.' });
+            }
         } else {
-            // Credenciais inválidas
-            res.json({ success: false, message: 'Usuário ou senha incorretos.' });    
+            res.json({ success: false, message: 'Usuário ou senha incorretos.' });
         }
-         // Fecha a conexão após o uso
+
+        // Fecha a conexão após o uso
         if (connection) {
             try {
                 await connection.close();
@@ -61,7 +62,7 @@ app.post('/login', async (req, res) => {
             }
         }
     } catch (error) {
-        // console.error('Erro ao realizar login:', error);
+        console.error('Erro ao realizar login:', error);
         res.status(500).json({ success: false, message: 'Erro no servidor.' });
     }
 });
@@ -71,8 +72,8 @@ app.post('/cadastro', async (req, res) => {
     const { nome, email, senha } = req.body;
     let { semestre, tipo } = req.body;
     
-    tipo = tipo || 'Aluno'; // Valor padrão para tipo
-    semestre = semestre ? parseInt(semestre, 10) : null; // Garante que semestre seja um número ou null
+    tipo = tipo || 'Aluno'; 
+    semestre = semestre ? parseInt(semestre, 10) : null; 
 
     const connection = await getConnection();
     
