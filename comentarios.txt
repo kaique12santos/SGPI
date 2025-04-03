@@ -47,3 +47,24 @@ fetch('/cadastro', { /* ... */ }) // ou /login, ou qualquer rota
 .then(data => {
   ativar(data.message.texto, data.message.tipo, data.message?.redirectUrl); // o "?" previne erro se redirectUrl não existir
 });
+
+
+
+// Função para obter o tipo de usuário atual do sistema
+// Esta função deve ser adaptada para integrar com seu sistema de autenticação
+function obterTipoUsuarioLogado() {
+    // Implemente a lógica para obter o tipo de usuário do seu sistema
+    // Exemplos:
+    // 1. Recuperar de um cookie ou localStorage
+    // const tipoUsuario = localStorage.getItem('tipoUsuario');
+    
+    // 2. Recuperar de uma variável global definida pelo servidor
+    // const tipoUsuario = window.userType;
+    
+    // 3. Fazer uma requisição AJAX para um endpoint da API
+    // (código assíncrono omitido)
+    
+    // Por enquanto, retornamos um valor fixo para demonstração
+    // Substitua por sua lógica real de autenticação
+    return 'aluno'; // Valores possíveis: 'aluno', 'professor', 'coordenador'
+}

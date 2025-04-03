@@ -69,6 +69,59 @@ html.dark-mode .menu-content a:hover{
     background-color: #970000; 
 }
 
+html.dark-mode #create-task{
+    background-color: #121212;
+}
+html.dark-mode .form-task {
+    background-color: #121212;
+    
+}
+
+html.dark-mode .form-task label {
+    color: #ffffff;
+}
+
+html.dark-mode .form-task .input-atividade {
+    background-color: #121212;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    
+}
+html.dark-mode .form-task .input-atividade[type="date"] {
+    background-color: #121212;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    
+}
+/* Modifica a cor do ícone do calendário */
+html.dark-mode .input-atividade[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+
+html.dark-mode .form-task .input-atividade::placeholder {
+    color: #aaaaaa;
+}
+
+html.dark-mode .form-task .input-atividade:focus {
+    border-color: #970000;
+    box-shadow: 0 0 5px rgba(151, 0, 0, 0.8);
+}
+
+html.dark-mode .form-task .send-button {
+    background-color: #363636;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.dark-mode .form-task .send-button:hover {
+    background-color: #970000;
+}
+
+
+
 .header-content{
     background-color: #970000;
     display: flex;
@@ -208,6 +261,8 @@ html.dark-mode .menu-content a:hover{
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.3s ease;
+    border-radius: 5px;
+    border-bottom: 2px solid rgb(119, 119, 119);
 }
 
 .page-links a{
@@ -241,3 +296,35 @@ html.dark-mode .menu-content a:hover{
     
 }
 
+.form-task{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #dedcdc;
+    width: 100%;
+}
+
+#create-task{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 5px;
+    background-color: #dedcdc;
+    padding: 2%;
+    border: none;
+    width: 95%;
+    color: #111111;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.send-button{
+    background-color: #970000;
+    border: none;
+    border-radius: 15px;
+    padding: 5px;
+    width: 20%;
+    color: #ffff;
+    cursor: pointer;
+    font-size: 1rem;
+}

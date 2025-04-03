@@ -6,6 +6,7 @@ const app = express();
 const port = 3000;
 const bcrypt = require('bcrypt');
 const frontendPath = path.join(__dirname, '..', 'frontend');
+const fs = require('fs').promises; // Para operações de arquivo assíncronas
 
 app.use(cors());
 app.use(express.static(frontendPath)); 
@@ -14,7 +15,7 @@ app.use(express.json());
 
 // Rota para servir o index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html')); 
+    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
 app.listen(port, async () => { 
@@ -67,6 +68,45 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// app.get('/professor/criar-atividade', async (req, res) => {
+//     try {
+//       // Verificar se o arquivo existe antes de enviá-lo (opcional)
+//       const filePath = path.join(frontendPath, 'criar-atividade.html');
+//       await fs.access(filePath);
+      
+//       // Enviar o arquivo
+//       res.sendFile(filePath);
+//     } catch (error) {
+//       console.error('Erro ao acessar a página do professor:', error);
+      
+//       // Se o arquivo não existir ou houver outro erro
+//       res.status(404).send('Página não encontrada. Erro: ' + error.message);
+//     }
+//   });
+
+//rota de criar-atividade
+ app.get('/professor/criar-atividade', (req, res) => {
+    // Verifique se o usuário tem permissão de professor (implementação depende do seu sistema de autenticação)
+    // if (!req.session.user || req.session.user.role !== 'professor') {
+    //   return res.status(403).send('Acesso negado: Somente professores podem acessar esta página');
+    // }
+    
+    // Opção 1: Renderizar uma view (se estiver usando um motor de template)
+    // return res.render('professor/criar-atividade', {
+    //   title: 'Criar Nova Atividade',
+    //   professor: req.session.user
+    // });
+    
+    // Opção 2: Enviar um arquivo HTML estático
+   return res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
+    
+    // Opção 3: Responder com JSON (para aplicações SPA/frontend separado)
+    // return res.json({
+    //   page: 'criar-atividade',
+    //   message: 'Use esta API para criar uma nova atividade'
+    // });
+ });
+ 
 // Rota de cadastro
 app.post('/cadastro', async (req, res) => {
     const { nome, email, senha } = req.body;
@@ -184,3 +224,16 @@ app.delete('/tarefas/:id', async (req, res) => {  // Usando parâmetro de rota p
 app.get('/TelaPrincipal', (req, res) => {
     res.sendFile(path.join(frontendPath, 'TelaPrincipal.html'));
 })
+
+
+app.use(async (req, res) => {
+    try {
+      const notFoundPath = path.join(frontendPath, '404.html');
+      // Verificar se existe uma página 404 personalizada
+      await fs.access(notFoundPath);
+      res.status(404).sendFile(notFoundPath);
+    } catch (error) {
+      // Se não existir, enviar uma mensagem simples
+      res.status(404).send('Página não encontrada');
+    }
+  });
