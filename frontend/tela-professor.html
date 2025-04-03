@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPI</title>
+
+    <!--__________LINKS AQUI__________-->
+    <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/style.css">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
+    <!--______________________________-->
+
+</head>
+
+<header>
+    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+        <img src="" alt="" class="logo-image">
+        <h1>SGPI</h1>
+        <input type="text" placeholder="Pesquisar..." class="search-box">
+        <p>Olá, Usuário!</p>
+        <button id="user-profile-pic" class="profile-pic">
+            <img src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+        </button>
+    </div>
+</header>
+
+<body>
+    <div class="container"> <!--Div container para facilitar configurações globais-->
+        <div class="wrapper">
+        <div class="menu-dropdown"> <!--Div feita para o menu, não sei ainda como fazer, favor não modificar-->
+            <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                </svg>
+            </button>
+            <div id="menu-itens" class="menu-content">
+                <a href="">Artefatos entregues</a>
+                <a href="">Atividades pendentes</a>
+                <a href="">Criar atividade</a>
+                <a href="">Atividades corrigidas</a>
+            </div>
+        </div>
+        <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
+            <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
+        </button>
+        </div>
+        </div>
+            
+
+
+        <div class="content"> <!--Div com o conteúdo principal da página-->
+            <div class="page-name">
+                <h2>Página Inicial</h2>
+            </div>
+
+            <div class="page-links "><!--Div para os botões da página, contendo links de redirecionamento-->
+                <a href=""> 
+                    <button class="button-link">Artefatos entregues
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
+                            <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855a.75.75 0 0 0-.124 1.329l4.995 3.178 1.531 2.406a.5.5 0 0 0 .844-.536L6.637 10.07l7.494-7.494-1.895 4.738a.5.5 0 1 0 .928.372zm-2.54 1.183L5.93 9.363 1.591 6.602z"/>
+                            <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-1.993-1.679a.5.5 0 0 0-.686.172l-1.17 1.95-.547-.547a.5.5 0 0 0-.708.708l.774.773a.75.75 0 0 0 1.174-.144l1.335-2.226a.5.5 0 0 0-.172-.686"/>
+                        </svg>
+                    </button>
+                </a>
+
+                <a href="">
+                    <button class="button-link">Atividades pendentes
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
+                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
+                        </svg>
+                    </button>
+                </a>
+
+                <a href="">
+                    <button class="button-link">Criar atividade
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
+                            <path d="M8 6.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 .5-.5"/>
+                            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z"/>
+                          </svg>
+                    </button>
+                </a>
+
+                <a href="">
+                    <button class="button-link">Atividades corrigidas
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                          </svg>
+                    </button>
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+    <script defer src="./javaScript/efeitoMenu.js"></script>
+    <script defer src="./javaScript/dark_mode.js"></script>
+</body>
+</html>
