@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!--__________LINKS AQUI__________-->
+    <link rel="stylesheet" href="./css/login-singup.css">
+    <link rel="stylesheet" href="./css/alerts.css">
+    <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+    <!--______________________________-->
+
+</head>
+
+<header>
+    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+        <div class="wrapper">
+            <img src="./imagens/logo-sgpi.png" alt="" class="logo-image">
+            <h1>SGPI</h1>
+            </div>
+            <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
+                <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<body>
+    <div class="container"> <!--Div container para facilitar configurações globais-->
+        <div class="login-box"> <!--Div que abriga todo espaço de login-->
+            <div class="login-info"> <!--Div contendo todas as informações de login-->
+                <form id="loginForm" class="login-info">  
+                    
+                    <div class="login-form">
+                        E-mail institucional
+                        <input type="email" id="username" name="username" placeholder="Digite aqui" class="login-input" required>
+                        <span id="emailError"></span>  
+                    </div>
+
+                    <div class="login-form">
+                        Senha
+                        <input type="password" id="password" name="password" placeholder="Digite aqui" class="login-input"  required>
+                        <span id="passwordError"></span>  
+                    </div>
+
+                    <div class="login-actions alert">
+                        <a href="./login.html">Esqueci a senha</a>
+                        <span id="formError"></span> <div id="formError"></div>
+                        <button type="submit" class="login-button">Enviar</button>  
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="greeting"> <!--Div para dividir o formulário e o banner de boas vindas-->
+            <p>Bem vindo ao Sistema Gerenciador de Projetos Interdisciplinares</p>
+            <p class="greeting-paragraph">Não tem conta? <a href="./signup.html">Cadastre-se</a></p>
+        </div>
+       
+
+    </div>
+    <script type="module"  src="./javaScript/Login.js"></script>
+    <script defer src="./javaScript/dark_mode.js"></script>
+    <script type="module" src="./javaScript/alerts.js"></script>
+    
+</body>
+</html>

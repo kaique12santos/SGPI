@@ -1,0 +1,167 @@
+*{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+body{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+span{
+    color: #ff0000;
+}
+
+button{
+    cursor: pointer;
+}
+
+html { 
+    background-color: #f4f4f4; /* Tema claro padrão */
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark-mode {
+    background-color: #2c2c2c;
+    color: #eee;
+}
+
+html.dark-mode .greeting{
+    background-color: #2c2c2c;
+    color: #ffffff;
+}
+
+html.dark-mode .header-content {
+    background-color: #680000; 
+
+}
+
+html.light-mode .header-content {
+    background-color: #970000; 
+}
+
+html.dark-mode .greeting-paragraph a{
+    color: #ffffff;
+}
+
+html.dark-mode .greeting-paragraph{
+    color: #ffffff;
+}
+
+.header-content{
+    background-color: #970000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1%;
+    padding-left: 1%;
+    color:#ffff;
+    font-size: larger;
+    
+}
+
+.logo-image{
+    width: 10%;
+    height: 10dvh;
+}
+
+.container {
+    width: 100%;
+    height: 82dvh;
+    display: flex;
+    flex-direction: row;  
+    justify-content: right;
+}
+
+.login-box{
+    background-color: #f3f3f3;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 5px;
+    width: 100%;
+    height: 80dvh;
+    display: flex;
+    align-items: center;
+    border-radius: 10px; 
+}
+
+.login-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 30px;
+    background-color: #f3f3f3;
+    padding: 10px;
+    width: 100%;
+    color: #000000;
+}
+
+.login-actions{
+    display: flex;
+    justify-content: space-between;
+    font-size: smaller;
+    padding: 10px;
+}
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    background-color: #f3f3f3;
+    padding: 10px;
+}
+
+.login-input{
+    border-radius: 5px;
+    padding: 5px;
+    border: solid #7e7e7e 0.5px;
+    background-color: #ffffff;
+    height: 20px;
+    margin-top: 5px;
+}
+
+.login-button{
+    background-color: #970000;
+    border: none;
+    border-radius: 15px;
+    padding: 5px;
+    width: 22%;
+    color: #ffff;
+    font-size: 1rem;
+}
+
+.greeting{
+    background-color: #EFDEDE;
+    padding:10px;
+    text-align: right;
+    width: 100%;
+    height: 97%;
+    font-size: x-large;
+    color: #A32025;
+    font-weight: 800;
+}
+
+.greeting-paragraph{
+    font-size: medium;
+    color: #000000;
+    font-weight: 100;
+}
+
+.greeting-paragraph a{
+    color: #000000;
+}
+
+.theme{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;  
+}
+
+.wrapper {
+    display: flex;
+    justify-content: left;
+    align-items: center; 
+    width: 100%; 
+    max-width: 100%;  
+}

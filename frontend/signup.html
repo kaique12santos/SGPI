@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+
+    <!--__________LINKS AQUI__________-->
+    <link rel="stylesheet" href="./css/signup.css">
+    <link rel="stylesheet" href="./css/alerts.css">
+    <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+    <!--______________________________-->
+
+</head>
+
+<header>
+    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+        <div class="wrapper">
+        <img src="./imagens/logo-sgpi.png" alt="" class="logo-image">
+        <h1>SGPI</h1>
+        </div>
+        <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
+            <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
+        </button>
+        </div>
+    </div>
+</header>
+
+<body>
+    <body>
+        <div class="container"> <!--Div container para facilitar configurações globais-->
+            <div class="signup-box"> <!--Div que abriga todo espaço de cadastro-->
+                <form class="signup-info"> <!-- Formulário de cadastro -->
+                    <div class="signup-form">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" placeholder="Digite aqui" class="signup-input" required>
+                    </div>
+                
+                    <div class="signup-form">
+                        <label for="email">E-mail institucional</label>
+                        <input type="email" id="email" name="email" placeholder="Digite aqui" class="signup-input" required>
+                        <span id="emailError"></span> 
+                    </div>
+                
+                    <div class="signup-form">
+                        <label for="semestre">Semestre</label>
+                        <select id="semestre" name="semestre" class="signup-input selectSemestre" required>
+                            <option value="0"></option>
+                            <option value="1">1º Semestre</option>
+                            <option value="2">2º Semestre</option>
+                            <option value="3">3º Semestre</option>
+                            <option value="4">4º Semestre</option>
+                            <option value="5">5º Semestre</option>
+                            <option value="6">6º Semestre</option>
+                        </select>
+                        <span id="semestreError"></span> 
+                    </div>
+                
+                    <div class="signup-form">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="Digite aqui" class="signup-input" required>
+                    </div>
+                
+                    <div class="signup-form">
+                        <label for="confirmar-senha">Digite a senha novamente</label>
+                        <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required>
+                        <span id="passwordError"></span> 
+                    </div>
+                
+                    <div class="signup-actions">
+                        <a href="">Esqueci a senha</a>
+                        <button type="submit" class="signup-button">Cadastrar</button>
+                    </div>
+                </form>
+                
+    
+            </div>
+            <div class="greeting"> <!--Div para dividir o formulário e o banner de boas vindas-->
+                <h3>Bem vindo ao Sistema Gerenciador de Projetos Interdisciplinares</h3>
+                <br>
+                <p class="greeting-paragraph">Já tem uma conta? <a href="./index.html">Entre aqui</a></p>
+    
+            </div>
+    
+
+        <script src="./javaScript/dark_mode.js" defer></script>
+        <script type="module" src="./javaScript/Cadastro.js"></script>
+        <script type="module" src="./javaScript/alerts.js"></script>
+            
+</body>
+</html>
