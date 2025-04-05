@@ -138,8 +138,8 @@ app.post('/cadastro', async (req, res) => {
 
         // Inserir usuário
         const result = await connection.execute(
-            `INSERT INTO Usuarios (nome, email, senha, tipo, semestre) VALUES (:1, :2, :3, :4, :5)`,
-            [nome, email, hashedSenha, tipo, semestre],
+            `INSERT INTO Usuarios (nome, email, senha, tipo, semestre, ativo) VALUES (:1, :2, :3, :4, :5, :6)`,
+            [nome, email, hashedSenha, tipo, semestre, 1],
             { autoCommit: true } 
         );
 
@@ -160,7 +160,7 @@ app.post('/cadastro', async (req, res) => {
             try { await connection.close(); } catch(innerError) { console.error("Erro fechando conexão:", innerError); } 
         }
 
-        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+        return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
     }
 });
 
