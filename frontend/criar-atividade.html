@@ -8,6 +8,7 @@
     <!--__________LINKS AQUI__________-->
     <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/alerts.css">
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
     <!--______________________________-->
@@ -59,19 +60,28 @@
             <div class="form-task"> <!--Div para o formulário de criação de atividade-->
                 <form id="create-task" >
                     <label for="nome">Nome da atividade</label>
-                    <input type="text" placeholder="Nome" class="input-atividade" required>
+                    <input type="text" placeholder="Nome" class="input-atividade" id="nomeAtividade" name="nomeAtividade" required>
 
                     <label for="descricao">Descricao da Atividade</label>
-                    <input type="text" placeholder="Descrição" class="input-atividade" required>
-
+                    <input type="text" placeholder="Descrição" class="input-atividade" id="descricao" name="descricao" required>
+                   
                     <label for="semestre">Semestre</label>
-                    <input type="number" placeholder="Semestre" class="input-atividade" required>
+                        <select id="semestre" name="semestre" class="input-atividade selectSemestre" required>
+                            <option value="0">Selecione</option>
+                            <option value="1">1º Semestre</option>
+                            <option value="2">2º Semestre</option>
+                            <option value="3">3º Semestre</option>
+                            <option value="4">4º Semestre</option>
+                            <option value="5">5º Semestre</option>
+                            <option value="6">6º Semestre</option>
+                        </select>
+                    <span id="semestreError"></span>
 
                     <label for="data">Data de entrega</label>
-                    <input type="datetime-local" placeholder="Data" class="input-atividade" required>
+                    <input type="datetime-local" placeholder="Data" class="input-atividade" id="dataEntrega" name="dataEntrega" min="2015-01-01T00:00" max="2035-12-31T23:59" required>
 
                     <label for="pontos">Pontos</label>
-                    <input type="number" placeholder="Pontos" class="input-atividade" required>
+                    <input type="number" placeholder="Pontos" class="input-atividade" id="pontos" name="pontos" min="1" max="100" required>
 
                     <div class="">
                         <button type="submit" class="send-button">Enviar</button>
@@ -79,13 +89,14 @@
 
                 </form>
             </div>
-
+            
             </div>
 
         </div>
     </div>
     <script defer src="/javaScript/efeitoMenu.js"></script>
     <script defer src="/javaScript/dark_mode.js"></script>
-    <script src="/javaScript/navigation-buttons.js"></script>
+    <script src="/javaScript/GerarMenu.js"></script>
+    <script type="module" src="/javaScript/Atividades.js"></script>
 </body>
 </html>

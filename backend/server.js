@@ -164,6 +164,86 @@ app.post('/cadastro', async (req, res) => {
     }
 });
 
+app.post('/professor/atividades', async (req, res) => {
+    const {
+        titulo,
+        descricao,
+        professor_id,
+        projeto_id,
+        prazo_entrega,
+        criterios_avaliacao,
+        semestre
+    } = req.body;
+
+    const connection = await getConnection();
+
+    try {
+        // Validação básica
+        if (!titulo || !descricao || !professor_id || !projeto_id || !prazo_entrega || !semestre) {
+            if (connection) await connection.close();
+            return res.status(400).json({ success: false, message: 'Todos os campos obrigatórios devem ser preenchidos.' });
+        }
+
+        // Inserção na tabela Atividades
+        const result = await connection.execute(
+            `INSERT INTO Atividades (
+                titulo, descricao, professor_id, projeto_id, prazo_entrega,
+                criterios_avaliacao, semestre
+            ) VALUES (
+                :1, :2, :3, :4, TO_TIMESTAMP(:5, 'YYYY-MM-DD"T"HH24:MI'), :6, :7
+            )`,
+            [
+                titulo,
+                descricao,
+                professor_id,
+                projeto_id,
+                prazo_entrega,
+                criterios_avaliacao,
+                semestre
+            ],
+            { autoCommit: true }
+        );
+
+        if (result.rowsAffected > 0) {
+            if (connection) await connection.close();
+            return res.json({ success: true, message: 'Atividade cadastrada com sucesso!' });
+        } else {
+            if (connection) await connection.close();
+            return res.status(500).json({ success: false, message: 'Erro ao cadastrar atividade.' });
+        }
+
+    } catch (error) {
+        console.error('Erro ao cadastrar atividade:', error);
+        if (connection) {
+            try { await connection.close(); } catch (innerError) { console.error('Erro ao fechar conexão:', innerError); }
+        }
+        return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
+    }
+});
+
+
+app.get('/professor/atividades', async (req, res) => {
+
+    const connection = await getConnection();
+    try {
+      const professorId = 1; // ID fixo por enquanto
+      const result = await connection.execute(
+        `SELECT titulo, TO_CHAR(prazo_entrega, 'YYYY-MM-DD"T"HH24:MI') as prazo_entrega, semestre
+         FROM Atividades
+         WHERE professor_id = :professorId
+         ORDER BY data_criacao DESC`,
+        [professorId]
+      );
+      
+      res.json(result.rows.map(([titulo, prazo_entrega, semestre]) => ({
+        titulo, prazo_entrega, semestre
+      })));
+    } catch (error) {
+      console.error('Erro ao buscar atividades:', error);
+      res.status(500).json({ message: 'Erro ao buscar atividades' });
+    }
+  });
+  
 //atualizações futuras
 //---------------------------------------------------------------------------------------------
 
