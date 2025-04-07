@@ -231,6 +231,7 @@ html.dark-mode .form-task .send-button:hover {
     color: #f1f1f1;
     display: flex;
     flex-direction: column;
+    border-bottom: 2px solid #ec0b0b ;
 }
 
 .page-name{
@@ -330,9 +331,14 @@ html.dark-mode .form-task .send-button:hover {
 }
 
 .atividades-criadas {
-    margin-top: 2rem;
-    border-top: 2px solid #ccc;
-    padding-top: 1rem;
+    
+    margin-top: 1rem;
+    display: flex;
+    justify-content: right;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
+    
 }
 
 .atividade-card {
@@ -341,4 +347,34 @@ html.dark-mode .form-task .send-button:hover {
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
+    
+}
+
+.textarea-tamanho{
+    width: 100%;
+    min-height: 150px;
+}
+
+.btn-alterar{
+    background-color: #3498db;
+    margin: 5px 5px 0px 0px;
+    border: 1px solid black;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.btn-alterar:hover{
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-excluir{
+    background-color: #e00101;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+.btn-excluir:hover{
+    background-color: #df2121;
+    transform: translateY(-2px)
+    
 }

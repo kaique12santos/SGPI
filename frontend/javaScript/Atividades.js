@@ -28,8 +28,26 @@ function criarCardAtividade({ titulo, prazo_entrega, semestre }) {
     div.innerHTML = `
         <strong>${titulo}</strong><br>
         Prazo: ${formatarData(prazo_entrega)}<br>
-        Semestre: ${semestre}
+        Semestre: ${semestre} <br>
     `;
+    const btnAlterar = document.createElement('button');
+    btnAlterar.textContent = 'Alterar';
+    btnAlterar.className = 'btn-alterar';
+    btnAlterar.onclick = () => {
+        // lógica para alterar atividade
+        alert(`Alterar: ${titulo}`);
+    };
+
+    const btnExcluir = document.createElement('button');
+    btnExcluir.textContent = 'Excluir';
+    btnExcluir.className = 'btn-excluir';
+    btnExcluir.onclick = () => {
+        // lógica para excluir atividade
+        div.remove(); // Exemplo simples
+    };
+
+    div.appendChild(btnAlterar);
+    div.appendChild(btnExcluir);
     return div;
 }
 
@@ -87,7 +105,7 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {
         if (response.ok) {
-            ativar('Atividade criada com sucesso!', 'sucesso', '/professor/atividades');
+            ativar('Atividade criada com sucesso!', 'sucesso', '/professor/criar-atividades');
         } else {
             response.json().then(data => {
                 ativar(data.message, data.success ? 'sucesso' : 'erro');
@@ -96,7 +114,7 @@ form.addEventListener('submit', (event) => {
     })
     .catch(error => {
         console.error('Erro na requisição:', error);
-        ativar('Erro ao conectar com o servidor.', 'erro', '');
+        ativar(`Erro ${response.status}: ${response.statusText}`, 'erro', '');
     });
 });
 
