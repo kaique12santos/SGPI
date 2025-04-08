@@ -1,0 +1,130 @@
+html.dark-mode {
+    background-color: #131313;
+    color: #eee;
+}
+
+html.dark-mode .login-box,
+html.dark-mode .login-info,
+html.dark-mode .login-form,
+html.dark-mode .signup-box,
+html.dark-mode .signup-info,
+html.dark-mode .signup-form {
+    background-color: #242424;
+}
+
+html.dark-mode .login-form,
+html.dark-mode .signup-form {
+    color: #eee;
+}
+
+html.dark-mode .login-input,
+html.dark-mode .signup-input {
+    background-color: #494949;
+    color: #ffffff;
+}
+
+html.dark-mode .greeting {
+    background-color: #131313;
+    color: #ffffff;
+}
+
+html.dark-mode .header-content {
+    background-color: #680000;
+}
+
+html.dark-mode .greeting-paragraph,
+html.dark-mode .greeting-paragraph a {
+    color: #ffffff;
+}
+
+html.dark-mode .menu-dropdown,
+html.dark-mode .dropbutton {
+    background-color: #680000;
+}
+
+html.dark-mode .dropbutton:hover {
+    background-color: #970000;
+}
+
+html.dark-mode body,
+html.dark-mode .menu-content {
+    background-color: #000000;
+}
+
+html.dark-mode .button-link {
+    background-color: #363636;
+    color: #ffffff;
+    border: none;
+    border-bottom: #858585 solid 2px;
+}
+
+html.dark-mode .button-link:hover {
+    background-color: #505050;
+}
+
+html.dark-mode .page-links,
+html.dark-mode #create-task,
+html.dark-mode .form-task {
+    background-color: #121212;
+}
+
+html.dark-mode .menu-content a {
+    color: #ffffff;
+}
+
+html.dark-mode .menu-content a:hover {
+    background-color: #970000;
+}
+
+html.dark-mode .form-task label {
+    color: #ffffff;
+}
+
+html.dark-mode .form-task .input-atividade {
+    background-color: #121212;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+html.dark-mode .form-task .input-atividade[type="date"] {
+    background-color: #121212;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+/* Modifica a cor do ícone do calendário */
+html.dark-mode .input-atividade[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+html.dark-mode .form-task .input-atividade::placeholder {
+    color: #aaaaaa;
+}
+
+html.dark-mode .form-task .input-atividade:focus {
+    border-color: #970000;
+    box-shadow: 0 0 5px rgba(151, 0, 0, 0.8);
+}
+
+html.dark-mode .form-task .send-button {
+    background-color: #6e0000;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.dark-mode .form-task .send-button:hover {
+    background-color: #970000;
+}
+
+html.dark-mode #userForm{
+    background-color: #242424;
+}
+
+html.dark-mode .user-input{
+    background-color: #494949;
+}
+
+html.dark-mode .container{
+    background-color: #121212;
+}

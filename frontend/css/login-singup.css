@@ -23,56 +23,6 @@ html {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-html.dark-mode {
-    background-color: #131313;
-    color: #eee;
-}
-
-html.dark-mode .login-box {
-    background-color: #242424;
-}
-
-html.dark-mode .login-info{
-    background-color: #242424;
-}
-
-html.dark-mode .login-form{
-    background-color: #242424;
-    color: #eee;
-}
-
-html.dark-mode .login-input{
-    background-color: #494949;
-    color: #ffffff;
-}
-
-html.dark-mode a{
-    color: #0080ff;
-}
-
-
-html.dark-mode .greeting{
-    background-color: #131313;
-    color: #ffffff;
-}
-
-html.dark-mode .header-content {
-    background-color: #680000; 
-
-}
-
-html.light-mode .header-content {
-    background-color: #970000; 
-}
-
-html.dark-mode .greeting-paragraph a{
-    color: #ffffff;
-}
-
-html.dark-mode .greeting-paragraph{
-    color: #ffffff;
-}
-
 .header-content{
     background-color: #970000;
     display: flex;
@@ -133,8 +83,9 @@ html.dark-mode .greeting-paragraph{
 .login-input{
     border-radius: 5px;
     padding: 5px;
-    border: solid #7e7e7e 0.5px;
-    background-color: #ffffff;
+    border: none;
+    border-bottom: solid #7e7e7e 1px;
+    background-color: #e6e6e6;
     height: 20px;
     margin-top: 5px;
 }

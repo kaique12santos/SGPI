@@ -3,66 +3,11 @@
 }
 
 html { 
-    background-color: #f4f4f4; /* Tema claro padrão */
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html { 
     background-color: #EFDEDE; /* Tema claro padrão */
     color: #333;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-html.dark-mode {
-    background-color: #131313;
-    color: #eee;
-}
-
-html.dark-mode .signup-box {
-    background-color: #242424;
-}
-
-html.dark-mode .signup-info{
-    background-color: #242424;
-}
-
-html.dark-mode .signup-form{
-    background-color: #242424;
-    color: #eee;
-}
-
-html.dark-mode .signup-input{
-    background-color: #494949;
-    color: #ffffff;
-}
-
-html.dark-mode a{
-    color: #0080ff;
-}
-
-
-html.dark-mode .greeting{
-    background-color: #131313;
-    color: #ffffff;
-}
-
-html.dark-mode .header-content {
-    background-color: #680000; 
-
-}
-
-html.light-mode .header-content {
-    background-color: #970000; 
-}
-
-html.dark-mode .greeting-paragraph a{
-    color: #ffffff;
-}
-
-html.dark-mode .greeting-paragraph{
-    color: #ffffff;
-}
 
 body{
     width: 100%;
