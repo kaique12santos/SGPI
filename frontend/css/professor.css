@@ -3,7 +3,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #dedcdc;
     width: 100%;
 }
 
@@ -31,6 +30,8 @@
     color: #111111;
     cursor: pointer;
     font-size: 1rem;
+    margin-bottom: 4px;
+    margin-top: 4px;
 }
 
 .send-button{
@@ -49,23 +50,24 @@
 }
 
 .atividades-criadas {
-    
-    margin-top: 1rem;
-    display: flex;
-    justify-content: right;
-    flex-wrap: wrap;
-    flex-direction: column;
-    width: 100%;
+  
+  
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas de largura igual */
+  gap: 1rem; /* espaçamento entre os cards */
+  width: 90%; /* ou 100%, como preferir */
+  margin-left: auto;
+  margin-right: auto;
     
 }
 
 .atividade-card {
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
+    background-color: #f5deb3;
+    border: 1px solid #b88a36;
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
-    
+    border-left: 3px solid #922b21;
 }
 
 .textarea-tamanho{
@@ -74,7 +76,7 @@
 }
 
 .btn {
-    padding: 0.5rem 0.5rem;
+    padding: 0.3rem 0.5rem;
     font-size: 16px;
     font-weight: 500;
     border: none;
@@ -98,7 +100,7 @@
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
   }
   
-  /* Edit button - Blue */
+  
   .btn-alterar {
     background: linear-gradient(135deg, #3498db, #2980b9);
     border-left: 3px solid #1a5276;
@@ -132,12 +134,13 @@
   
   /* View button - Pink/Purple */
   .btn-Ver {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    border-left: 3px solid #6c3483;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    border-left: 3px solid #1e8449;
+    margin-left: 0;
   }
   
   .btn-Ver:hover {
-    background: linear-gradient(135deg, #8e44ad, #6c3483);
+    background: linear-gradient(135deg, #27ae60, #1e8449);
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
   }

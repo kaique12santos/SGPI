@@ -53,12 +53,13 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
             const modal = document.createElement('div');
             modal.className='div-mostrar'
             modal.innerHTML = `
-                  <h2>${titulo}</h2>
+            
+                  <h2>Titulo: ${titulo}</h2>
                   <p><strong>Descrição:</strong> ${descricao}</p>
-                  <p><strong>Semestre:</strong> ${semestre}</p>
+                  <p><strong>Semestre:</strong> ${semestre}º Semestre</p>
                   <p><strong>Prazo de Entrega:</strong> ${formatarData(prazo_entrega)}</p>
-                  <p><strong>Critérios de Avaliação:</strong> ${criterios_avaliacao}</p>
-                  <button id="fecharModal" style="margin-top: 1rem;">Fechar</button>
+                  <p><strong>Critérios de Avaliação:</strong> ${criterios_avaliacao} Pontos</p>
+                  <button id="fecharModal" class='send-button' style="margin-top: 1rem;">Fechar</button>
             `;
         
             // Evento para fechar o modal
@@ -95,8 +96,9 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
         const modal = document.createElement('div');
         modal.className = 'div-mostrar form-task';
         modal.innerHTML = `
-            <h2>Editar Atividade</h2>
+            
             <form id="editar-atividade">
+            <h2>Editar Atividade</h2>
                 <label for="edit-titulo">Nome da atividade</label>
                 <input type="text" id="edit-titulo" class="input-atividade" value="${titulo}" required>
                 
