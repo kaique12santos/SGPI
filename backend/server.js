@@ -6,7 +6,9 @@ const app = express();
 const port = 3000;
 const bcrypt = require('bcrypt');
 const frontendPath = path.join(__dirname, '..', 'frontend');
-const fs = require('fs').promises; // Para operações de arquivo assíncronas
+const fs = require('fs').promises; 
+
+
 
 app.use(cors());
 app.use(express.static(frontendPath)); 
@@ -68,43 +70,10 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// app.get('/professor/criar-atividade', async (req, res) => {
-//     try {
-//       // Verificar se o arquivo existe antes de enviá-lo (opcional)
-//       const filePath = path.join(frontendPath, 'criar-atividade.html');
-//       await fs.access(filePath);
-      
-//       // Enviar o arquivo
-//       res.sendFile(filePath);
-//     } catch (error) {
-//       console.error('Erro ao acessar a página do professor:', error);
-      
-//       // Se o arquivo não existir ou houver outro erro
-//       res.status(404).send('Página não encontrada. Erro: ' + error.message);
-//     }
-//   });
 
 //rota de criar-atividade
  app.get('/professor/criar-atividade', (req, res) => {
-    // Verifique se o usuário tem permissão de professor (implementação depende do seu sistema de autenticação)
-    // if (!req.session.user || req.session.user.role !== 'professor') {
-    //   return res.status(403).send('Acesso negado: Somente professores podem acessar esta página');
-    // }
-    
-    // Opção 1: Renderizar uma view (se estiver usando um motor de template)
-    // return res.render('professor/criar-atividade', {
-    //   title: 'Criar Nova Atividade',
-    //   professor: req.session.user
-    // });
-    
-    // Opção 2: Enviar um arquivo HTML estático
    return res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
-    
-    // Opção 3: Responder com JSON (para aplicações SPA/frontend separado)
-    // return res.json({
-    //   page: 'criar-atividade',
-    //   message: 'Use esta API para criar uma nova atividade'
-    // });
  });
  
 // Rota de cadastro
@@ -222,28 +191,138 @@ app.post('/professor/atividades', async (req, res) => {
 });
 
 
-app.get('/professor/atividades', async (req, res) => {
-
+// Função para converter LOB (CLOB) em string
+function lobToString(lob) {
+    return new Promise((resolve, reject) => {
+      if (lob === null) return resolve(null);
+  
+      let content = '';
+      lob.setEncoding('utf8');
+  
+      lob.on('data', chunk => {
+        content += chunk;
+      });
+  
+      lob.on('end', () => {
+        resolve(content);
+      });
+  
+      lob.on('error', err => {
+        reject(err);
+      });
+    });
+  }
+  // rota para visualizar os dados
+  app.get('/professor/atividades', async (req, res) => {
     const connection = await getConnection();
+  
     try {
-      const professorId = 1; // ID fixo por enquanto
+      const professorId = 1;
+  
       const result = await connection.execute(
-        `SELECT titulo, TO_CHAR(prazo_entrega, 'YYYY-MM-DD"T"HH24:MI') as prazo_entrega, semestre
+        `SELECT id,
+                titulo,
+                descricao,
+                criterios_avaliacao,
+                TO_CHAR(prazo_entrega, 'YYYY-MM-DD"T"HH24:MI') as prazo_entrega,
+                semestre
          FROM Atividades
          WHERE professor_id = :professorId
          ORDER BY data_criacao DESC`,
-        [professorId]
+        [professorId],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-      
-      res.json(result.rows.map(([titulo, prazo_entrega, semestre]) => ({
-        titulo, prazo_entrega, semestre
-      })));
+  
+      // Processar cada linha e transformar os CLOBs em string
+      const atividades = await Promise.all(result.rows.map(async row => {
+        const descricao = await lobToString(row.DESCRICAO);
+        const criterios = await lobToString(row.CRITERIOS_AVALIACAO);
+  
+        return {
+          id: row.ID,           
+          titulo: row.TITULO,
+          descricao,
+          criterios_avaliacao: criterios,
+          prazo_entrega: row.PRAZO_ENTREGA,
+          semestre: row.SEMESTRE
+        };
+      }));
+  
+      res.json(atividades);
     } catch (error) {
       console.error('Erro ao buscar atividades:', error);
       res.status(500).json({ message: 'Erro ao buscar atividades' });
     }
   });
   
+//rota para deletar atividades
+app.delete('/professor/criar-atividade/:atividadeId', async (req, res) => {
+    const connection = await getConnection();
+    
+    try {
+      // Converter explicitamente para número para evitar problemas de tipo
+      const atividadeId = parseInt(req.params.atividadeId, 10);
+      
+      // Verificar se é um número válido
+      if (isNaN(atividadeId)) {
+        return res.status(400).json({ message: 'ID de atividade inválido' });
+      }
+      
+      const professorId = 1; // Usando ID fixo como no exemplo original
+      
+      // Verificar se a atividade pertence ao professor antes de excluir
+      const verificacao = await connection.execute(
+        `SELECT COUNT(*) as count 
+         FROM Atividades 
+         WHERE id = :atividadeId AND professor_id = :professorId`,
+        [atividadeId, professorId],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      if (verificacao.rows[0].COUNT === 0) {
+        return res.status(403).json({ message: 'Atividade não encontrada ou você não tem permissão para excluí-la' });
+      }
+      
+      // Executar a exclusão
+      const result = await connection.execute(
+        `DELETE FROM Atividades 
+         WHERE id = :atividadeId AND professor_id = :professorId`,
+        [atividadeId, professorId]
+      );
+      
+      // Commit da transação
+      await connection.commit();
+      
+      if (result.rowsAffected > 0) {
+        res.json({ message: 'Atividade excluída com sucesso' });
+      } else {
+        res.status(404).json({ message: 'Não foi possível excluir a atividade' });
+      }
+    } catch (error) {
+      console.error('Erro ao excluir atividade:', error);
+      
+      // Rollback em caso de erro
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch (rollbackError) {
+          console.error('Erro ao realizar rollback:', rollbackError);
+        }
+      }
+      
+      res.status(500).json({ message: 'Erro ao excluir atividade' });
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (closeError) {
+          console.error('Erro ao fechar conexão:', closeError);
+        }
+      }
+    }
+  });
+
+
 //atualizações futuras
 //---------------------------------------------------------------------------------------------
 

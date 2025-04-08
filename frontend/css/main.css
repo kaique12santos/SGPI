@@ -355,26 +355,153 @@ html.dark-mode .form-task .send-button:hover {
     min-height: 150px;
 }
 
-.btn-alterar{
-    background-color: #3498db;
-    margin: 5px 5px 0px 0px;
-    border: 1px solid black;
+.btn {
+    padding: 0.5rem 0.5rem;
+    font-size: 16px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 5px;
-}
-.btn-alterar:hover{
-    background-color: #2980b9;
-    transform: translateY(-2px);
-}
-
-.btn-excluir{
-    background-color: #e00101;
-    cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid black;
-}
-.btn-excluir:hover{
-    background-color: #df2121;
-    transform: translateY(-2px)
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 5px;
+    color: white;
     
-}
+  }
+  
+  .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+  }
+  
+  /* Edit button - Blue */
+  .btn-alterar {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-left: 3px solid #1a5276;
+  }
+  
+  .btn-alterar:hover {
+    background: linear-gradient(135deg, #2980b9, #1a5276);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-alterar:active {
+    transform: translateY(-1px);
+  }
+  
+  /* Delete button - Red */
+  .btn-excluir {
+    background: linear-gradient(135deg, #eb0202, #c21502);
+    border-left: 3px solid #922b21;
+  }
+  
+  .btn-excluir:hover {
+    background: linear-gradient(135deg, #c21401, #970e01);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-excluir:active {
+    transform: translateY(-1px);
+  }
+  
+  /* View button - Pink/Purple */
+  .btn-Ver {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-left: 3px solid #6c3483;
+  }
+  
+  .btn-Ver:hover {
+    background: linear-gradient(135deg, #8e44ad, #6c3483);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-Ver:active {
+    transform: translateY(-1px);
+  }
+  
+  /* Button with icon */
+  .btn-icon {
+    padding-left: 1rem;
+  }
+  
+  .btn-icon svg {
+    margin-right: 0.5rem;
+  }
+  
+  /* Modal overlay styling */
+  .div-zindex {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .div-mostrar {
+    max-height: 80vh; /* altura máxima em relação à altura da janela */
+    overflow-y: auto; /* adiciona scroll vertical quando necessário */
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .div-mostrar p {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+    line-height: 1.6;
+    color: #333;
+    margin: 1rem 0;
+  }
+  
+  /* Button container for alignment */
+  .btn-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .btn {
+      padding: 0.6rem 1.2rem;
+      font-size: 14px;
+      min-width: 100px;
+    }
+    
+    .div-mostrar {
+      padding: 1.5rem;
+      max-width: 90%;
+    }
+  }
+  
