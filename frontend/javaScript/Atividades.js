@@ -1,6 +1,5 @@
 import { ativar } from "./alerts.js";
 
-
 document.addEventListener('DOMContentLoaded', () => {
     carregarAtividades();
 });
@@ -11,13 +10,18 @@ function carregarAtividades() {
         .then(atividades => {
             const container = document.createElement('div');
             container.className = 'atividades-criadas';
+            container.innerHTML = '';
 
+            // Ordena pela data de criação (mais recente primeiro)
+            atividades.sort((a, b) => new Date(b.data_criacao) - new Date(a.data_criacao));
             atividades.forEach(atividade => {
                 const div = criarCardAtividade(atividade);
                 container.appendChild(div);
             });
 
-            document.querySelector('.container').appendChild(container);
+            if (!document.querySelector('.atividades-criadas')) {
+                document.querySelector('.container').appendChild(container);
+            }
         })
         .catch(error => console.error('Erro ao carregar atividades:', error));
 }
@@ -29,8 +33,8 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
     
     div.innerHTML = `
         <strong>${titulo}</strong><br>
-        Prazo: ${formatarData(prazo_entrega)}<br>
-        Semestre: ${semestre} <br>
+        Prazo de Entrega: ${formatarData(prazo_entrega)}<br>
+        Semestre: ${semestre}º Semestre <br>
     `;
 
     const btnMostrar = document.createElement('button');
@@ -68,15 +72,120 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
         
     };
     const btnAlterar = document.createElement('button');
-    
     btnAlterar.className = 'btn-alterar btn';
     btnAlterar.innerHTML = ` <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg> Alterar`
     btnAlterar.onclick = () => {
-        // lógica para alterar atividade
-        alert(`Alterar: ${titulo}`);
+        // Criar o modal de edição
+        const overlay = document.createElement('div');
+        overlay.className = 'div-zindex';
+        
+        // Formatar a data para o campo datetime-local
+        const dataHora = new Date(prazo_entrega);
+        const ano = dataHora.getFullYear();
+        const mes = String(dataHora.getMonth() + 1).padStart(2, '0');
+        const dia = String(dataHora.getDate()).padStart(2, '0');
+        const hora = String(dataHora.getHours()).padStart(2, '0');
+        const minuto = String(dataHora.getMinutes()).padStart(2, '0');
+        const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+        
+        // Criar modal com formulário de edição
+        const modal = document.createElement('div');
+        modal.className = 'div-mostrar form-task';
+        modal.innerHTML = `
+            <h2>Editar Atividade</h2>
+            <form id="editar-atividade">
+                <label for="edit-titulo">Nome da atividade</label>
+                <input type="text" id="edit-titulo" class="input-atividade" value="${titulo}" required>
+                
+                <label for="edit-descricao">Descrição da Atividade</label>
+                <textarea id="edit-descricao" class="input-atividade textarea-tamanho" required>${descricao}</textarea>
+                
+                <label for="edit-semestre">Semestre</label>
+                <select id="edit-semestre" class="input-atividade selectSemestre" required>
+                    <option value="1" ${semestre == 1 ? 'selected' : ''}>1º Semestre</option>
+                    <option value="2" ${semestre == 2 ? 'selected' : ''}>2º Semestre</option>
+                    <option value="3" ${semestre == 3 ? 'selected' : ''}>3º Semestre</option>
+                    <option value="4" ${semestre == 4 ? 'selected' : ''}>4º Semestre</option>
+                    <option value="5" ${semestre == 5 ? 'selected' : ''}>5º Semestre</option>
+                    <option value="6" ${semestre == 6 ? 'selected' : ''}>6º Semestre</option>
+                </select>
+                
+                <label for="edit-prazo">Data de entrega</label>
+                <input type="datetime-local" id="edit-prazo" class="input-atividade" value="${dataFormatada}" required>
+                
+                <label for="edit-criterios">Pontos</label>
+                <input type="number" id="edit-criterios" class="input-atividade" value="${criterios_avaliacao}" min="1" max="100" required>
+                
+                <div class="btn-group">
+                    <button type="submit" class="send-button">Salvar</button>
+                    <button type="button" id="cancelar-edicao" class="btn-excluir">Cancelar</button>
+                </div>
+            </form>
+        `;
+        
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        
+        // Evento para cancelar edição
+        document.getElementById('cancelar-edicao').addEventListener('click', () => {
+            document.body.removeChild(overlay);
+        });
+        
+        // Evento de envio do formulário de edição
+        document.getElementById('editar-atividade').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const atividadeId = div.dataset.atividadeId;
+            
+            const dadosAtualizados = {
+                titulo: document.getElementById('edit-titulo').value,
+                descricao: document.getElementById('edit-descricao').value,
+                semestre: parseInt(document.getElementById('edit-semestre').value),
+                prazo_entrega: document.getElementById('edit-prazo').value,
+                criterios_avaliacao: document.getElementById('edit-criterios').value,
+                professor_id: 1,  // ID fixo como no exemplo original
+                projeto_id: 1     // ID fixo como no exemplo original
+            };
+            
+            try {
+                const response = await fetch(`/professor/atividades/${atividadeId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosAtualizados)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erro ao atualizar atividade');
+                }
+                
+                const data = await response.json();
+                
+                // Atualizar o card com os novos dados
+                div.querySelector('strong').textContent = dadosAtualizados.titulo;
+                div.querySelector('br').nextSibling.textContent = `Prazo: ${formatarData(dadosAtualizados.prazo_entrega)}`;
+                
+                // Atualizar as referências aos dados para os eventos de botões
+                titulo = dadosAtualizados.titulo;
+                descricao = dadosAtualizados.descricao;
+                semestre = dadosAtualizados.semestre;
+                prazo_entrega = dadosAtualizados.prazo_entrega;
+                criterios_avaliacao = dadosAtualizados.criterios_avaliacao;
+                
+                // Fechar o modal e mostrar mensagem de sucesso
+                document.body.removeChild(overlay);
+                ativar(data.message, 'sucesso', '');
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(`Falha ao atualizar atividade: ${error.message}`);
+            }
+        });
     };
 
     const btnExcluir = document.createElement('button');
@@ -185,7 +294,12 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {
         if (response.ok) {
-            ativar('Atividade criada com sucesso!', 'sucesso', '/professor/atividades');
+            ativar('Atividade criada com sucesso!', 'sucesso', '/professor/criar-atividade');
+            form.reset();
+            // Criar e adicionar lembrete abaixo do formulário
+            response.json().then(data => {
+                carregarAtividades();
+            });
         } else {
             response.json().then(data => {
                 ativar(data.message, data.success ? 'sucesso' : 'erro');
@@ -197,22 +311,3 @@ form.addEventListener('submit', (event) => {
         ativar(`Erro ${response.status}: ${response.statusText}`, 'erro', '');
     });
 });
-
-if (response.ok) {
-    ativar('Tarefa adicionada com sucesso!', 'sucesso', '');
-
-    // Criar e adicionar lembrete abaixo do formulário
-    const novaAtividade = {
-        id,
-        titulo,
-        descricao,
-        prazo_entrega,
-        semestre,
-        criterios_avaliacao
-    };
-    const lembrete = criarCardAtividade(novaAtividade);
-    document.querySelector('.atividades-criadas').prepend(lembrete);
-    
-    // Limpar formulário
-    form.reset();
-}

@@ -48,8 +48,9 @@ O <b>Sistema de Gestão de PIS</b> é uma plataforma web projetada para centrali
 ---
 ### Features
 
-- [x] Cadastro de usuário (aluno, professor, coordenador)
+- [x] Cadastro de usuário (aluno, professores,professor Orientador, coordenador do curso)
 - [x] Login e autenticação
+- [X] Criação e Gestão de Tarefas
 - [ ] Notificações automáticas por e-mail
 - [ ] Gerenciamento de grupos de alunos
 - [ ] Upload de arquivos de artefatos
