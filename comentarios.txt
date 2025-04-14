@@ -3,50 +3,6 @@ para informar o usuario das situaçoes que acontecerem
 importando do backend a resposta de message do json
 para utiliza-la no frontend na funçao ativar de alerts 
 -------------------------------------------------------------------
-possivel maneira de fazer
-
-Backend (Node.js - server.js):
-// ... suas rotas ...
-
-app.post('/cadastro', async (req, res) => {
-    // ... (lógica de cadastro)
-
-    if (result.rowsAffected > 0) {
-        res.json({ success: true, message: { texto: 'Usuário cadastrado com sucesso!', tipo: 'sucesso' } });
-    } else {
-        res.json({ success: false, message: { texto: 'Erro ao cadastrar usuário.', tipo: 'erro' } });
-    }
-
-    // ...
-});
-
-// ... outras rotas ...
-
-// Exemplo em outra rota com redirecionamento:
-
-app.post('/login', async (req, res) => {
-    // ... (lógica de login)
-
-    if (/* login bem-sucedido */) {
-      res.json({
-        success: true,
-        message: { texto: 'Login realizado com sucesso!', tipo: 'sucesso', redirectUrl: '/dashboard' }
-      });
-    } else {
-      // ...
-    }
-
-});
-
-Frontend (JavaScript do cliente):
-// ... (seu código)
-
-
-fetch('/cadastro', { /* ... */ }) // ou /login, ou qualquer rota
-.then(response => response.json())
-.then(data => {
-  ativar(data.message.texto, data.message.tipo, data.message?.redirectUrl); // o "?" previne erro se redirectUrl não existir
-});
 
 
 
@@ -68,3 +24,11 @@ function obterTipoUsuarioLogado() {
     // Substitua por sua lógica real de autenticação
     return 'aluno'; // Valores possíveis: 'aluno', 'professor', 'coordenador'
 }
+
+------------------------------------------------------------------------------------------------------------
+proximas paginas para serem criadas
+
+1- criar grupos
+2- pagina de perfil dos usuarios
+3- pagina de entrega das atividades do perfil aluno
+4- pagina de atividades entregues do perfil do professor/orientador
