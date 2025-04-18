@@ -46,11 +46,26 @@ app.post('/login', async (req, res) => {
         if (result.rows.length > 0) {
             const storedHashedPassword = result.rows[0].SENHA;
 
+            const userRole = result.rows[0].TIPO;
+
+            // Mapeie os valores do banco para os valores esperados pelo frontend
+            let roleFrontend = 'aluno'; // valor padrão
+            
+            // Adapte este mapeamento conforme os valores do seu banco
+            if (userRole === 'Professor' || userRole === 'professor') {
+                roleFrontend = 'professor';
+            } else if (userRole === 'Coordenador' || userRole === 'coordenador') {
+                roleFrontend = 'coordenador';
+            }else if (userRole === 'Professor_Orientador' || userRole === 'professor_orientador') {
+                roleFrontend='professor_orientador'
+            }
+           
+            
             // Comparando a senha digitada com a senha criptografada
             const passwordMatch = await bcrypt.compare(passwordString, storedHashedPassword);
 
             if (passwordMatch) {
-                res.json({ success: true });
+                res.json({ success: true ,userRole: roleFrontend});
             } else {
                 res.json({ success: false, message: 'Usuário ou senha incorretos.' });
             }

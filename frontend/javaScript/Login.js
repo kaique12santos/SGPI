@@ -50,6 +50,9 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
+                if (data.userRole) {
+                    localStorage.setItem('userRole', data.userRole);
+                }
                 ativar("Login realizado com sucesso!", 'sucesso', '/TelaPrincipal');
             } else {
                 

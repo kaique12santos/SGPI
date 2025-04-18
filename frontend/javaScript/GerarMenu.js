@@ -1,5 +1,4 @@
-//codigo das funçoes no menu-dropdown
-//-------------------------------------------------------------------------------------------------------
+
 // Função para gerar o menu baseado no tipo de perfil
 function gerarMenu(tipoPerfil) {
     // Elemento do menu
@@ -13,21 +12,28 @@ function gerarMenu(tipoPerfil) {
         aluno: [
             { texto: 'Artefatos entregues', link: '/aluno/artefatos' },
             { texto: 'Atividades pendentes', link: '/aluno/atividades' },
-            { texto: 'Visualizar matérias', link: '/aluno/materias' }
+            { texto: 'Visualizar Notas', link: '/aluno/notas' },
+            { texto: 'Manual do Curso', link: '/aluno/manual' }
+        ],
+        professor_orientador: [
+            { texto: 'Artefatos entregues', link: '/professor_orientador/artefatos' },
+            { texto: 'Atividades pendentes', link: '/professor_orientador/atividades' },
+            { texto: 'Gerenciar grupo', link: '/professor_orientador/grupos' },
+            { texto: 'Atividades Corrigidas', link: '/professor_orientador/corrigidas' },
+            { texto: 'Criar Atividades', link: '/professor_orientador/atividades' }
+            
+        ],
+        coordenador: [
+            { texto: 'Gerenciar usuarios', link: '/coordenador/gerenciar-usuarios' },
+            { texto: 'Relatórios de desempenho', link: '/coordenador/relatorios' },
+            { texto: 'Visualizar entregas', link: '/coordenador/entregas'}
         ],
         professor: [
             { texto: 'Artefatos entregues', link: '/professor/artefatos' },
             { texto: 'Atividades pendentes', link: '/professor/atividades' },
-            { texto: 'Gerenciar grupo', link: '/professor/grupos' },
-            { texto: 'Visualizar matérias', link: '/professor/materias' }
-        ],
-        coordenador: [
-            { texto: 'Artefatos entregues', link: '/coordenador/artefatos' },
-            { texto: 'Atividades pendentes', link: '/coordenador/atividades' },
-            { texto: 'Gerenciar grupo', link: '/coordenador/grupos' },
-            { texto: 'Gerenciar professores', link: '/coordenador/professores' },
-            { texto: 'Visualizar matérias', link: '/coordenador/materias' },
-            { texto: 'Relatórios de desempenho', link: '/coordenador/relatorios' }
+            { texto: 'Atividades Corrigidas', link: '/professor/corrigidas' },
+            { texto: 'Criar Atividades', link: '/professor/atividades' }
+            
         ]
     };
     
@@ -46,18 +52,8 @@ function gerarMenu(tipoPerfil) {
     });
 }
 
-// Exemplo de uso:
-// Supondo que temos uma variável "perfilUsuario" que contém o tipo de perfil atual
-// Esta informação normalmente viria de uma sessão do usuário ou de um sistema de autenticação
-let perfilUsuario = 'coordenador'; // Pode ser 'aluno', 'professor' ou 'coordenador'
 
-// Executar a função quando a página carregar
 document.addEventListener('DOMContentLoaded', function() {
+    const perfilUsuario = localStorage.getItem('userRole') || 'aluno'; 
     gerarMenu(perfilUsuario);
 });
-
-// Para testar diferentes perfis
-function mudarPerfil(novoPerfil) {
-    perfilUsuario = novoPerfil;
-    gerarMenu(perfilUsuario);
-}
