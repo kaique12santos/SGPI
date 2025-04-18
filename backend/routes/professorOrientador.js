@@ -4,21 +4,24 @@ const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
+// Utilitário para converter CLOB em string
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
-    if (lob === null) return resolve(null);
+    if (!lob) return resolve(null);
     let content = '';
     lob.setEncoding('utf8');
     lob.on('data', chunk => content += chunk);
     lob.on('end', () => resolve(content));
-    lob.on('error', err => reject(err));
+    lob.on('error', reject);
   });
 }
 
+// Rota para tela de criação (opcional)
 router.get('/criar-atividade', (req, res) => {
-  return res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
+  res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
 });
 
+// Criar nova atividade
 router.post('/atividades', async (req, res) => {
   const {
     titulo,
@@ -33,16 +36,16 @@ router.post('/atividades', async (req, res) => {
   const connection = await getConnection();
 
   try {
-    if (!titulo || !descricao || !professor_id || !projeto_id || !prazo_entrega || !semestre) {
-      return res.status(400).json({ success: false, message: 'Preencha todos os campos obrigatórios.' });
+    if (!titulo || !descricao || !professor_id || !prazo_entrega || !criterios_avaliacao || !semestre) {
+      return res.status(400).json({ success: false, message: 'Campos obrigatórios não preenchidos.' });
     }
 
     const result = await connection.execute(
       `INSERT INTO Atividades (
-          titulo, descricao, professor_id, projeto_id, prazo_entrega,
-          criterios_avaliacao, semestre
+        titulo, descricao, professor_id, projeto_id, prazo_entrega,
+        criterios_avaliacao, semestre
       ) VALUES (
-          :1, :2, :3, :4, TO_TIMESTAMP(:5, 'YYYY-MM-DD"T"HH24:MI'), :6, :7
+        :1, :2, :3, :4, TO_TIMESTAMP(:5, 'YYYY-MM-DD"T"HH24:MI'), :6, :7
       )`,
       [titulo, descricao, professor_id, projeto_id, prazo_entrega, criterios_avaliacao, semestre],
       { autoCommit: true }
@@ -54,6 +57,7 @@ router.post('/atividades', async (req, res) => {
         ? 'Atividade cadastrada com sucesso!'
         : 'Erro ao cadastrar atividade.'
     });
+
   } catch (error) {
     console.error('Erro ao cadastrar atividade:', error);
     res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
@@ -62,13 +66,16 @@ router.post('/atividades', async (req, res) => {
   }
 });
 
+// Listar atividades por professor_orientador
 router.get('/atividades', async (req, res) => {
   const connection = await getConnection();
+  const professorId = parseInt(req.query.professor_id, 10);
+
+  if (isNaN(professorId)) {
+    return res.status(400).json({ message: 'ID de professor inválido' });
+  }
 
   try {
-    const professorId = parseInt(req.query.professor_id, 10);
-    if (isNaN(professorId)) return res.status(400).json({ message: 'ID de professor inválido.' });
-
     const result = await connection.execute(
       `SELECT id, titulo, descricao, criterios_avaliacao,
               TO_CHAR(prazo_entrega, 'YYYY-MM-DD"T"HH24:MI') as prazo_entrega, semestre
@@ -91,27 +98,32 @@ router.get('/atividades', async (req, res) => {
     res.json(atividades);
   } catch (error) {
     console.error('Erro ao buscar atividades:', error);
-    res.status(500).json({ message: 'Erro ao buscar atividades' });
+    res.status(500).json({ message: 'Erro ao buscar atividades.' });
   } finally {
     if (connection) await connection.close();
   }
 });
 
+// Atualizar atividade
 router.put('/atividades/:atividadeId', async (req, res) => {
   const connection = await getConnection();
+  const atividadeId = parseInt(req.params.atividadeId, 10);
+  const professorId = parseInt(req.body.professor_id, 10);
+
+  if (isNaN(atividadeId) || isNaN(professorId)) {
+    return res.status(400).json({ message: 'ID inválido' });
+  }
 
   try {
-    const atividadeId = parseInt(req.params.atividadeId, 10);
-    const professorId = parseInt(req.body.professor_id, 10);
-
-    if (isNaN(atividadeId) || isNaN(professorId)) {
-      return res.status(400).json({ message: 'ID inválido.' });
-    }
-
-    const { titulo, descricao, prazo_entrega, criterios_avaliacao, semestre } = req.body;
+    const {
+      titulo, descricao, prazo_entrega,
+      criterios_avaliacao, semestre
+    } = req.body;
 
     const verificacao = await connection.execute(
-      `SELECT COUNT(*) as count FROM Atividades WHERE id = :atividadeId AND professor_id = :professorId`,
+      `SELECT COUNT(*) as count
+       FROM Atividades
+       WHERE id = :atividadeId AND professor_id = :professorId`,
       [atividadeId, professorId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -136,8 +148,9 @@ router.put('/atividades/:atividadeId', async (req, res) => {
     res.json({
       message: result.rowsAffected > 0
         ? 'Atividade atualizada com sucesso!'
-        : 'Não foi possível atualizar a atividade'
+        : 'Erro ao atualizar atividade.'
     });
+
   } catch (error) {
     console.error('Erro ao atualizar atividade:', error);
     res.status(500).json({ message: 'Erro no servidor.', error: error.message });
@@ -146,19 +159,20 @@ router.put('/atividades/:atividadeId', async (req, res) => {
   }
 });
 
+// Excluir atividade
 router.delete('/atividades/:atividadeId', async (req, res) => {
   const connection = await getConnection();
+  const atividadeId = parseInt(req.params.atividadeId, 10);
+  const professorId = parseInt(req.query.professor_id, 10);
+
+  if (isNaN(atividadeId) || isNaN(professorId)) {
+    return res.status(400).json({ message: 'IDs inválidos.' });
+  }
 
   try {
-    const atividadeId = parseInt(req.params.atividadeId, 10);
-    const professorId = parseInt(req.query.professor_id || req.body.professor_id, 10);
-
-    if (isNaN(atividadeId) || isNaN(professorId)) {
-      return res.status(400).json({ message: 'IDs inválidos.' });
-    }
-
     const verificacao = await connection.execute(
-      `SELECT COUNT(*) as count FROM Atividades WHERE id = :atividadeId AND professor_id = :professorId`,
+      `SELECT COUNT(*) as count FROM Atividades
+       WHERE id = :atividadeId AND professor_id = :professorId`,
       [atividadeId, professorId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -168,7 +182,8 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
     }
 
     const result = await connection.execute(
-      `DELETE FROM Atividades WHERE id = :atividadeId AND professor_id = :professorId`,
+      `DELETE FROM Atividades
+       WHERE id = :atividadeId AND professor_id = :professorId`,
       [atividadeId, professorId],
       { autoCommit: true }
     );
@@ -176,8 +191,9 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
     res.json({
       message: result.rowsAffected > 0
         ? 'Atividade excluída com sucesso'
-        : 'Erro ao excluir a atividade'
+        : 'Erro ao excluir atividade'
     });
+
   } catch (error) {
     console.error('Erro ao excluir atividade:', error);
     res.status(500).json({ message: 'Erro ao excluir atividade', error: error.message });

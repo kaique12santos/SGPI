@@ -10,7 +10,7 @@ function carregarAtividades() {
         if (!professor_id || isNaN(professor_id)) {
             console.error("ID do professor não encontrado no localStorage.");
         }
-    fetch(`/professor/atividades?professor_id=${professor_id}`)
+    fetch(`/professor_orientador/atividades?professor_id=${professor_id}`)
         .then(response => response.json())
         .then(atividades => {
             const container = document.createElement('div');
@@ -158,7 +158,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
             };
             
             try {
-                const response = await fetch(`/professor/atividades/${atividadeId}`, {
+                const response = await fetch(`/professor_orientador/atividades/${atividadeId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -217,7 +217,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
             }
             
             // Fazer requisição DELETE para o servidor
-            const response = await fetch(`/professor/criar-atividade/${atividadeId}`, {
+            const response = await fetch(`/professor_orientador/criar-atividade/${atividadeId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -285,7 +285,7 @@ form.addEventListener('submit', (event) => {
     }
 
     // Envio para o back-end
-    fetch('/professor/atividades', {
+    fetch('/professor_orientador/atividades', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -302,7 +302,7 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {
         if (response.ok) {
-            ativar('Atividade criada com sucesso!', 'sucesso', '/professor/criar-atividade');
+            ativar('Atividade criada com sucesso!', 'sucesso', '/professor_orientador/criar-atividade');
             form.reset();
             // Criar e adicionar lembrete abaixo do formulário
             response.json().then(data => {

@@ -10,7 +10,7 @@ const fs = require('fs').promises;
 
 // Importar as rotas
 const professor = require('./routes/professor.js')
-
+const professorOrientador = require('./routes/professorOrientador.js');
 
 app.use(cors());
 app.use(express.static(frontendPath)); 
@@ -24,6 +24,7 @@ app.get('/', (req, res) => {
 
 // Usar as rotas importadas
 app.use('/professor', professor);
+app.use('/professor_orientador', professorOrientador);
 
 
 
@@ -65,7 +66,7 @@ app.post('/login', async (req, res) => {
             const passwordMatch = await bcrypt.compare(passwordString, storedHashedPassword);
 
             if (passwordMatch) {
-                res.json({ success: true ,userRole: roleFrontend});
+                res.json({ success: true ,userRole: roleFrontend,id: result.rows[0].ID});
             } else {
                 res.json({ success: false, message: 'Usuário ou senha incorretos.' });
             }

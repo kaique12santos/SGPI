@@ -52,6 +52,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
             if (data.success) {
                 if (data.userRole) {
                     localStorage.setItem('userRole', data.userRole);
+                    localStorage.setItem('professorId', data.id);
                 }
                 ativar("Login realizado com sucesso!", 'sucesso', '/TelaPrincipal');
             } else {
