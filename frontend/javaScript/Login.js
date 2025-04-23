@@ -54,6 +54,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
                     localStorage.setItem('userRole', data.userRole);
                     localStorage.setItem('professorId', data.id);
                 }
+                console.log(data.id)
                 ativar("Login realizado com sucesso!", 'sucesso', '/TelaPrincipal');
             } else {
                 

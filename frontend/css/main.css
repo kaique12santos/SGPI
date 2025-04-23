@@ -34,12 +34,17 @@ body{
 }
 
 #user-profile-pic{
-    width: 90px;
-    padding: 0;
-    margin: 0;
+    text-align: center;
+    margin: 10px 0;
     background-color: transparent;
-    border: transparent;
-    cursor: pointer;
+    border: none;
+}
+#user-profile-pic a img{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    
 }
 
 .search-box{
@@ -50,6 +55,11 @@ body{
     height: 30px;
 }
 
+.espaco{
+    width: 20%;
+    height: 20%;
+   
+}
 .wrapper {
     display: flex;
     justify-content: space-between; 
@@ -131,6 +141,8 @@ body{
     background-color: black;
     padding-left: 1%;
     border-bottom: 1px solid #ffffff;
+    width: 100%;
+    color: #f1f1f1;
 }
 
 .div_theme{

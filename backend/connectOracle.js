@@ -5,6 +5,7 @@ const config = {
   user: process.env.USER,
   password: process.env.PASSWORD,
   connectString: process.env.CONNECTSTRING,
+  
 };
 
 async function getConnection() {

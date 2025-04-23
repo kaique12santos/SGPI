@@ -11,6 +11,8 @@ const fs = require('fs').promises;
 // Importar as rotas
 const professor = require('./routes/professor.js')
 const professorOrientador = require('./routes/professorOrientador.js');
+const atualizarPerfil = require('./routes/atualizarPerfil.js');
+const grupos = require('./routes/grupos.js');
 
 app.use(cors());
 app.use(express.static(frontendPath)); 
@@ -22,9 +24,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
+app.use('/imagens/perfil', express.static(path.join(__dirname, '..', 'frontend', 'imagens', 'perfil')));
+
+
 // Usar as rotas importadas
 app.use('/professor', professor);
 app.use('/professor_orientador', professorOrientador);
+app.use('/perfil', atualizarPerfil);
+app.use('/',grupos);
 
 
 

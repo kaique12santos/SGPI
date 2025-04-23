@@ -4,28 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>perfil de usuario</title>
+    <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="stylesheet" href="css/perfil.css">
+    <link rel="stylesheet" href="css/alerts.css">
 </head>
 <header>
     <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
         <img src="" alt="" class="logo-image">
         <h1>SGPI</h1>
         <input type="text" placeholder="Pesquisar..." class="search-box">
-        <p>Olá, Usuário!</p>
-        <button id="user-profile-pic" class="profile-pic" >
-            <a href="/perfil.html">
-            <img src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+        <div class="espaco"></div>
+        <div id="user-profile-pic" class="profile-pic " >
+            <a href="/TelaPrincipal" >
+            <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
             </a>
-        </button>
-        <button id="logout-button" class="logout-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-            </svg>
-            Sair
-        </button>
+        </div>
+       
     </div>
 </header>
 <body>
@@ -53,7 +49,7 @@
     <div class="perfil-container">
         <h2>Meu Perfil</h2>
         <div class="profile-preview">
-          <img id="preview-foto" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Foto de Perfil">
+          <img id="preview-foto" class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Foto de Perfil">
         </div>
     
         <form id="form-perfil">
@@ -66,15 +62,26 @@
             <label for="senha">Nova Senha:</label>
             <input type="password" id="senha" name="senha">
           </div>
+          <div class="form-group">
+            <label for="confirmar-senha">Digite a senha novamente</label>
+            <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required>
+            <span id="passwordError"></span> 
+        </div>
     
           <div class="form-group">
             <label for="fotoPerfil">Foto de Perfil:</label>
             <input type="file" id="fotoPerfil" accept="image/*">
           </div>
     
-          <button type="submit" class="salvar-btn">Salvar Alterações</button>
+          <button type="button" class="salvar-btn">Salvar Alterações</button>
         </form>
       </div>
     </div>
+
+    <script defer src="./javaScript/efeitoMenu.js"></script>
+    <script defer src="./javaScript/dark_mode.js"></script>
+    <script defer src="./javaScript/GerarMenu.js"></script>
+    <script type="module" src="./javaScript/perfil.js"></script>
+    <script src="./javaScript/imagemPerfil.js"></script>
 </body>
 </html>

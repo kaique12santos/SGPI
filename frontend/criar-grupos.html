@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Criar Grupo - SGPI</title>
+  <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dark-mode.css">
+  <link rel="stylesheet" href="css/perfil.css">
+  <link rel="stylesheet" href="css/alerts.css">
+  <link rel="stylesheet" href="css/grupos.css">
+</head>
+<header>
+    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+        <img src="" alt="" class="logo-image">
+        <h1>SGPI</h1>
+        <input type="text" placeholder="Pesquisar..." class="search-box">
+        <div class="espaco"></div>
+        <div id="user-profile-pic" class="profile-pic " >
+            <a href="/TelaPrincipal" >
+            <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+            </a>
+        </div>
+       
+    </div>
+</header>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div class="menu-dropdown"> <!--Div feita para o menu, não sei ainda como fazer, favor não modificar-->
+                <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                    </svg>
+                </button>
+                <div id="menu-itens" class="menu-content">
+                    <a href=""></a>
+                    <a href=""></a>
+                    <a href=""></a>
+                    <a href=""></a>
+                </div>
+            </div>
+            <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
+                <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
+            </button>
+            </div>
+            </div>
+    <div class="page-name">
+        <h2>Criar Grupos</h2>
+    </div>
+    <div class="container-grupo">
+        <form id="formGrupo" class="formulario-grupo">
+        <label for="nomeGrupo" class="label-form">Nome do Grupo:</label>
+        <input type="text" id="nomeGrupo" name="nomeGrupo" class="input-form" placeholder="Ex: Grupo 2" required>
+    
+        <label for="tema" class="label-form">Tema:</label>
+        <textarea id="tema" name="tema" class="textarea-form" placeholder="Descreva o tema do projeto..." required></textarea>
+    
+        <label for="semestre" class="label-form">Semestre:</label>
+        <select id="semestre" name="semestre" class="select-form" required>
+            <option value="0">Selecione</option>
+            <option value="1">1º Semestre</option>
+            <option value="2">2º Semestre</option>
+            <option value="3">3º Semestre</option>
+            <option value="4">4º Semestre</option>
+            <option value="5">5º Semestre</option>
+            <option value="6">6º Semestre</option>
+        </select>
+    
+        <label for="alunos" class="label-form">Alunos (selecione múltiplos):</label>
+        <select id="alunos" name="alunos" class="select-form" multiple required>
+
+            <option disabled>Selecione um semestre primeiro</option>
+        </select>
+    
+        <button type="submit" class="botao-form">Criar Grupo</button>
+        </form>
+    </div>
+
+ 
+
+    <script defer src="./javaScript/efeitoMenu.js"></script>
+    <script defer src="./javaScript/dark_mode.js"></script>
+    <script defer src="./javaScript/GerarMenu.js"></script>
+    <script src="./javaScript/imagemPerfil.js"></script>
+    <script type="module" defer src="./javaScript/gerenciarGrupos.js"></script>
+
+</body>
+</html>
