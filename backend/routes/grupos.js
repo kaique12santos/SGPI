@@ -50,24 +50,25 @@ router.post('/grupos', async (req, res) => {
       { autoCommit: false }
     );
 
-    const grupoId = resultGrupo.outBinds[0];
+    const grupoId = resultGrupo.outBinds[0][0];
+    await connection.commit();
 
-    for (const alunoIdRaw of alunos) {
-      const alunoId = parseInt(alunoIdRaw);
-      if (isNaN(alunoId)) {
-        throw new Error(`ID de aluno inválido: ${alunoIdRaw}`);
-      }
-    
-      await connection.execute(
-        `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel) 
-         VALUES (:usuario_id, :grupo_id, :papel)`,
-        {
-          usuario_id: { val: alunoId, type: oracledb.NUMBER },
-          grupo_id:   { val: grupoId, type: oracledb.NUMBER },
-          papel:      { val: 'Membro', type: oracledb.STRING }
-        }
-      );
-    }
+    // Chamar procedure para adicionar alunos
+    const alunosCSV = alunos.join(','); // Junta os IDs em string separada por vírgula
+
+    await connection.execute(
+      `BEGIN
+         adicionar_alunos_grupo2(:grupoId, :alunosCSV);
+       END;`,
+      {
+        grupoId: grupoId,
+        alunosCSV: alunosCSV
+      },
+      { autoCommit: true }
+    );
+
+    res.status(201).json({ success: true, message: 'Grupo criado com sucesso!' });
+
   } catch (error) {
     try {
       await connection.rollback();
@@ -329,7 +330,17 @@ router.get('/alunos/semestre/:semestre', async (req, res) => {
 
   try {
     const result = await connection.execute(
-      `SELECT id, nome FROM Usuarios WHERE semestre = :semestre AND tipo = 'Aluno'`,
+      `SELECT u.id, u.nome, u.email 
+      FROM Usuarios u
+      WHERE u.semestre = :semestre 
+      AND u.tipo = 'Aluno'
+      AND u.ativo = 1
+      AND NOT EXISTS (
+          SELECT 1 
+          FROM Usuario_Grupo ug 
+          WHERE ug.usuario_id = u.id
+      )
+      ORDER BY u.nome`,
       [semestre],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -374,6 +385,46 @@ router.delete('/grupos/:grupoId/membros/:usuarioId', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Erro ao remover membro do grupo.', 
+      error: error.message 
+    });
+  } finally {
+    if (connection) await connection.close();
+  }
+});
+
+router.delete('/grupos/:id', async (req, res) => {
+  const connection = await getConnection();
+  const grupoId = parseInt(req.params.id, 10);
+
+  if (isNaN(grupoId)) {
+    return res.status(400).json({ message: 'ID de grupo inválido.' });
+  }
+
+  try {
+    // Remover vínculos primeiro
+    await connection.execute(
+      `DELETE FROM Usuario_Grupo WHERE grupo_id = :grupoId`,
+      [grupoId],
+      { autoCommit: false }
+    );
+
+    // Remover o grupo
+    const result = await connection.execute(
+      `DELETE FROM Grupos WHERE id = :grupoId`,
+      [grupoId],
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected === 0) {
+      return res.status(404).json({ message: 'Grupo não encontrado.' });
+    }
+
+    res.json({ success: true, message: 'Grupo excluído com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao excluir grupo:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erro ao excluir grupo.', 
       error: error.message 
     });
   } finally {
