@@ -6,7 +6,7 @@ let userFoto = null;
 
 async function obterDadosUsuario() {
     try {
-        userId = parseInt(localStorage.getItem('professorId'));
+        userId = parseInt(localStorage.getItem('usuarioId'));
 
         if (!userId) {
             ativar('Usuário não autenticado.', 'erro', '/TelaPrincipal.html');

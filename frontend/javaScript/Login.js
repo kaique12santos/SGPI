@@ -49,12 +49,16 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     
         if (response.ok) {
             const data = await response.json();
+            console.log('Dados recebidos do login:', data);
             if (data.success) {
-                if (data.userRole) {
-                    localStorage.setItem('userRole', data.userRole);
-                    localStorage.setItem('professorId', data.id);
-                }
-                console.log(data.id)
+                console.log('Login bem-sucedido:', data);
+            
+                console.log('Salvando no localStorage: id=', data.id, 'role=', data.userRole);
+                // Salvar sempre o ID com chave padrão
+                localStorage.setItem('usuarioId', data.id);
+                localStorage.setItem('userRole', data.userRole);
+            
+                // Redirecionar para página principal
                 ativar("Login realizado com sucesso!", 'sucesso', '/TelaPrincipal');
             } else {
                 

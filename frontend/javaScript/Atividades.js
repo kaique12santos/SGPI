@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function carregarAtividades() {
-    const professor_id = parseInt(localStorage.getItem('professorId'));
+    const professor_id = parseInt(localStorage.getItem('usuarioId'));
+
         if (!professor_id || isNaN(professor_id)) {
             console.error("ID do professor não encontrado no localStorage.");
         }
@@ -133,17 +134,20 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
             e.preventDefault();
             
             const atividadeId = div.dataset.atividadeId;
+            const professorId = parseInt(localStorage.getItem('usuarioId'));
+            console.log("Professor ID:", professorId);
             
             const dadosAtualizados = {
                 titulo: document.getElementById('edit-titulo').value,
                 descricao: document.getElementById('edit-descricao').value,
                 semestre: parseInt(document.getElementById('edit-semestre').value),
                 prazo_entrega: document.getElementById('edit-prazo').value,
-                criterios_avaliacao: document.getElementById('edit-criterios').value,
-                professor_id: parseInt(localStorage.getItem('professorId')), 
+                criterios_avaliacao: parseInt(document.getElementById('edit-criterios').value, 10),
+                professor_id: professorId,
                 projeto_id: 1     
             };
-            
+            console.log(dadosAtualizados)
+            console.log("✔️ professor_id está definido corretamente:", dadosAtualizados.professor_id);
             try {
                 const response = await fetch(`/professor/atividades/${atividadeId}`, {
                     method: 'PUT',
@@ -168,7 +172,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 semestre = dadosAtualizados.semestre;
                 prazo_entrega = dadosAtualizados.prazo_entrega;
                 criterios_avaliacao = dadosAtualizados.criterios_avaliacao;
-                professor_id= dadosAtualizados.professor_id;
+                
                 
                 document.body.removeChild(overlay);
                 ativar(data.message, 'sucesso', '');
@@ -190,16 +194,17 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
     btnExcluir.onclick = async () => {
         try {
             const atividadeId = parseInt(div.dataset.atividadeId, 10);
+            const professorId = parseInt(localStorage.getItem('usuarioId'), 10);
             console.log("ID da atividade a ser excluída:", atividadeId); 
-            if (isNaN(atividadeId)) {
-                throw new Error('ID da atividade inválido');
+            if (isNaN(atividadeId) || isNaN(professorId)) {
+                throw new Error('ID da atividade ou professor inválido');
             }
             
             if (!confirm('Tem certeza que deseja excluir esta atividade?')) {
-                return; 
+                return;
             }
             
-            const response = await fetch(`/professor/criar-atividade/${atividadeId}`, {
+            const response = await fetch(`/professor/atividades/${atividadeId}?professor_id=${professorId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -246,9 +251,7 @@ form.addEventListener('submit', (event) => {
     const semestre = parseInt(document.getElementById('semestre').value);
     const prazo_entrega = document.getElementById('dataEntrega').value;
     const criterios_avaliacao = document.getElementById('pontos').value;
-    const professor_id = parseInt(localStorage.getItem('professorId'));
-
-   
+    const professor_id = parseInt(localStorage.getItem('usuarioId'));
     const projeto_id = 1;
 
     document.getElementById('semestreError').textContent = '';

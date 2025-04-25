@@ -74,6 +74,10 @@ app.post('/login', async (req, res) => {
 
             if (passwordMatch) {
                 res.json({ success: true ,userRole: roleFrontend,id: result.rows[0].ID});
+                console.log('LOGIN SUCESSO:', {
+                    id: result.rows[0].ID,
+                    role: roleFrontend
+                  });
             } else {
                 res.json({ success: false, message: 'Usuário ou senha incorretos.' });
             }

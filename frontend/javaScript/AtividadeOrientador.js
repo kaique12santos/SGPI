@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function carregarAtividades() {
-    const professor_id = parseInt(localStorage.getItem('professorId'));
+    const professor_id = parseInt(localStorage.getItem('usuarioId'));
         if (!professor_id || isNaN(professor_id)) {
             console.error("ID do professor não encontrado no localStorage.");
         }
@@ -136,18 +136,22 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
             e.preventDefault();
             
             const atividadeId = div.dataset.atividadeId;
+            const professorId = parseInt(localStorage.getItem('usuarioId'));
             
+
+            console.log("Professor_orientador ID:", professorId);
             const dadosAtualizados = {
                 titulo: document.getElementById('edit-titulo').value,
                 descricao: document.getElementById('edit-descricao').value,
                 semestre: parseInt(document.getElementById('edit-semestre').value),
                 prazo_entrega: document.getElementById('edit-prazo').value,
                 criterios_avaliacao: document.getElementById('edit-criterios').value,
-                professor_id: parseInt(localStorage.getItem('professorId')), 
-                projeto_id: 1     // ID fixo como no exemplo original
+                professor_id: professorId, 
+                projeto_id: 1     
             };
             
             try {
+                
                 const response = await fetch(`/professor_orientador/atividades/${atividadeId}`, {
                     method: 'PUT',
                     headers: {
@@ -156,12 +160,12 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                     body: JSON.stringify(dadosAtualizados)
                 });
                 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Erro ao atualizar atividade');
-                }
-                
                 const data = await response.json();
+
+                if (!response.ok || data.message === 'Erro ao atualizar atividade.') {
+                    throw new Error(data.message || 'Erro ao atualizar atividade');
+                }
+
                 
                 // Atualizar o card com os novos dados
                 div.querySelector('strong').textContent = dadosAtualizados.titulo;
@@ -207,7 +211,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
             }
             
             // Fazer requisição DELETE para o servidor
-            const response = await fetch(`/professor_orientador/criar-atividade/${atividadeId}`, {
+            const response = await fetch(`/professor_orientador/atividades/${atividadeId}?professor_id=${professorId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -256,7 +260,8 @@ form.addEventListener('submit', (event) => {
     const semestre = parseInt(document.getElementById('semestre').value);
     const prazo_entrega = document.getElementById('dataEntrega').value;
     const criterios_avaliacao = document.getElementById('pontos').value;
-    const professor_id = parseInt(localStorage.getItem('professorId'));
+    const professor_id = parseInt(localStorage.getItem('usuarioId'));
+
 
    
     const projeto_id = 1;

@@ -103,6 +103,9 @@ router.put('/atividades/:atividadeId', async (req, res) => {
   try {
     const atividadeId = parseInt(req.params.atividadeId, 10);
     const professorId = parseInt(req.body.professor_id, 10);
+    console.log('📥 Dados recebidos no body:', req.body);
+    console.log('🆔 atividadeId:', atividadeId);
+    console.log('🧑 professorId:', professorId);
 
     if (isNaN(atividadeId) || isNaN(professorId)) {
       return res.status(400).json({ message: 'ID inválido.' });
@@ -152,6 +155,10 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
   try {
     const atividadeId = parseInt(req.params.atividadeId, 10);
     const professorId = parseInt(req.query.professor_id || req.body.professor_id, 10);
+
+    console.log('📥 Dados recebidos no body:', req.body);
+    console.log('🆔 atividadeId:', atividadeId);
+    console.log('🧑 professorId:', professorId);
 
     if (isNaN(atividadeId) || isNaN(professorId)) {
       return res.status(400).json({ message: 'IDs inválidos.' });

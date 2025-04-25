@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const profileImages = document.querySelectorAll('.profile-image'); 
-    const userId = localStorage.getItem('professorId');
+    const userId = localStorage.getItem('usuarioId');
 
     profileImages.forEach(imgElement => { 
         if (userId && imgElement) {
