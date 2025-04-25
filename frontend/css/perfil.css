@@ -46,7 +46,7 @@
   .salvar-btn {
     width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #970000;
     color: white;
     font-weight: bold;
     border: none;
@@ -55,5 +55,5 @@
   }
 
   .salvar-btn:hover {
-    background-color: #3e8e41;
+    background-color: #ca0000;
   }
