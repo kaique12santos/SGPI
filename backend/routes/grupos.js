@@ -226,7 +226,7 @@ router.get('/grupos/:id/membros', async (req, res) => {
 router.put('/grupos/:id', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.id, 10);
-  const { nome, descricao, semestre } = req.body;
+  const { nome, descricao, semestre, alunos } = req.body;
 
   if (isNaN(grupoId)) {
     return res.status(400).json({ message: 'ID de grupo inválido' });
@@ -252,9 +252,28 @@ router.put('/grupos/:id', async (req, res) => {
            semestre = :semestre,
            data_atualizacao = CURRENT_TIMESTAMP
        WHERE id = :grupoId`,
-      [nome, descricao, semestre, grupoId],
-      { autoCommit: true }
+      [nome, descricao, semestre, grupoId]
     );
+    if (Array.isArray(alunos)) {
+      // Remover todos os membros anteriores
+      await connection.execute(
+        `DELETE FROM Usuario_Grupo WHERE grupo_id = :grupoId`,
+        [grupoId]
+      );
+
+      for (const alunoId of alunos) {
+        await connection.execute(
+          `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel)
+           VALUES (:usuarioId, :grupoId, 'Membro')`,
+          {
+            usuarioId: alunoId,
+            grupoId: grupoId
+          }
+        );
+      }
+    }
+
+    await connection.commit();
 
     res.json({
       success: result.rowsAffected > 0,

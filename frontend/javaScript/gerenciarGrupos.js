@@ -1,10 +1,8 @@
 import { ativar } from "./alerts.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar o gerenciamento de grupos
     inicializarGerenciamentoGrupos();
     
-    // Configurar o form de criação de grupos
     const formGrupo = document.getElementById('formGrupo');
     if (formGrupo) {
         formGrupo.addEventListener('submit', criarNovoGrupo);
@@ -12,20 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function inicializarGerenciamentoGrupos() {
-    // Criar container para listar grupos existentes
     const containerGrupo = document.querySelector('.container-grupo');
     
     if (!containerGrupo) return;
     
-    // Criar seção para listar grupos
     const listagemSection = document.createElement('div');
     listagemSection.className = 'grupos-existentes';
     listagemSection.innerHTML = '<h3>Grupos Existentes</h3>';
     
-    // Adicionar após o formulário
     containerGrupo.insertAdjacentElement('afterend', listagemSection);
     
-    // Carregar a lista de grupos
     carregarGrupos();
 }
 
@@ -50,7 +44,6 @@ function renderizarGrupos(grupos) {
     
     if (!container) return;
     
-    // Limpar conteúdo existente
     const titulo = container.querySelector('h3');
     container.innerHTML = '';
     container.appendChild(titulo);
@@ -62,7 +55,6 @@ function renderizarGrupos(grupos) {
         return;
     }
     
-    // Criar cards para cada grupo
     grupos.forEach(grupo => {
         const card = criarCardGrupo(grupo);
         container.appendChild(card);
@@ -79,7 +71,6 @@ function criarCardGrupo({ id, nome, descricao, semestre }) {
         <p>Semestre: ${semestre}</p>
     `;
     
-    // Botão Ver Detalhes
     const btnVerDetalhes = document.createElement('button');
     btnVerDetalhes.className = 'btn-Ver btn';
     btnVerDetalhes.innerHTML = `
@@ -91,7 +82,6 @@ function criarCardGrupo({ id, nome, descricao, semestre }) {
     `;
     btnVerDetalhes.onclick = () => exibirDetalhesGrupo(id);
     
-    // Botão Editar
     const btnEditar = document.createElement('button');
     btnEditar.className = 'btn-alterar btn';
     btnEditar.innerHTML = `
@@ -127,7 +117,6 @@ function criarCardGrupo({ id, nome, descricao, semestre }) {
 
 async function exibirDetalhesGrupo(grupoId) {
     try {
-        // Buscar informações detalhadas do grupo
         const response = await fetch(`/grupos/${grupoId}`);
         
         if (!response.ok) {
@@ -136,18 +125,15 @@ async function exibirDetalhesGrupo(grupoId) {
         
         const grupo = await response.json();
         
-        // Buscar membros do grupo
         const membrosResponse = await fetch(`/grupos/${grupoId}/membros`);
         const membros = await membrosResponse.json();
         
-        // Criar overlay e modal
         const overlay = document.createElement('div');
         overlay.className = 'div-zindex';
         
         const modal = document.createElement('div');
         modal.className = 'div-mostrar';
         
-        // Formatar lista de membros
         let membrosHTML = '<p><strong>Membros:</strong></p><ul>';
         if (membros && membros.length > 0) {
             membros.forEach(membro => {
@@ -167,7 +153,6 @@ async function exibirDetalhesGrupo(grupoId) {
             <button id="fecharModal" class='send-button' style="margin-top: 1rem;">Fechar</button>
         `;
         
-        // Evento para fechar o modal
         modal.querySelector('#fecharModal').onclick = () => {
             document.body.removeChild(overlay);
         };
@@ -204,10 +189,10 @@ async function abrirModalEdicao({ id, nome, descricao, semestre }) {
                 ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${semestre === String(n) ? 'selected' : ''}>${n}º Semestre</option>`).join('')}
             </select>
 
-            <label for="alunos" class="label-form">Alunos (selecione múltiplos):</label>
-            <select id="alunos" name="alunos" class="select-form" multiple required>
-                <option disabled>Selecione um semestre primeiro</option>
-            </select>
+            <label class="label-form">Alunos (selecione até 5):</label>
+            <div id="alunos-edicao-container" class="checkbox-container">
+                <p style="color: gray;">Selecione um semestre primeiro</p>
+            </div>
 
             <div class="btn-group">
                 <button type="submit" class="send-button">Salvar</button>
@@ -231,13 +216,13 @@ async function abrirModalEdicao({ id, nome, descricao, semestre }) {
     }
 
     if (semestre && semestre !== '0') {
-        await listarAlunosPorSemestre(alunosSelect, semestre, membroAtuais);
+        await listarAlunosComCheckboxes(semestre, membroAtuais, 'alunos-edicao-container');
     }
 
     semestreSelect.addEventListener('change', () => {
         const semestreSelecionado = semestreSelect.value;
         if (semestreSelecionado !== "0") {
-            listarAlunosPorSemestre(alunosSelect, semestreSelecionado, membroAtuais);
+            listarAlunosComCheckboxes(semestreSelecionado, membroAtuais, 'alunos-edicao-container');
         } else {
             alunosSelect.innerHTML = '<option disabled>Selecione um semestre primeiro</option>';
         }
@@ -250,7 +235,9 @@ async function abrirModalEdicao({ id, nome, descricao, semestre }) {
     modal.querySelector('#editar-grupo').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const alunosSelecionados = Array.from(alunosSelect.selectedOptions).map(option => option.value);
+        const checkboxes = document.querySelectorAll('#alunos-edicao-container input[type="checkbox"]:checked');
+        const alunosSelecionados = Array.from(checkboxes).map(cb => cb.value);
+
 
         const dadosAtualizados = {
             nome: modal.querySelector('#edit-nome').value,
@@ -287,74 +274,98 @@ async function carregarAlunosPorSemestre(semestre) {
     try {
         const response = await fetch(`/alunos/semestre/${semestre}`);
         if (!response.ok) throw new Error('Erro ao buscar alunos');
-        
-        const alunos = await response.json();
-        const selectAlunos = document.getElementById('alunos');
 
-        // Limpar opções atuais
-        selectAlunos.innerHTML = '';
+        const alunos = await response.json();
+        const container = document.getElementById('alunos-container');
+        container.innerHTML = ''; // limpa
 
         if (alunos.length === 0) {
-            const opt = document.createElement('option');
-            opt.textContent = 'Nenhum aluno encontrado';
-            opt.disabled = true;
-            selectAlunos.appendChild(opt);
+            container.innerHTML = '<p>Nenhum aluno encontrado</p>';
             return;
         }
 
-        alunos.forEach(aluno => {
-            const option = document.createElement('option');
-            option.value = aluno.ID; // ID do aluno
-            option.textContent = aluno.NOME;
-            selectAlunos.appendChild(option);
+        alunos.forEach((aluno, index) => {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'alunosSelecionados';
+            checkbox.value = aluno.ID;
+            checkbox.id = `aluno-${index}`;
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = aluno.NOME;
+
+            const div = document.createElement('div');
+            div.classList.add('aluno-checkbox');
+            div.appendChild(checkbox);
+            div.appendChild(label);
+
+            container.appendChild(div);
         });
 
-        
+        limitarSelecaoDeCheckboxes(5);
     } catch (error) {
         console.error('Erro ao carregar alunos:', error);
     }
 }
 
-async function listarAlunosPorSemestre(selectAlvo, semestre, membrosAtuais = []) {
+async function listarAlunosComCheckboxes(semestre, membrosAtuais = [], containerId = 'alunos-edicao-container') {
     try {
         const response = await fetch(`/alunos/semestre/${semestre}`);
         if (!response.ok) throw new Error('Erro ao buscar alunos');
 
         const alunos = await response.json();
-        selectAlvo.innerHTML = '';
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
 
-        if (alunos.length === 0) {
-            const opt = document.createElement('option');
-            opt.textContent = 'Nenhum aluno encontrado';
-            opt.disabled = true;
-            selectAlvo.appendChild(opt);
-            return;
-        }
+        const idsExistentes = alunos.map(a => String(a.ID));
 
-        alunos.forEach(aluno => {
-            const option = document.createElement('option');
-            option.value = aluno.ID;
-            option.textContent = aluno.NOME;
-            selectAlvo.appendChild(option);
+        alunos.forEach((aluno, index) => {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'alunosSelecionados';
+            checkbox.value = aluno.ID;
+            checkbox.id = `${containerId}-aluno-${index}`;
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = aluno.NOME;
+
+            const div = document.createElement('div');
+            div.classList.add('aluno-checkbox');
+            div.appendChild(checkbox);
+            div.appendChild(label);
+
+            container.appendChild(div);
         });
 
-        membrosAtuais.forEach(membro => {
-            const jaExiste = Array.from(selectAlvo.options).some(opt => opt.value == membro.id);
-            if (!jaExiste) {
-                const opt = document.createElement('option');
-                opt.value = membro.id;
-                opt.textContent = membro.nome;
-                opt.selected = true;
-                selectAlvo.appendChild(opt);
-            } else {
-                const optExistente = Array.from(selectAlvo.options).find(opt => opt.value == membro.id);
-                if (optExistente) optExistente.selected = true;
+        membrosAtuais.forEach((membro, index) => {
+            const membroId = String(membro.id);
+            if (!idsExistentes.includes(membroId)) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'alunosSelecionados';
+                checkbox.value = membro.id;
+                checkbox.id = `${containerId}-extra-${index}`;
+                checkbox.checked = true;
+
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = membro.nome + ' (Membro)';
+
+                const div = document.createElement('div');
+                div.classList.add('aluno-checkbox');
+                div.appendChild(checkbox);
+                div.appendChild(label);
+
+                container.appendChild(div);
             }
         });
 
+        limitarSelecaoDeCheckboxes(5, containerId);
+
     } catch (error) {
         console.error('Erro ao listar alunos:', error);
-        selectAlvo.innerHTML = '<option disabled>Erro ao carregar alunos</option>';
     }
 }
 
@@ -376,7 +387,7 @@ async function confirmarExclusaoGrupo(grupoId, grupoNome) {
         }
 
         ativar(data.message || 'Grupo excluído com sucesso!', 'sucesso', '');
-        carregarGrupos(); // Atualiza lista
+        carregarGrupos(); 
     } catch (error) {
         console.error('Erro ao excluir grupo:', error);
         ativar(`Falha ao excluir grupo: ${error.message}`, 'erro', '');
@@ -386,37 +397,31 @@ async function confirmarExclusaoGrupo(grupoId, grupoNome) {
 async function criarNovoGrupo(event) {
     event.preventDefault();
     
-    // Capturar dados do formulário
     const form = event.target;
     const formData = new FormData(form);
     
-    // Converter para objeto
     const grupoData = {
         nome: formData.get('nomeGrupo'),
         descricao: formData.get('tema'),
         semestre: formData.get('semestre')
     };
     
-    // Validação básica
     if (!grupoData.nome || !grupoData.descricao || !grupoData.semestre) {
         ativar('Por favor, preencha todos os campos obrigatórios.', 'erro', '');
         return;
     }
     
-    // Capturar seleção múltipla de alunos
-    const alunosSelect = document.getElementById('alunos');
-    const alunosSelecionados = Array.from(alunosSelect.selectedOptions).map(option => option.value);
+    const checkboxes = document.querySelectorAll('#alunos-container input[type="checkbox"]:checked');
+    const alunosSelecionados = Array.from(checkboxes).map(cb => cb.value);
     
     if (alunosSelecionados.length === 0) {
         ativar('Por favor, selecione pelo menos um aluno para o grupo.', 'erro', '');
         return;
     }
     
-    // Adicionar alunos ao objeto de dados
     grupoData.alunos = alunosSelecionados;
     
     try {
-        // Enviar para o servidor
         const response = await fetch('/grupos', {
             method: 'POST',
             headers: {
@@ -432,13 +437,10 @@ async function criarNovoGrupo(event) {
         
         const data = await response.json();
         
-        // Exibir mensagem de sucesso
         ativar(data.message || 'Grupo criado com sucesso!', 'sucesso', '');
         
-        // Resetar formulário
         form.reset();
         
-        // Recarregar lista de grupos
         carregarGrupos();
         
     } catch (error) {
@@ -481,5 +483,18 @@ function formatarData(dataISO) {
         year: 'numeric',
         hour: '2-digit', 
         minute: '2-digit'
+    });
+}
+
+function limitarSelecaoDeCheckboxes(max, containerId = 'alunos-container') {
+    const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]`);
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            const selecionados = Array.from(checkboxes).filter(c => c.checked);
+            if (selecionados.length > max) {
+                cb.checked = false;
+                ativar(`Você pode selecionar no máximo ${max} alunos.`, 'erro', '');
+            }
+        });
     });
 }

@@ -17,7 +17,6 @@ form.addEventListener('submit', (event) => {
     const minLength = 6;
     const maxLength = 12;
 
-    // Validações gerais
     if (!nome || !email || !semestre || !senha || !confirmarSenha) {
         ativar('Por favor, preencha todos os campos.','erro','')
         return;
@@ -48,14 +47,12 @@ form.addEventListener('submit', (event) => {
         return;
     }
 
-    // Envio para o back-end
-
     fetch('/cadastro', {  
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nome, email, semestre, senha }) // Envia os dados como JSON
+        body: JSON.stringify({ nome, email, semestre, senha })
         
     })
     .then(response => {  
@@ -63,7 +60,6 @@ form.addEventListener('submit', (event) => {
           ativar('Cadastro realizado com sucesso!','sucesso','/index.html')
         } else {
             response.json().then(data => {
-                //Pegar a resposta do back-end e fornecer a resposta 
                 ativar(data.message, data.success ? 'sucesso' : 'erro');
             });
         }

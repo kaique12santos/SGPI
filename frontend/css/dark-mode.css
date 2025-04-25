@@ -103,7 +103,7 @@ html.dark-mode .form-task .input-atividade[type="date"] {
     border: 1px solid #ffffff;
 }
 
-/* Modifica a cor do ícone do calendário */
+
 html.dark-mode .input-atividade[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }

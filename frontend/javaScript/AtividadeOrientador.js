@@ -50,11 +50,11 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 </svg>
                 Ver`
     btnMostrar.onclick = () => {
-            // Div do fundo escuro
+            
             const overlay = document.createElement('div');
             overlay.className='div-zindex'
         
-            // Div do conteúdo central
+            
             const modal = document.createElement('div');
             modal.className='div-mostrar'
             modal.innerHTML = `
@@ -67,15 +67,13 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                   <button id="fecharModal" class='send-button' style="margin-top: 1rem;">Fechar</button>
             `;
         
-            // Evento para fechar o modal
             modal.querySelector('#fecharModal').onclick = () => {
                 document.body.removeChild(overlay);
             };
         
             overlay.appendChild(modal);
             document.body.appendChild(overlay);
-        
-        
+               
     };
     const btnAlterar = document.createElement('button');
     btnAlterar.className = 'btn-alterar btn';
@@ -84,11 +82,9 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg> Alterar`
     btnAlterar.onclick = () => {
-        // Criar o modal de edição
         const overlay = document.createElement('div');
         overlay.className = 'div-zindex';
         
-        // Formatar a data para o campo datetime-local
         const dataHora = new Date(prazo_entrega);
         const ano = dataHora.getFullYear();
         const mes = String(dataHora.getMonth() + 1).padStart(2, '0');
@@ -97,7 +93,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
         const minuto = String(dataHora.getMinutes()).padStart(2, '0');
         const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
         
-        // Criar modal com formulário de edição
         const modal = document.createElement('div');
         modal.className = 'div-mostrar form-task';
         modal.innerHTML = `
@@ -112,12 +107,8 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 
                 <label for="edit-semestre">Semestre</label>
                 <select id="edit-semestre" class="input-atividade selectSemestre" required>
-                    <option value="1" ${semestre == 1 ? 'selected' : ''}>1º Semestre</option>
-                    <option value="2" ${semestre == 2 ? 'selected' : ''}>2º Semestre</option>
-                    <option value="3" ${semestre == 3 ? 'selected' : ''}>3º Semestre</option>
-                    <option value="4" ${semestre == 4 ? 'selected' : ''}>4º Semestre</option>
-                    <option value="5" ${semestre == 5 ? 'selected' : ''}>5º Semestre</option>
-                    <option value="6" ${semestre == 6 ? 'selected' : ''}>6º Semestre</option>
+                    <option value="0">Selecione</option>
+                ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${semestre === String(n) ? 'selected' : ''}>${n}º Semestre</option>`).join('')}
                 </select>
                 
                 <label for="edit-prazo">Data de entrega</label>
@@ -136,7 +127,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
         
-        // Evento para cancelar edição
         document.getElementById('cancelar-edicao').addEventListener('click', () => {
             document.body.removeChild(overlay);
         });

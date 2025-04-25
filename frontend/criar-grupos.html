@@ -67,11 +67,10 @@
             <option value="6">6º Semestre</option>
         </select>
     
-        <label for="alunos" class="label-form">Alunos (selecione múltiplos):</label>
-        <select id="alunos" name="alunos" class="select-form" multiple required>
-
-            <option disabled>Selecione um semestre primeiro</option>
-        </select>
+        <label for="alunos-container" class="label-form">Alunos (selecione até 5):</label>
+        <div id="alunos-container" class="checkbox-container">
+            <p style="color: gray;">Selecione um semestre primeiro</p>
+        </div>
     
         <button type="submit" class="botao-form send-button">Criar Grupo</button>
         </form>

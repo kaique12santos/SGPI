@@ -1,13 +1,9 @@
-
-// Função para gerar o menu baseado no tipo de perfil
 function gerarMenu(tipoPerfil) {
-    // Elemento do menu
+
     const menuItens = document.getElementById('menu-itens');
     
-    // Limpar conteúdo atual do menu
     menuItens.innerHTML = '';
     
-    // Estrutura de itens de menu por tipo de perfil
     const itensMenu = {
         aluno: [
             { texto: 'Artefatos entregues', link: '/aluno/artefatos' },
@@ -37,13 +33,11 @@ function gerarMenu(tipoPerfil) {
         ]
     };
     
-    // Verificar se o tipo de perfil é válido
     if (!itensMenu[tipoPerfil]) {
         console.error('Tipo de perfil inválido:', tipoPerfil);
         return;
     }
     
-    // Criar e adicionar os itens do menu
     itensMenu[tipoPerfil].forEach(item => {
         const link = document.createElement('a');
         link.href = item.link;

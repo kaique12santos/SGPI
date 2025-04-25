@@ -4,7 +4,6 @@ const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
-// Utilitário para converter CLOB em string
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
     if (!lob) return resolve(null);
@@ -16,7 +15,6 @@ function lobToString(lob) {
   });
 }
 
-// Rota para tela de criação (opcional)
 router.get('/criar-atividade', (req, res) => {
   res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
 });
@@ -66,7 +64,7 @@ router.post('/atividades', async (req, res) => {
   }
 });
 
-// Listar atividades por professor_orientador
+// Listar atividades 
 router.get('/atividades', async (req, res) => {
   const connection = await getConnection();
   const professorId = parseInt(req.query.professor_id, 10);

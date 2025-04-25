@@ -53,9 +53,9 @@
   
   
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 colunas de largura igual */
-  gap: 1rem; /* espaçamento entre os cards */
-  width: 90%; /* ou 100%, como preferir */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; 
+  width: 90%; 
   margin-left: auto;
   margin-right: auto;
     
@@ -116,7 +116,7 @@
     transform: translateY(-1px);
   }
   
-  /* Delete button - Red */
+
   .btn-excluir {
     background: linear-gradient(135deg, #eb0202, #c21502);
     border-left: 3px solid #922b21;
@@ -132,7 +132,7 @@
     transform: translateY(-1px);
   }
   
-  /* View button - Pink/Purple */
+
   .btn-Ver {
     background: linear-gradient(135deg, #2ecc71, #27ae60);
     border-left: 3px solid #1e8449;
@@ -149,7 +149,7 @@
     transform: translateY(-1px);
   }
   
-  /* Button with icon */
+ 
   .btn-icon {
     padding-left: 1rem;
   }
@@ -158,7 +158,7 @@
     margin-right: 0.5rem;
   }
   
-  /* Modal overlay styling */
+
   .div-zindex {
     position: fixed;
     top: 0;
@@ -180,8 +180,8 @@
   }
   
   .div-mostrar {
-    max-height: 80vh; /* altura máxima em relação à altura da janela */
-    overflow-y: auto; /* adiciona scroll vertical quando necessário */
+    max-height: 80vh; 
+    overflow-y: auto; 
     background-color: #ffffff;
     padding: 2.5rem;
     border-radius: 12px;
@@ -205,14 +205,14 @@
     margin: 1rem 0;
   }
   
-  /* Button container for alignment */
+
   .btn-container {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
   }
   
-  /* Responsive adjustments */
+ 
   @media (max-width: 768px) {
     .btn {
       padding: 0.6rem 1.2rem;

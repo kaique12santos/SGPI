@@ -4,7 +4,6 @@
 //-----------------------------------------------------------------------------------------------------
 // Definição de botões por tipo de perfil
 const navigationButtonsByRole = {
-    // Botões para alunos
     aluno: [
       {
         text: "Artefatos entregues",
@@ -40,7 +39,6 @@ const navigationButtonsByRole = {
       }
     ],
     
-    // Botões para professores
     professor: [
       {
         text: "Artefatos entregues",
@@ -76,7 +74,6 @@ const navigationButtonsByRole = {
       }
     ],
     
-    // Botões para coordenadores
     professor_orientador: [
       {
         text: "Artefatos entregues",
@@ -144,7 +141,6 @@ const navigationButtonsByRole = {
     ]
   };
 
-  // Função para alternar a visibilidade do menu dropdown
 function toggleMenu(button) {
     const menuContent = document.getElementById('menu-itens');
     const expanded = button.getAttribute('aria-expanded') === 'true';
@@ -153,73 +149,17 @@ function toggleMenu(button) {
     menuContent.style.display = expanded ? 'none' : 'block';
   }
   
-  // Função para obter o tipo de usuário atual
   function obterTipoUsuarioLogado() {
-   // Obtém o tipo de usuário do localStorage
    const userRole = localStorage.getItem('userRole');
     
-   // Se não encontrar um tipo válido, use um valor padrão
    if (!userRole || !['aluno', 'professor', 'coordenador', 'professor_orientador'].includes(userRole)) {
     console.warn('Tipo de usuário não encontrado ou inválido. Usando padrão: aluno');
     return 'aluno';
   }
-   
    return userRole;
   }
   
-  // Função para renderizar os links no menu dropdown com base no tipo de usuário
-  // function renderizarMenuDropdown() {
-  //   const menuContent = document.getElementById('menu-itens');
-    
-  //   if (!menuContent) {
-  //     console.error("Elemento 'menu-itens' não encontrado");
-  //     return;
-  //   }
-    
-  //   // Limpa o conteúdo atual do menu
-  //   menuContent.innerHTML = '';
-    
-  //   // Obtém o tipo de usuário logado
-  //   const tipoUsuario = obterTipoUsuarioLogado();
-    
-  //   // Obtém os links específicos para o tipo de usuário
-  //   const linksUsuario = navigationButtonsByRole[tipoUsuario] || [];
-    
-  //   // Adiciona cada link ao menu
-  //   linksUsuario.forEach(item => {
-  //     const link = document.createElement('a');
-  //     link.href = item.url;
-      
-  //     // Opção 1: Apenas o texto do link
-  //     // link.textContent = item.text;
-      
-  //     // Opção 2: Incluir o ícone junto com o texto
-  //     const spanText = document.createElement('span');
-  //     spanText.textContent = item.text;
-      
-  //     link.insertAdjacentHTML('afterbegin', item.icon);
-  //     link.appendChild(spanText);
-      
-  //     // Estilização opcional para alinhar o ícone e o texto
-  //     link.style.display = 'flex';
-  //     link.style.alignItems = 'center';
-  //     link.style.gap = '8px';
-      
-  //     menuContent.appendChild(link);
-  //   });
-  // }
   
-  // Função para trocar o tipo de usuário (útil para testes)
-  function trocarTipoUsuario(tipo) {
-    if (['aluno', 'professor', 'coordenador','professor_orientador'].includes(tipo)) {
-      localStorage.setItem('userRole', tipo);
-      renderizarMenuDropdown();
-    } else {
-      console.error('Tipo de usuário inválido:', tipo);
-    }
-  }
-  
-  // Função para renderizar os botões com base no perfil
   function renderNavigationButtons(containerId) {
     const container = document.getElementById(containerId);
     
@@ -228,65 +168,48 @@ function toggleMenu(button) {
       return;
     }
     
-    // Determina o perfil do usuário a partir da classe do container
-    const userRole = obterTipoUsuarioLogado(); // Perfil padrão caso nenhum seja especificado
+    const userRole = obterTipoUsuarioLogado(); 
     
     container.classList.remove('aluno', 'professor', 'coordenador','professor_orientador');
     container.classList.add(userRole);
     
-    // Obtém os botões específicos para o perfil do usuário
     const buttonsForRole = navigationButtonsByRole[userRole] || [];
     
-    // Limpa o conteúdo atual do container
     container.innerHTML = '';
     
-    // Cria um div para os botões de navegação
     const pageLinksDiv = document.createElement('div');
     pageLinksDiv.className = 'page-links';
     
-    // Adiciona cada botão ao div
     buttonsForRole.forEach(button => {
-      // Cria o elemento <a>
       const link = document.createElement('a');
       link.href = button.url;
       
-      // Cria o elemento <button>
       const buttonElement = document.createElement('button');
       buttonElement.className = 'button-link';
       buttonElement.textContent = button.text;
       
-      // Adiciona o ícone SVG
       buttonElement.insertAdjacentHTML('beforeend', ' ' + button.icon);
       
-      // Adiciona o botão ao link
       link.appendChild(buttonElement);
       
-      // Adiciona o link ao div de links
       pageLinksDiv.appendChild(link);
     });
     
-    // Adiciona o div de links ao container
     container.appendChild(pageLinksDiv);
   }
   
-  // Exemplo de uso no carregamento da página
   document.addEventListener('DOMContentLoaded', function() {
     renderNavigationButtons('navigation-container');
     
-    // Adicional: Exemplo de como mudar o perfil dinamicamente
     function changeUserRole(role) {
       const container = document.getElementById('navigation-container');
       
-      // Remove classes de perfil existentes
       container.classList.remove('aluno', 'professor', 'coordenador','professor_orientador');
       
-      // Adiciona a nova classe de perfil
       container.classList.add(role);
       
-      // Atualiza os botões
       renderNavigationButtons('navigation-container');
     }
     
-    // Torna a função disponível globalmente (opcional)
     window.changeUserRole = changeUserRole;
   });

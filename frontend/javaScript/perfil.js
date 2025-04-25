@@ -4,7 +4,6 @@ let userId = null;
 let userNome = null;
 let userFoto = null;
 
-// Função para obter dados do usuário atual
 async function obterDadosUsuario() {
     try {
         userId = parseInt(localStorage.getItem('professorId'));
@@ -130,7 +129,6 @@ async function atualizarPerfil(event) {
                 }
             }
 
-            // Redirecionar para a tela principal após sucesso
             window.location.href = '/TelaPrincipal.html';
         } else {
             ativar(data.message, 'erro', '');
@@ -141,7 +139,6 @@ async function atualizarPerfil(event) {
     }
 }
 
-// Inicializar as funções quando o documento é carregado
 document.addEventListener('DOMContentLoaded', function () {
     obterDadosUsuario();
     previewImagem();

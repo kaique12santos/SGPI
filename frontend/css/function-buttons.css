@@ -1,4 +1,3 @@
-/*Botôes para funções de acesso*/
 
 .page-links{
     display: flex;
@@ -67,7 +66,7 @@
     height: 16px;
 }
 
-/* Para modo escuro */
+
 .dark-mode .logout-btn {
     background-color: #b71c1c;
 }

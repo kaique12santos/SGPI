@@ -17,7 +17,6 @@ function carregarAtividades() {
             container.className = 'atividades-criadas';
             container.innerHTML = '';
 
-            // Ordena pela data de criação (mais recente primeiro)
             atividades.sort((a, b) => new Date(b.data_criacao) - new Date(a.data_criacao));
             atividades.forEach(atividade => {
                 const div = criarCardAtividade(atividade);
@@ -50,11 +49,9 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 </svg>
                 Ver`
     btnMostrar.onclick = () => {
-            // Div do fundo escuro
             const overlay = document.createElement('div');
             overlay.className='div-zindex'
         
-            // Div do conteúdo central
             const modal = document.createElement('div');
             modal.className='div-mostrar'
             modal.innerHTML = `
@@ -67,7 +64,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                   <button id="fecharModal" class='send-button' style="margin-top: 1rem;">Fechar</button>
             `;
         
-            // Evento para fechar o modal
             modal.querySelector('#fecharModal').onclick = () => {
                 document.body.removeChild(overlay);
             };
@@ -84,11 +80,9 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg> Alterar`
     btnAlterar.onclick = () => {
-        // Criar o modal de edição
         const overlay = document.createElement('div');
         overlay.className = 'div-zindex';
         
-        // Formatar a data para o campo datetime-local
         const dataHora = new Date(prazo_entrega);
         const ano = dataHora.getFullYear();
         const mes = String(dataHora.getMonth() + 1).padStart(2, '0');
@@ -97,7 +91,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
         const minuto = String(dataHora.getMinutes()).padStart(2, '0');
         const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
         
-        // Criar modal com formulário de edição
         const modal = document.createElement('div');
         modal.className = 'div-mostrar form-task';
         modal.innerHTML = `
@@ -112,12 +105,8 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 
                 <label for="edit-semestre">Semestre</label>
                 <select id="edit-semestre" class="input-atividade selectSemestre" required>
-                    <option value="1" ${semestre == 1 ? 'selected' : ''}>1º Semestre</option>
-                    <option value="2" ${semestre == 2 ? 'selected' : ''}>2º Semestre</option>
-                    <option value="3" ${semestre == 3 ? 'selected' : ''}>3º Semestre</option>
-                    <option value="4" ${semestre == 4 ? 'selected' : ''}>4º Semestre</option>
-                    <option value="5" ${semestre == 5 ? 'selected' : ''}>5º Semestre</option>
-                    <option value="6" ${semestre == 6 ? 'selected' : ''}>6º Semestre</option>
+                   <option value="0">Selecione</option>
+                    ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${semestre === String(n) ? 'selected' : ''}>${n}º Semestre</option>`).join('')}
                 </select>
                 
                 <label for="edit-prazo">Data de entrega</label>
@@ -136,12 +125,10 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
         
-        // Evento para cancelar edição
         document.getElementById('cancelar-edicao').addEventListener('click', () => {
             document.body.removeChild(overlay);
         });
         
-        // Evento de envio do formulário de edição
         document.getElementById('editar-atividade').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -154,7 +141,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 prazo_entrega: document.getElementById('edit-prazo').value,
                 criterios_avaliacao: document.getElementById('edit-criterios').value,
                 professor_id: parseInt(localStorage.getItem('professorId')), 
-                projeto_id: 1     // ID fixo como no exemplo original
+                projeto_id: 1     
             };
             
             try {
@@ -173,11 +160,9 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 
                 const data = await response.json();
                 
-                // Atualizar o card com os novos dados
                 div.querySelector('strong').textContent = dadosAtualizados.titulo;
                 div.querySelector('br').nextSibling.textContent = `Prazo: ${formatarData(dadosAtualizados.prazo_entrega)}`;
                 
-                // Atualizar as referências aos dados para os eventos de botões
                 titulo = dadosAtualizados.titulo;
                 descricao = dadosAtualizados.descricao;
                 semestre = dadosAtualizados.semestre;
@@ -185,7 +170,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 criterios_avaliacao = dadosAtualizados.criterios_avaliacao;
                 professor_id= dadosAtualizados.professor_id;
                 
-                // Fechar o modal e mostrar mensagem de sucesso
                 document.body.removeChild(overlay);
                 ativar(data.message, 'sucesso', '');
                 
@@ -205,7 +189,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 Excluir`
     btnExcluir.onclick = async () => {
         try {
-            // Obter e converter ID para número
             const atividadeId = parseInt(div.dataset.atividadeId, 10);
             console.log("ID da atividade a ser excluída:", atividadeId); 
             if (isNaN(atividadeId)) {
@@ -216,7 +199,6 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 return; 
             }
             
-            // Fazer requisição DELETE para o servidor
             const response = await fetch(`/professor/criar-atividade/${atividadeId}`, {
                 method: 'DELETE',
                 headers: {
@@ -229,11 +211,9 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 throw new Error(errorData.message || 'Erro ao excluir atividade');
             }
             
-            // Se chegou aqui, a exclusão foi bem-sucedida
             const data = await response.json();
             ativar(data.message,'sucesso',''); 
             
-            // Remover elemento do DOM
             div.remove();
             
         } catch (error) {
@@ -284,7 +264,6 @@ form.addEventListener('submit', (event) => {
         return;
     }
 
-    // Envio para o back-end
     fetch('/professor/atividades', {
         method: 'POST',
         headers: {
@@ -304,7 +283,6 @@ form.addEventListener('submit', (event) => {
         if (response.ok) {
             ativar('Atividade criada com sucesso!', 'sucesso', '/professor/criar-atividade');
             form.reset();
-            // Criar e adicionar lembrete abaixo do formulário
             response.json().then(data => {
                 carregarAtividades();
             });
