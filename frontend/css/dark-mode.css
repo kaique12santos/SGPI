@@ -13,6 +13,22 @@ html.dark-mode .atividade-card {
     border-left: 4px solid #922b21;
 }
 
+html.dark-mode .grupo-card {
+    background-color: #2f2f2f;
+    border: 1px solid #6b6b6b; 
+    color: #f5f5f5; 
+    box-shadow: 2px 4px 10px rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #922b21;
+}
+
+html.dark-mode .grupo-card p{
+    color: #ffffff;
+}
+
+html.dark-mode .grupo-card strong{
+    color: #ffffff;
+}
+
 
 html.dark-mode .login-box,
 html.dark-mode .login-info,
@@ -75,7 +91,8 @@ html.dark-mode .button-link:hover {
 
 html.dark-mode .page-links,
 html.dark-mode #create-task,
-html.dark-mode .form-task {
+html.dark-mode .form-task,
+html.dark-mode #formGrupo {
     background-color: #121212;
 }
 
@@ -90,12 +107,31 @@ html.dark-mode .menu-content a:hover {
 html.dark-mode .form-task label {
     color: #ffffff;
 }
+html.dark-mode #formGrupo label {
+    color: #ffffff;
+}
 
 html.dark-mode .form-task .input-atividade {
     background-color: #121212;
     color: #ffffff;
     border: 1px solid #ffffff;
 }
+html.dark-mode #formGrupo .input-form {
+    background-color: #121212;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+html.dark-mode #formGrupo .p_Check-box {
+    color: #ffffff;
+   
+}
+
+html.dark-mode #formGrupo .textarea-form {
+    background-color: #121212;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
 
 html.dark-mode .form-task .input-atividade[type="date"] {
     background-color: #121212;
@@ -138,4 +174,8 @@ html.dark-mode .user-input{
 
 html.dark-mode .container{
     background-color: #121212;
+}
+
+html.dark-mode .container h3{
+    color: #ffffff;
 }
