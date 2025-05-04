@@ -96,7 +96,7 @@ O <b>Sistema de Gestão de PIS</b> é uma plataforma web projetada para centrali
   </a>
 </p><h3 align="left">Luiz Carlos Gimenes Fernandes de Sousa</h3>
 <p align="left">
-  <a href="https://www.linkedin.com/in/luiz-carlos-gimenes-fernandes-de-sousa-045b75198/">
+  <a href="https://linkedin.com/in/kaique-caitano-b68b902ba">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
   </a>
   <a href="https://www.facebook.com/luizcarlos.gimenes.50/">
