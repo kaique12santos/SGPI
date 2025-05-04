@@ -13,6 +13,9 @@ const professor = require('./routes/professor.js')
 const professorOrientador = require('./routes/professorOrientador.js');
 const atualizarPerfil = require('./routes/atualizarPerfil.js');
 const grupos = require('./routes/grupos.js');
+const notificacoes = require('./routes/notificacoes.js');
+
+
 
 app.use(cors());
 app.use(express.static(frontendPath)); 
@@ -32,6 +35,7 @@ app.use('/professor', professor);
 app.use('/professor_orientador', professorOrientador);
 app.use('/perfil', atualizarPerfil);
 app.use('/',grupos);
+app.use('/', notificacoes);
 
 
 

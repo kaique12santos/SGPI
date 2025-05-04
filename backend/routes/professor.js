@@ -3,6 +3,7 @@ const router = express.Router();
 const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
+require('dotenv').config()
 
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
@@ -27,7 +28,7 @@ router.post('/atividades', async (req, res) => {
     projeto_id,
     prazo_entrega,
     criterios_avaliacao,
-    semestre
+    semestre,
   } = req.body;
 
   const connection = await getConnection();
@@ -47,6 +48,11 @@ router.post('/atividades', async (req, res) => {
       [titulo, descricao, professor_id, projeto_id, prazo_entrega, criterios_avaliacao, semestre],
       { autoCommit: true }
     );
+    await notificarAlunosSobreAtividade(connection, {
+      titulo,
+      prazo_entrega,
+      semestre
+    });
 
     res.json({
       success: result.rowsAffected > 0,
@@ -192,5 +198,45 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
     if (connection) await connection.close();
   }
 });
+
+
+async function notificarAlunosSobreAtividade(connection, atividade) {
+  try {
+    // Buscar alunos do mesmo semestre
+    const alunosResult = await connection.execute(
+      `SELECT id FROM Usuarios
+       WHERE tipo = 'Aluno' 
+       AND semestre = :semestre
+       AND ativo = 1`,
+      [atividade.semestre],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    // Para cada aluno, criar uma notificação
+    for (const aluno of alunosResult.rows) {
+      await connection.execute(
+        `INSERT INTO Notificacoes (
+            usuario_id, titulo, mensagem, tipo
+         ) VALUES (
+            :usuario_id,
+            :titulo,
+            :mensagem,
+            'Nova_Atividade'
+         )`,
+        {
+          usuario_id: aluno.ID,
+          titulo: `Nova atividade: ${atividade.titulo}`,
+          mensagem: `Uma nova atividade foi criada pelo professor: ${atividade.titulo}. 
+                    Prazo de entrega: ${new Date(atividade.prazo_entrega).toLocaleString()}`,
+        },
+        { autoCommit: true }
+      );
+    }
+    console.log(`Notificações enviadas para ${alunosResult.rows.length} alunos.`);
+  } catch (error) {
+    console.error('Erro ao enviar notificações:', error);
+    // Não quebra o fluxo principal mesmo se as notificações falharem
+  }
+}
 
 module.exports = router;

@@ -34,6 +34,24 @@
             Sair
         </button>
     </div>
+    <div class="notificacoes-dropdown">
+        <button class="notificacao-botao" id="notificacao-toggle">
+            <i class="fas fa-bell"></i>
+            <span class="contador-notificacoes" id="contador-notificacoes">0</span>
+        </button>
+        <div class="notificacoes-container" id="notificacoes-container">
+            <div class="notificacoes-header">
+                <h3>Notificações</h3>
+                <button id="marcar-todas-lidas">Marcar todas como lidas</button>
+            </div>
+            <div class="notificacoes-lista" id="notificacoes-lista">
+                <!-- Notificações serão inseridas aqui via JavaScript -->
+                <div class="notificacao-item notificacao-vazia">
+                    <p>Nenhuma notificação disponível.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 
 <body>
@@ -77,6 +95,8 @@
     <script src="./javaScript/GerarMenu.js"></script>
     <script src="./javaScript/deslogar.js"></script>
     <script src="./javaScript/imagemPerfil.js"></script>
+    <!-- <script src="./javaScript/auth.js"></script> -->
+    <script src="./javaScript/notificacoes.js" defer></script>
     
 </body>
 </html>
