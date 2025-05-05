@@ -162,6 +162,8 @@ body{
 .notificacoes-dropdown {
     position: relative;
     display: inline-block;
+    width: 100%;
+    height: 30px;
 }
 
 .notificacao-botao {
@@ -170,11 +172,15 @@ body{
     cursor: pointer;
     font-size: 1.2rem;
     position: relative;
+    height: 32px;
+}
+.notificacao-botao p{
+    margin: 0;
 }
 
 .contador-notificacoes {
     position: absolute;
-    top: -8px;
+    top: -4px;
     right: -8px;
     background-color: #ff4444;
     color: white;
@@ -257,5 +263,47 @@ body{
 .notificacao-vazia {
     text-align: center;
     color: #999;
+}
+
+.perfil-container {
+    position: relative;
+    display: inline-block;
+}
+
+.perfil-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    z-index: 1000;
+    width: 150px;
+}
+
+
+.perfil-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: #000000;
+}
+
+.perfil-menu button:hover {
+    background-color: #6f0000;
+}
+#user-profile-pic img{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    
+}
+
+.perfil-container h2{
+
 }
 

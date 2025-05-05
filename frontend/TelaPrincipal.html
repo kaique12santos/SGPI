@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
     <!--______________________________-->
-
 </head>
 
 <header>
@@ -21,43 +20,52 @@
         <h1>SGPI</h1>
         <input type="text" placeholder="Pesquisar..." class="search-box">
         <p>Olá, Usuário!</p>
-        <button id="user-profile-pic" class="profile-pic" >
-            <a href="/perfil.html">
-            <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
-            </a>
-        </button>
-        <button id="logout-button" class="logout-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-            </svg>
-            Sair
-        </button>
-    </div>
-    <div class="notificacoes-dropdown">
-        <button class="notificacao-botao" id="notificacao-toggle">
-            <i class="fas fa-bell"></i>
-            <span class="contador-notificacoes" id="contador-notificacoes">0</span>
-        </button>
-        <div class="notificacoes-container" id="notificacoes-container">
-            <div class="notificacoes-header">
-                <h3>Notificações</h3>
-                <button id="marcar-todas-lidas">Marcar todas como lidas</button>
-            </div>
-            <div class="notificacoes-lista" id="notificacoes-lista">
-                <!-- Notificações serão inseridas aqui via JavaScript -->
-                <div class="notificacao-item notificacao-vazia">
-                    <p>Nenhuma notificação disponível.</p>
+        
+        <div class="perfil-container">
+            <button id="user-profile-pic" class="profile-pic">
+                <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Avatar" width="100%">
+            </button>
+
+            <div id="perfil-menu" class="perfil-menu" style="display: none;">
+                <button id="btn-meu-perfil">Meu Perfil</button>
+
+                <button id="logout-button" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                        <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                    </svg>
+                    Sair
+                </button>
+
+                <div class="notificacoes-dropdown">
+                    <button class="notificacao-botao" id="notificacao-toggle">
+                        <p>Notificações</p>
+                        
+                        <span class="contador-notificacoes" id="contador-notificacoes">0</span>
+                    </button>
+                    <div class="notificacoes-container" id="notificacoes-container">
+                        <div class="notificacoes-header">
+                            
+                            <button id="marcar-todas-lidas">Marcar todas como lidas</button>
+                        </div>
+                        <div class="notificacoes-lista" id="notificacoes-lista">
+                            <div class="notificacao-item notificacao-vazia">
+                                <p>Nenhuma notificação disponível.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        
     </div>
+    
 </header>
 
 <body>
     <div class="container"> <!--Div container para facilitar configurações globais-->
         <div class="wrapper">
-        <div class="menu-dropdown"> <!--Div feita para o menu, não sei ainda como fazer, favor não modificar-->
+        <div class="menu-dropdown"> 
             <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
@@ -89,14 +97,14 @@
 
         </div>
     </div>
+
+    <script src="./javaScript/menuPerfil.js"></script>
     <script defer src="./javaScript/efeitoMenu.js"></script>
     <script defer src="./javaScript/dark_mode.js"></script>
     <script src="./javaScript/navigation-buttons.js"></script>
     <script src="./javaScript/GerarMenu.js"></script>
     <script src="./javaScript/deslogar.js"></script>
     <script src="./javaScript/imagemPerfil.js"></script>
-    <!-- <script src="./javaScript/auth.js"></script> -->
     <script src="./javaScript/notificacoes.js" defer></script>
-    
 </body>
 </html>

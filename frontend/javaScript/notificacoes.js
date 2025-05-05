@@ -1,4 +1,4 @@
-// Adicionar este script na página após carregar o DOM
+// notificacoes.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const usuarioId = localStorage.getItem("usuarioId");
@@ -17,19 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let notificacoesAbertas = false;
     
-    // Toggle para abrir/fechar o dropdown de notificações
-    notificacaoBotao.addEventListener('click', function() {
-        if (notificacoesAbertas) {
-            notificacoesContainer.style.display = 'none';
-            notificacoesAbertas = false;
-        } else {
-            notificacoesContainer.style.display = 'block';
-            notificacoesAbertas = true;
-            carregarNotificacoes();
-        }
+    notificacaoBotao.addEventListener('click', function(event) {
+        event.stopPropagation();
+        notificacoesAbertas = !notificacoesAbertas;
+        notificacoesContainer.style.display = notificacoesAbertas ? 'block' : 'none';
+        if (notificacoesAbertas) carregarNotificacoes();
     });
     
-    // Fechar notificações ao clicar fora
     document.addEventListener('click', function(event) {
         if (notificacoesAbertas && 
             !notificacoesContainer.contains(event.target) && 
@@ -39,74 +33,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Marcar todas as notificações como lidas
     marcarTodasLidas.addEventListener('click', function() {
         fetch(`/notificacoes/todas/lidas`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ usuario_id: usuarioId })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Atualizar a UI
-                const notificacoesNaoLidas = document.querySelectorAll('.notificacao-item.nao-lida');
-                notificacoesNaoLidas.forEach(item => {
-                    item.classList.remove('nao-lida');
-                });
-                
-                // Atualizar contador
+                document.querySelectorAll('.notificacao-item.nao-lida')
+                    .forEach(el => el.classList.remove('nao-lida'));
                 contadorNotificacoes.textContent = '0';
                 contadorNotificacoes.style.display = 'none';
             }
         })
-        .catch(error => console.error('Erro ao marcar todas como lidas:', error));
+        .catch(e => console.error('Erro ao marcar todas como lidas:', e));
     });
-    
-    // Função para formatar data
+
     function formatarData(dataStr) {
         if (!dataStr) return '';
-        
         const data = new Date(dataStr);
         const hoje = new Date();
         const ontem = new Date(hoje);
         ontem.setDate(hoje.getDate() - 1);
-        
-        // Se for hoje
+
         if (data.toDateString() === hoje.toDateString()) {
             return `Hoje às ${data.getHours().toString().padStart(2, '0')}:${data.getMinutes().toString().padStart(2, '0')}`;
         }
-        
-        // Se for ontem
+
         if (data.toDateString() === ontem.toDateString()) {
             return `Ontem às ${data.getHours().toString().padStart(2, '0')}:${data.getMinutes().toString().padStart(2, '0')}`;
         }
-        
-        // Outro dia
+
         return `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth()+1).toString().padStart(2, '0')}/${data.getFullYear()} ${data.getHours().toString().padStart(2, '0')}:${data.getMinutes().toString().padStart(2, '0')}`;
     }
-    
-    // Função para carregar notificações
+
     function carregarNotificacoes() {
         fetch(`/notificacoes?usuario_id=${usuarioId}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 const { total_nao_lidas, notificacoes } = data;
-                
-                // Atualizar contador
+
                 if (total_nao_lidas > 0) {
                     contadorNotificacoes.textContent = total_nao_lidas > 9 ? '9+' : total_nao_lidas;
                     contadorNotificacoes.style.display = 'block';
                 } else {
                     contadorNotificacoes.style.display = 'none';
                 }
-                
-                // Limpar lista
+
                 notificacoesLista.innerHTML = '';
-                
-                // Se não houver notificações
+
                 if (notificacoes.length === 0) {
                     notificacoesLista.innerHTML = `
                         <div class="notificacao-item notificacao-vazia">
@@ -115,31 +92,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     return;
                 }
-                
-                // Renderizar notificações
-                notificacoes.forEach(notificacao => {
+
+                notificacoes.forEach(notif => {
                     const item = document.createElement('div');
-                    item.className = `notificacao-item ${!notificacao.lida ? 'nao-lida' : ''}`;
-                    item.setAttribute('data-id', notificacao.id);
-                    
+                    item.className = `notificacao-item ${!notif.lida ? 'nao-lida' : ''}`;
+                    item.dataset.id = notif.id;
                     item.innerHTML = `
-                        <div class="notificacao-titulo">${notificacao.titulo}</div>
-                        <div class="notificacao-mensagem">${notificacao.mensagem}</div>
-                        <div class="notificacao-data">${formatarData(notificacao.data_criacao)}</div>
+                        <div class="notificacao-titulo">${notif.titulo}</div>
+                        <div class="notificacao-mensagem">${notif.mensagem}</div>
+                        <div class="notificacao-data">${formatarData(notif.data_criacao)}</div>
                     `;
-                    
-                    // Marcar como lida ao clicar
+
                     item.addEventListener('click', function() {
-                        const notificacaoId = this.getAttribute('data-id');
-                        marcarComoLida(notificacaoId);
+                        marcarComoLida(notif.id);
                         this.classList.remove('nao-lida');
                     });
-                    
+
                     notificacoesLista.appendChild(item);
                 });
             })
-            .catch(error => {
-                console.error('Erro ao carregar notificações:', error);
+            .catch(e => {
+                console.error('Erro ao carregar notificações:', e);
                 notificacoesLista.innerHTML = `
                     <div class="notificacao-item notificacao-vazia">
                         <p>Erro ao carregar notificações.</p>
@@ -147,39 +120,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
     }
-    
-    // Função para marcar notificação como lida
+
     function marcarComoLida(notificacaoId) {
         fetch(`/notificacoes/${notificacaoId}/lida`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ usuario_id: usuarioId })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Atualizar contador
-                const contador = parseInt(contadorNotificacoes.textContent);
-                if (contador > 1) {
-                    contadorNotificacoes.textContent = contador - 1;
+                const atual = parseInt(contadorNotificacoes.textContent);
+                if (atual > 1) {
+                    contadorNotificacoes.textContent = atual - 1;
                 } else {
                     contadorNotificacoes.style.display = 'none';
                 }
             }
         })
-        .catch(error => console.error('Erro ao marcar como lida:', error));
+        .catch(e => console.error('Erro ao marcar como lida:', e));
     }
-    
-    // Verificar notificações a cada 2 minutos
+
     function verificarNotificacoesPeriodicamente() {
         fetch(`/notificacoes?usuario_id=${usuarioId}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 const { total_nao_lidas } = data;
-                
-                // Atualizar apenas o contador
                 if (total_nao_lidas > 0) {
                     contadorNotificacoes.textContent = total_nao_lidas > 9 ? '9+' : total_nao_lidas;
                     contadorNotificacoes.style.display = 'block';
@@ -187,12 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     contadorNotificacoes.style.display = 'none';
                 }
             })
-            .catch(error => console.error('Erro ao verificar notificações:', error));
+            .catch(e => console.error('Erro ao verificar notificações:', e));
     }
-    
-    // Carregar notificações inicialmente
+
     verificarNotificacoesPeriodicamente();
-    
-    // Verificar a cada 2 minutos
     setInterval(verificarNotificacoesPeriodicamente, 120000);
 });
