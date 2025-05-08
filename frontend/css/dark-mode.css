@@ -179,3 +179,99 @@ html.dark-mode .container{
 html.dark-mode .container h3{
     color: #ffffff;
 }
+
+html.dark-mode .filter-section,
+html.dark-mode .users-table,
+html.dark-mode .modal-content {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.05);
+}
+
+html.dark-mode .filter-section select,
+html.dark-mode .filter-section input {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+html.dark-mode .users-table th {
+    background-color: #680000;
+    color: #ffffff;
+}
+
+html.dark-mode .users-table tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
+
+html.dark-mode .users-table tr:hover {
+    background-color: #333333;
+}
+
+html.dark-mode .users-table td {
+    border-bottom: 1px solid #444;
+}
+
+html.dark-mode .btn-primary {
+    background-color: #970000;
+    color: #ffffff;
+}
+
+html.dark-mode .btn-primary:hover {
+    background-color: #c0392b;
+}
+
+html.dark-mode .btn-success {
+    background-color: #27ae60;
+    color: #ffffff;
+}
+
+html.dark-mode .btn-danger {
+    background-color: #c0392b;
+    color: #ffffff;
+}
+
+html.dark-mode .btn-warning {
+    background-color: #f39c12;
+    color: #ffffff;
+}
+
+html.dark-mode .pagination button {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #666;
+}
+
+html.dark-mode .pagination button.active {
+    background-color: #970000;
+    border-color: #970000;
+    color: #ffffff;
+}
+
+html.dark-mode .modal-content h2 {
+    color: #ffffff;
+}
+
+html.dark-mode .modal-content input,
+html.dark-mode .modal-content select {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+html.dark-mode .close {
+    color: #bbb;
+}
+
+html.dark-mode .close:hover {
+    color: #ffffff;
+}
+
+html.dark-mode .page-name-usuario {
+    background-color: #121212;
+    color: #ffffff;
+    border-bottom: 1px solid #333;
+}
+html.dark-mode .label-usuarios{
+    color: white;
+}

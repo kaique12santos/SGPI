@@ -1,11 +1,11 @@
 :root {
-    --primary: #1a5276;
+    --primary: #970000d2;
     --secondary: #2980b9;
     --success: #27ae60;
     --danger: #c0392b;
     --warning: #f39c12;
     --light: #ecf0f1;
-    --dark: #2c3e50;
+    --dark: #050505;
 }
 
 * {
@@ -21,9 +21,10 @@ body {
 }
 
 .container_usuarios {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 10px 10px 10px;
 }
 
 header {
