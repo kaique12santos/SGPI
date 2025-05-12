@@ -7,8 +7,12 @@ const port = 3000;
 const bcrypt = require('bcrypt');
 const frontendPath = path.join(__dirname, '..', 'frontend');
 const fs = require('fs').promises; 
+const {v4: uuidv4}=require('uuid');
+
+
 
 // Importar as rotas
+const redefinirSenha = require('./routes/redefinirSenha.js');
 const professor = require('./routes/professor.js')
 const professorOrientador = require('./routes/professorOrientador.js');
 const atualizarPerfil = require('./routes/atualizarPerfil.js');
@@ -38,6 +42,7 @@ app.use('/perfil', atualizarPerfil);
 app.use('/',grupos);
 app.use('/', notificacoes);
 app.use('/',usuarios);
+app.use('/', redefinirSenha);
 
 
 
