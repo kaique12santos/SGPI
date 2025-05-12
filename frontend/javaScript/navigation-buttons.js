@@ -28,7 +28,8 @@ const navigationButtonsByRole = {
       },
       {
         text: "Manual do Curso",
-        url: "/aluno/manual",
+        url: "/uploads/manuais/Manual_de_Projetos_Interdisciplinares_para_o_CST_em_Desenvolvimento_de_Software Multiplataforma.pdf",
+        target: "_blank",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M6 8V1h1v6.117L8.743 6.07a.5.5 0 0 1 .514 0L11 7.117V1h1v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8"/>
                 <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
@@ -181,6 +182,9 @@ function toggleMenu(button) {
     buttonsForRole.forEach(button => {
       const link = document.createElement('a');
       link.href = button.url;
+      if (button.target) {
+        link.target = button.target;
+      }
       
       const buttonElement = document.createElement('button');
       buttonElement.className = 'button-link';

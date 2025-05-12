@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/imagens/perfil', express.static(path.join(__dirname, '..', 'frontend', 'imagens', 'perfil')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usar as rotas importadas
 app.use('/professor', professor);
@@ -38,6 +38,8 @@ app.use('/perfil', atualizarPerfil);
 app.use('/',grupos);
 app.use('/', notificacoes);
 app.use('/',usuarios);
+
+
 
 
 
