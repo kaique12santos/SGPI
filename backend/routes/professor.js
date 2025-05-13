@@ -3,7 +3,24 @@ const router = express.Router();
 const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
-require('dotenv').config()
+require('dotenv').config();
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_FROM,
+    pass: process.env.EMAIL_PASSWORD
+  }, 
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false
+  },
+    debug: true
+});
+
 
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
@@ -51,7 +68,8 @@ router.post('/atividades', async (req, res) => {
     await notificarAlunosSobreAtividade(connection, {
       titulo,
       prazo_entrega,
-      semestre
+      semestre,
+      professor_id
     });
 
     res.json({
@@ -200,11 +218,58 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
 });
 
 
+// async function notificarAlunosSobreAtividade(connection, atividade) {
+//   try {
+//     // Buscar alunos do mesmo semestre
+//     const alunosResult = await connection.execute(
+//       `SELECT id FROM Usuarios
+//        WHERE tipo = 'Aluno' 
+//        AND semestre = :semestre
+//        AND ativo = 1`,
+//       [atividade.semestre],
+//       { outFormat: oracledb.OUT_FORMAT_OBJECT }
+//     );
+
+//     // Para cada aluno, criar uma notificação
+//     for (const aluno of alunosResult.rows) {
+//       await connection.execute(
+//         `INSERT INTO Notificacoes (
+//             usuario_id, titulo, mensagem, tipo
+//          ) VALUES (
+//             :usuario_id,
+//             :titulo,
+//             :mensagem,
+//             'Nova_Atividade'
+//          )`,
+//         {
+//           usuario_id: aluno.ID,
+//           titulo: `Nova atividade: ${atividade.titulo}`,
+//           mensagem: `Uma nova atividade foi criada pelo professor: ${atividade.titulo}. 
+//                     Prazo de entrega: ${new Date(atividade.prazo_entrega).toLocaleString()}`,
+//         },
+//         { autoCommit: true }
+//       );
+//     }
+//     console.log(`Notificações enviadas para ${alunosResult.rows.length} alunos.`);
+//   } catch (error) {
+//     console.error('Erro ao enviar notificações:', error);
+//     // Não quebra o fluxo principal mesmo se as notificações falharem
+//   }
+// }
 async function notificarAlunosSobreAtividade(connection, atividade) {
   try {
+    // Buscar nome do professor
+    const professorResult = await connection.execute(
+      `SELECT nome FROM Usuarios WHERE id = :id`,
+      [atividade.professor_id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const nomeProfessor = professorResult.rows[0]?.NOME || 'Professor';
+
     // Buscar alunos do mesmo semestre
     const alunosResult = await connection.execute(
-      `SELECT id FROM Usuarios
+      `SELECT id, email, nome FROM Usuarios
        WHERE tipo = 'Aluno' 
        AND semestre = :semestre
        AND ativo = 1`,
@@ -212,30 +277,60 @@ async function notificarAlunosSobreAtividade(connection, atividade) {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // Para cada aluno, criar uma notificação
     for (const aluno of alunosResult.rows) {
+      const titulo = `Nova atividade: ${atividade.titulo}`;
+      const mensagem = `O professor ${nomeProfessor} publicou a atividade: <strong>${atividade.titulo}</strong><br>
+                        Prazo de entrega: ${new Date(atividade.prazo_entrega).toLocaleString()}`;
+
+      // 1. Inserir notificação no banco
       await connection.execute(
-        `INSERT INTO Notificacoes (
-            usuario_id, titulo, mensagem, tipo
-         ) VALUES (
-            :usuario_id,
-            :titulo,
-            :mensagem,
-            'Nova_Atividade'
-         )`,
-        {
-          usuario_id: aluno.ID,
-          titulo: `Nova atividade: ${atividade.titulo}`,
-          mensagem: `Uma nova atividade foi criada pelo professor: ${atividade.titulo}. 
-                    Prazo de entrega: ${new Date(atividade.prazo_entrega).toLocaleString()}`,
-        },
+        `INSERT INTO Notificacoes (usuario_id, titulo, mensagem, tipo) 
+         VALUES (:1, :2, :3, 'Nova_Atividade')`,
+        [aluno.ID, titulo, mensagem],
         { autoCommit: true }
       );
+
+      // 2. Enviar e-mail
+      try {
+        await transporter.sendMail({
+          from: `SGPI <${process.env.EMAIL_FROM}>`,
+          to: aluno.EMAIL,
+          subject: `📢 Nova Atividade - ${atividade.titulo}`,
+          html: `
+                    <!DOCTYPE html>
+                    <html lang="pt-BR">
+                    <head><meta charset="UTF-8"><title>Nova Atividade</title></head>
+                    <body style="margin:0;padding:0;background-color:#f3f4f6;font-family:Arial,sans-serif;">
+                      <div style="max-width:600px;margin:40px auto;background:white;padding:30px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                        <div style="background:#2563eb;color:white;padding:16px;border-radius:6px 6px 0 0;text-align:center;font-size:20px;">
+                          📘 Nova Atividade Publicada
+                        </div>
+                        <div style="padding:24px;font-size:16px;color:#374151;">
+                          <p>Olá <strong>${aluno.NOME}</strong>,</p>
+                          <p>O professor <strong>${nomeProfessor}</strong> publicou uma nova atividade no SGPI:</p>
+                          <div style="background:#e0f2fe;padding:10px;border-left:4px solid #3b82f6;margin:16px 0;border-radius:4px;font-weight:bold;">
+                            📌 <strong>${atividade.titulo}</strong>
+                          </div>
+                          <p><strong>Prazo de entrega:</strong> ${new Date(atividade.prazo_entrega).toLocaleString()}</p>
+                          <p>Acesse o sistema SGPI para mais detalhes e entrega.</p>
+                        </div>
+                        <div style="text-align:center;font-size:13px;color:#6b7280;margin-top:30px;">
+                          Sistema de Gestão de Projetos Integradores - SGPI<br>
+                          Este e-mail foi enviado automaticamente. Por favor, não responda.
+                        </div>
+                      </div>
+                    </body>
+                    </html> `
+        });
+        console.log(`📧 Notificação enviada para ${aluno.EMAIL}`);
+      } catch (emailError) {
+        console.warn(`❌ Falha ao enviar e-mail para ${aluno.EMAIL}:`, emailError.message);
+      }
     }
-    console.log(`Notificações enviadas para ${alunosResult.rows.length} alunos.`);
+
+    console.log(`✅ Notificações internas e e-mails enviados para ${alunosResult.rows.length} alunos.`);
   } catch (error) {
-    console.error('Erro ao enviar notificações:', error);
-    // Não quebra o fluxo principal mesmo se as notificações falharem
+    console.error('Erro ao notificar alunos:', error);
   }
 }
 

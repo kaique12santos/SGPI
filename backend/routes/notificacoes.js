@@ -4,6 +4,7 @@ const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
+
 // Função para converter CLOB para string (já existente em professor.js)
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
