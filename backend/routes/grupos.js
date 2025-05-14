@@ -16,12 +16,10 @@ function lobToString(lob) {
   });
 }
 
-// Rota para a página de criação de grupos
 router.get('/criar-grupos', (req, res) => {
   res.sendFile(path.join(frontendPath, 'criar-grupos.html'));
 });
 
-// Criar novo grupo
 router.post('/grupos', async (req, res) => {
   const connection = await getConnection();
   const { nome, descricao, semestre, alunos } = req.body;
@@ -41,7 +39,6 @@ router.post('/grupos', async (req, res) => {
       });
     }
 
-    // Inserir grupo e obter ID
     const resultGrupo = await connection.execute(
       `INSERT INTO Grupos (nome, descricao, semestre) 
        VALUES (:1, :2, :3) 
@@ -54,7 +51,7 @@ router.post('/grupos', async (req, res) => {
     await connection.commit();
 
     // Chamar procedure para adicionar alunos
-    const alunosCSV = alunos.join(','); // Junta os IDs em string separada por vírgula
+    const alunosCSV = alunos.join(','); 
 
     await connection.execute(
       `BEGIN
@@ -93,7 +90,6 @@ router.post('/grupos', async (req, res) => {
   }
 });
 
-// Listar todos os grupos
 router.get('/grupos', async (req, res) => {
   const connection = await getConnection();
 
@@ -108,7 +104,6 @@ router.get('/grupos', async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // Processar resultados para converter CLOBs
     const grupos = await Promise.all(result.rows.map(async row => ({
       id: row.ID,
       nome: row.NOME,
@@ -132,7 +127,6 @@ router.get('/grupos', async (req, res) => {
   }
 });
 
-// Obter detalhes de um grupo específico
 router.get('/grupos/:id', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.id, 10);
@@ -244,7 +238,6 @@ router.put('/grupos/:id', async (req, res) => {
       return res.status(404).json({ message: 'Grupo não encontrado.' });
     }
 
-    // Atualizar grupo
     const result = await connection.execute(
       `UPDATE Grupos
        SET nome = :nome,
@@ -305,7 +298,6 @@ router.post('/grupos/:id/membros', async (req, res) => {
   }
 
   try {
-    // Verificar se o usuário já está no grupo
     const verificacao = await connection.execute(
       `SELECT COUNT(*) as count 
        FROM Usuario_Grupo 
@@ -318,7 +310,6 @@ router.post('/grupos/:id/membros', async (req, res) => {
       return res.status(400).json({ message: 'Usuário já pertence ao grupo.' });
     }
 
-    // Adicionar usuário ao grupo
     const result = await connection.execute(
       `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel)
        VALUES (:usuario_id, :grupoId, :papel)`,
@@ -342,7 +333,6 @@ router.post('/grupos/:id/membros', async (req, res) => {
     if (connection) await connection.close();
   }
 });
-// Buscar alunos por semestre
 router.get('/alunos/semestre/:semestre', async (req, res) => {
   const connection = await getConnection();
   const semestre = req.params.semestre;
@@ -374,7 +364,6 @@ router.get('/alunos/semestre/:semestre', async (req, res) => {
 });
 
 
-// Remover membro do grupo
 router.delete('/grupos/:grupoId/membros/:usuarioId', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.grupoId, 10);
@@ -420,14 +409,12 @@ router.delete('/grupos/:id', async (req, res) => {
   }
 
   try {
-    // Remover vínculos primeiro
     await connection.execute(
       `DELETE FROM Usuario_Grupo WHERE grupo_id = :grupoId`,
       [grupoId],
       { autoCommit: false }
     );
 
-    // Remover o grupo
     const result = await connection.execute(
       `DELETE FROM Grupos WHERE id = :grupoId`,
       [grupoId],

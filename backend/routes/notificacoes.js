@@ -5,7 +5,6 @@ const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
 
-// Função para converter CLOB para string (já existente em professor.js)
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
     if (lob === null) return resolve(null);
@@ -17,7 +16,6 @@ function lobToString(lob) {
   });
 }
 
-// Rota para buscar notificações do usuário
 router.get('/notificacoes', async (req, res) => {
   const connection = await getConnection();
 
@@ -25,7 +23,6 @@ router.get('/notificacoes', async (req, res) => {
     const usuarioId = parseInt(req.query.usuario_id, 10);
     if (isNaN(usuarioId)) return res.status(400).json({ message: 'ID de usuário inválido.' });
 
-    // Quantidade de notificações não lidas (contador)
     const contadorQuery = await connection.execute(
       `SELECT COUNT(*) as total FROM Notificacoes 
        WHERE usuario_id = :usuarioId AND lida = 0`,
@@ -35,7 +32,6 @@ router.get('/notificacoes', async (req, res) => {
     
     const totalNaoLidas = contadorQuery.rows[0].TOTAL;
 
-    // Buscar as notificações (limitado a 20 mais recentes)
     const result = await connection.execute(
       `SELECT id, titulo, mensagem, tipo, lida, 
               TO_CHAR(data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
@@ -70,7 +66,6 @@ router.get('/notificacoes', async (req, res) => {
   }
 });
 
-// Rota para marcar notificação como lida
 router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
   const connection = await getConnection();
 
@@ -82,7 +77,6 @@ router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
       return res.status(400).json({ message: 'IDs inválidos.' });
     }
 
-    // Verificar se a notificação pertence ao usuário
     const verificacao = await connection.execute(
       `SELECT COUNT(*) as count FROM Notificacoes 
        WHERE id = :notificacaoId AND usuario_id = :usuarioId`,
@@ -94,7 +88,6 @@ router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
       return res.status(403).json({ message: 'Notificação não encontrada ou sem permissão.' });
     }
 
-    // Marcar como lida e atualizar a data de leitura
     const result = await connection.execute(
       `UPDATE Notificacoes
        SET lida = 1, 
@@ -118,7 +111,6 @@ router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
   }
 });
 
-// Marcar todas as notificações como lidas
 router.put('/notificacoes/todas/lidas', async (req, res) => {
   const connection = await getConnection();
 

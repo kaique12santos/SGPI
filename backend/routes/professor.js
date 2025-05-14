@@ -258,7 +258,7 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
 // }
 async function notificarAlunosSobreAtividade(connection, atividade) {
   try {
-    // Buscar nome do professor
+    
     const professorResult = await connection.execute(
       `SELECT nome FROM Usuarios WHERE id = :id`,
       [atividade.professor_id],
@@ -267,7 +267,6 @@ async function notificarAlunosSobreAtividade(connection, atividade) {
 
     const nomeProfessor = professorResult.rows[0]?.NOME || 'Professor';
 
-    // Buscar alunos do mesmo semestre
     const alunosResult = await connection.execute(
       `SELECT id, email, nome FROM Usuarios
        WHERE tipo = 'Aluno' 
@@ -282,7 +281,6 @@ async function notificarAlunosSobreAtividade(connection, atividade) {
       const mensagem = `O professor ${nomeProfessor} publicou a atividade: <strong>${atividade.titulo}</strong><br>
                         Prazo de entrega: ${new Date(atividade.prazo_entrega).toLocaleString()}`;
 
-      // 1. Inserir notificação no banco
       await connection.execute(
         `INSERT INTO Notificacoes (usuario_id, titulo, mensagem, tipo) 
          VALUES (:1, :2, :3, 'Nova_Atividade')`,
@@ -290,7 +288,6 @@ async function notificarAlunosSobreAtividade(connection, atividade) {
         { autoCommit: true }
       );
 
-      // 2. Enviar e-mail
       try {
         await transporter.sendMail({
           from: `SGPI <${process.env.EMAIL_FROM}>`,
