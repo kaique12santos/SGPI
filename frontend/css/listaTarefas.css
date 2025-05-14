@@ -1,0 +1,191 @@
+.container-conteudo {
+    height: 100%;
+    width: 100%;
+    
+    
+}
+h2{
+    margin: 0 0 13px 0;
+    padding: 19px 0 10px 0;
+}
+
+.filters {
+    background-color: #f5f5f5;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.filters select, .filters input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filters label {
+    font-weight: 500;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-pendente {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-entregue {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-atrasado {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.status-avaliado {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.atividades-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 0 5px 0 5px;
+    
+}
+
+.atividade-card {
+    background-color: #f5deb3;
+    border: 1px solid #b88a36;
+    border-left: 3px solid #922b21;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    cursor: pointer;
+    padding: 15px;
+    margin: 10px 0;
+    width: 90%;
+}
+
+.atividade-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.atividade-header {
+    padding: 15px;
+    background-color: #e0f2fe;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.atividade-header h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 5px;
+}
+
+.atividade-body {
+    padding: 15px;
+}
+
+.atividade-footer {
+    padding: 12px 15px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9fafb;
+}
+
+.info-grupo {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.prazo {
+    font-size: 14px;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.prazo svg {
+    color: #6b7280;
+}
+
+.criterios {
+    font-size: 14px;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sem-atividades {
+    text-align: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sem-atividades h3 {
+    color: #4b5563;
+    margin-bottom: 10px;
+}
+
+.professor-name {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.loading img {
+    width: 50px;
+    height: 50px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border-left: 4px solid #ef4444;
+}
+
+@media (max-width: 768px) {
+    .atividades-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

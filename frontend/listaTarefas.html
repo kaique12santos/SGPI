@@ -8,10 +8,10 @@
     
     <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/professor.css">
     <link rel="stylesheet" href="/css/dark-mode.css">
     <link rel="stylesheet" href="/css/alerts.css">
     <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/listaTarefas.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
     
     <!--______________________________-->
@@ -53,8 +53,60 @@
         </div>
 
 
+        <div class="container-conteudo">
+            <div class="page-name">
+                <h2>Minhas Atividades</h2>
+            </div>
+            
+            <div class="filters">
+                <div>
+                    <label for="filtro-status">Status:</label>
+                    <select id="filtro-status">
+                        <option value="todos">Todos</option>
+                        <option value="pendente">Pendentes</option>
+                        <option value="entregue">Entregues</option>
+                        <option value="avaliado">Avaliados</option>
+                        <option value="atrasado">Atrasados</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="filtro-prazo">Prazo:</label>
+                    <select id="filtro-prazo">
+                        <option value="todos">Todos</option>
+                        <option value="proximos">Próximos 7 dias</option>
+                        <option value="vencidos">Vencidos</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="filtro-busca">Buscar:</label>
+                    <input type="text" id="filtro-busca" placeholder="Digite o título...">
+                </div>
+            </div>
+            
+            <div id="mensagem-erro" class="alert" style="display: none;">
+                Ocorreu um erro ao carregar as atividades. Por favor, tente novamente mais tarde.
+            </div>
+            
+            <div id="loading" class="loading">
+                <div>Carregando atividades...</div>
+            </div>
+            
+            <div id="atividades-container" class="atividades-container">
+                <!-- O conteúdo será preenchido pelo JavaScript -->
+            </div>
+            
+            <div id="sem-atividades" class="sem-atividades" style="display: none;">
+                <h3>Nenhuma atividade encontrada</h3>
+                <p>Não há atividades disponíveis para o seu semestre no momento.</p>
+            </div>
+        </div>
+
+
     <script defer src="/javaScript/efeitoMenu.js"></script>
     <script defer src="/javaScript/dark_mode.js"></script>
+    <script defer src="/javaScript/listaTarefas.js"></script>
     <script src="/javaScript/GerarMenu.js"></script>
     <script src="/javaScript/imagemPerfil.js"></script>
 

@@ -19,6 +19,7 @@ const atualizarPerfil = require('./routes/atualizarPerfil.js');
 const grupos = require('./routes/grupos.js');
 const notificacoes = require('./routes/notificacoes.js');
 const usuarios = require ('./routes/usuarios.js');
+const aluno = require('./routes/alunoAtividade.js')
 
 
 
@@ -43,6 +44,7 @@ app.use('/',grupos);
 app.use('/', notificacoes);
 app.use('/',usuarios);
 app.use('/', redefinirSenha);
+app.use('/', aluno);
 
 
 
