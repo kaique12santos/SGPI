@@ -53,9 +53,9 @@ O <b>Sistema de Gestão de PIS</b> é uma plataforma web projetada para centrali
 - [X] Criação e Gestão de Tarefas
 - [X] Notificações automáticas por e-mail
 - [X] Gerenciamento de grupos de alunos
-- [ ] Upload de arquivos de artefatos
-- [ ] Avaliação e feedback de professores
-- [ ] Visualização de avaliações e pedidos de reconsideração
+- [X] Upload de arquivos de artefatos
+- [X] Avaliação e feedback de professores
+- [X] Visualização de avaliações e pedidos de reconsideração
 - [ ] Geração de relatórios acadêmicos
 - [ ] Organização de projetos por semestre letivo
 - [X] Recuperação de senha
