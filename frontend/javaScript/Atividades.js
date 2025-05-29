@@ -143,8 +143,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 semestre: parseInt(document.getElementById('edit-semestre').value),
                 prazo_entrega: document.getElementById('edit-prazo').value,
                 criterios_avaliacao: parseInt(document.getElementById('edit-criterios').value, 10),
-                professor_id: professorId,
-                projeto_id: 1     
+                professor_id: professorId,   
             };
             console.log(dadosAtualizados)
             console.log("✔️ professor_id está definido corretamente:", dadosAtualizados.professor_id);
@@ -167,15 +166,16 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 div.querySelector('strong').textContent = dadosAtualizados.titulo;
                 div.querySelector('br').nextSibling.textContent = `Prazo: ${formatarData(dadosAtualizados.prazo_entrega)}`;
                 
-                titulo = dadosAtualizados.titulo;
-                descricao = dadosAtualizados.descricao;
-                semestre = dadosAtualizados.semestre;
-                prazo_entrega = dadosAtualizados.prazo_entrega;
+                 titulo = dadosAtualizados.titulo;
+                 descricao = dadosAtualizados.descricao;
+                 semestre = dadosAtualizados.semestre;
+                 prazo_entrega = dadosAtualizados.prazo_entrega;
                 criterios_avaliacao = dadosAtualizados.criterios_avaliacao;
                 
                 
                 document.body.removeChild(overlay);
                 ativar(data.message, 'sucesso', '');
+                carregarAtividades()
                 
             } catch (error) {
                 console.error('Erro:', error);
@@ -252,7 +252,6 @@ form.addEventListener('submit', (event) => {
     const prazo_entrega = document.getElementById('dataEntrega').value;
     const criterios_avaliacao = document.getElementById('pontos').value;
     const professor_id = parseInt(localStorage.getItem('usuarioId'));
-    const projeto_id = 1;
 
     document.getElementById('semestreError').textContent = '';
 
@@ -276,7 +275,6 @@ form.addEventListener('submit', (event) => {
             titulo,
             descricao,
             professor_id,
-            projeto_id,
             prazo_entrega,
             criterios_avaliacao,
             semestre

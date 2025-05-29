@@ -7,7 +7,14 @@ const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
-    if (lob === null) return resolve(null);
+    if (!lob) return resolve('');
+
+    // Se já é uma string, retorna direto
+    if (typeof lob === 'string') return resolve(lob);
+
+    // Se não for um stream válido, converte como string mesmo assim
+    if (typeof lob.setEncoding !== 'function') return resolve(String(lob));
+
     let content = '';
     lob.setEncoding('utf8');
     lob.on('data', chunk => content += chunk);

@@ -7,7 +7,18 @@ const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 // Utilitário para converter CLOB em string
 function lobToString(lob) {
   return new Promise((resolve, reject) => {
+    // Se o lob é null ou undefined, retorna null
     if (!lob) return resolve(null);
+    
+    // Se já é uma string, retorna diretamente
+    if (typeof lob === 'string') return resolve(lob);
+    
+    // Se não tem o método setEncoding, provavelmente já é uma string ou valor simples
+    if (typeof lob.setEncoding !== 'function') {
+      return resolve(String(lob));
+    }
+    
+    // Caso seja um LOB válido, processa normalmente
     let content = '';
     lob.setEncoding('utf8');
     lob.on('data', chunk => content += chunk);

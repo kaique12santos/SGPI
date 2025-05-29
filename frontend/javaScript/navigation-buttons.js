@@ -12,7 +12,7 @@ const navigationButtonsByRole = {
               </svg>`
       },
       {
-        text: "Atividades pendentes",
+        text: "Artefatos pendentes",
         url: "/listaTarefas.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
@@ -21,7 +21,7 @@ const navigationButtonsByRole = {
       },
       {
         text: "Visualizar Notas",
-        url: "/aluno/visualizar-materias",
+        url: "/notas.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M7.84 4.1a.178.178 0 0 1 .32 0l.634 1.285a.18.18 0 0 0 .134.098l1.42.206c.145.021.204.2.098.303L9.42 6.993a.18.18 0 0 0-.051.158l.242 1.414a.178.178 0 0 1-.258.187l-1.27-.668a.18.18 0 0 0-.165 0l-1.27.668a.178.178 0 0 1-.257-.187l.242-1.414a.18.18 0 0 0-.05-.158l-1.03-1.001a.178.178 0 0 1 .098-.303l1.42-.206a.18.18 0 0 0 .134-.098z"/>
                 <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
@@ -42,14 +42,14 @@ const navigationButtonsByRole = {
     professor: [
       {
         text: "Artefatos entregues",
-        url: "/professor/artefatos-entregues",
+        url: "/artefatosEntregues.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855a.75.75 0 0 0-.124 1.329l4.995 3.178 1.531 2.406a.5.5 0 0 0 .844-.536L6.637 10.07l7.494-7.494-1.895 4.738a.5.5 0 1 0 .928.372zm-2.54 1.183L5.93 9.363 1.591 6.602z"/>
                 <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-1.993-1.679a.5.5 0 0 0-.686.172l-1.17 1.95-.547-.547a.5.5 0 0 0-.708.708l.774.773a.75.75 0 0 0 1.174-.144l1.335-2.226a.5.5 0 0 0-.172-.686"/>
               </svg>`
       },
       {
-        text: "Atividades pendentes",
+        text: "Artefatos pendentes",
         url: "/professor/atividades-pendentes",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
@@ -57,7 +57,7 @@ const navigationButtonsByRole = {
               </svg>`
       },
       {
-        text: "Criar atividade",
+        text: "Criar Artefato",
         url: "/professor/criar-atividade",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M8 6.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 .5-.5"/>
@@ -65,11 +65,13 @@ const navigationButtonsByRole = {
               </svg>`
       },
       {
-        text: "Atividades corrigidas",
-        url: "/professor/atividades-corrigidas",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+        text: "Pedidos de Reconsiderações",
+        url: "/reconsideracoes.html",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" class="link-icon">
+                '<path d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"/>
+                <path d="M9 7h6"/>
+                <path d="m9 14 2 2 4-4"/>
+                <path d="M10 3v3.5h4V3z"/>
               </svg>`
       }
     ],
@@ -77,15 +79,15 @@ const navigationButtonsByRole = {
     professor_orientador: [
       {
         text: "Artefatos entregues",
-        url: "/professor_orientador/artefatos-entregues",
+        url: "/artefatosEntregues.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855a.75.75 0 0 0-.124 1.329l4.995 3.178 1.531 2.406a.5.5 0 0 0 .844-.536L6.637 10.07l7.494-7.494-1.895 4.738a.5.5 0 1 0 .928.372zm-2.54 1.183L5.93 9.363 1.591 6.602z"/>
                 <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-1.993-1.679a.5.5 0 0 0-.686.172l-1.17 1.95-.547-.547a.5.5 0 0 0-.708.708l.774.773a.75.75 0 0 0 1.174-.144l1.335-2.226a.5.5 0 0 0-.172-.686"/>
               </svg>`
       },
       {
-        text: "Atividades pendentes",
-        url: "/professor_orientador/atividades-pendentes",
+        text: "Criar Projetos",
+        url: "/projetos.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
                 <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
@@ -99,7 +101,7 @@ const navigationButtonsByRole = {
               </svg>`
       },
       {
-        text: "Criar atividade",
+        text: "Criar Artefatos",
         url: "/professor_orientador/criar-atividade",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                 <path d="M8 6.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 .5-.5"/>
@@ -107,11 +109,13 @@ const navigationButtonsByRole = {
               </svg>`
       },
       {
-        text: "Atividades corrigidas",
-        url: "/professor_orientador/atividades-corrigidas",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+        text: "Pedidos de Reconsiderações",
+        url: "/reconsideracoes.html",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" class="link-icon">
+                '<path d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"/>
+                <path d="M9 7h6"/>
+                <path d="m9 14 2 2 4-4"/>
+                <path d="M10 3v3.5h4V3z"/>
               </svg>`
       }
     ],

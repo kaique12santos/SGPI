@@ -22,16 +22,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-function lobToString(lob) {
-  return new Promise((resolve, reject) => {
-    if (lob === null) return resolve(null);
-    let content = '';
-    lob.setEncoding('utf8');
-    lob.on('data', chunk => content += chunk);
-    lob.on('end', () => resolve(content));
-    lob.on('error', err => reject(err));
-  });
-}
+
 
 router.get('/criar-atividade', (req, res) => {
   return res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
@@ -42,7 +33,6 @@ router.post('/atividades', async (req, res) => {
     titulo,
     descricao,
     professor_id,
-    projeto_id,
     prazo_entrega,
     criterios_avaliacao,
     semestre,
@@ -51,32 +41,27 @@ router.post('/atividades', async (req, res) => {
   const connection = await getConnection();
 
   try {
-    if (!titulo || !descricao || !professor_id || !projeto_id || !prazo_entrega || !semestre) {
+    if (!titulo || !descricao || !professor_id || !prazo_entrega || !semestre) {
       return res.status(400).json({ success: false, message: 'Preencha todos os campos obrigatórios.' });
     }
 
-    const result = await connection.execute(
-      `INSERT INTO Atividades (
-          titulo, descricao, professor_id, projeto_id, prazo_entrega,
-          criterios_avaliacao, semestre
-      ) VALUES (
-          :1, :2, :3, :4, TO_TIMESTAMP(:5, 'YYYY-MM-DD"T"HH24:MI'), :6, :7
-      )`,
-      [titulo, descricao, professor_id, projeto_id, prazo_entrega, criterios_avaliacao, semestre],
+    await connection.execute(
+      `BEGIN
+          criar_atividade_para_semestre(:1, :2, :3, TO_TIMESTAMP(:4, 'YYYY-MM-DD"T"HH24:MI:SS'), :5, :6);
+      END;`,
+      [titulo, descricao, professor_id, prazo_entrega, criterios_avaliacao, semestre],
       { autoCommit: true }
     );
+    
+    res.json({
+      success: true,
+      message: 'Atividade cadastrada com sucesso!'
+    });
     await notificarAlunosSobreAtividade(connection, {
       titulo,
       prazo_entrega,
       semestre,
       professor_id
-    });
-
-    res.json({
-      success: result.rowsAffected > 0,
-      message: result.rowsAffected > 0
-        ? 'Atividade cadastrada com sucesso!'
-        : 'Erro ao cadastrar atividade.'
     });
   } catch (error) {
     console.error('Erro ao cadastrar atividade:', error);
@@ -94,23 +79,29 @@ router.get('/atividades', async (req, res) => {
     if (isNaN(professorId)) return res.status(400).json({ message: 'ID de professor inválido.' });
 
     const result = await connection.execute(
-      `SELECT id, titulo, descricao, criterios_avaliacao,
-              TO_CHAR(prazo_entrega, 'YYYY-MM-DD"T"HH24:MI') as prazo_entrega, semestre
-       FROM Atividades
-       WHERE professor_id = :professorId
-       ORDER BY data_criacao DESC`,
+      `SELECT 
+          MIN(id) AS id,  -- Pega o menor ID (pode ser qualquer função de agregação)
+          titulo,
+          descricao,
+          criterios_avaliacao,
+          TO_CHAR(prazo_entrega, 'YYYY-MM-DD"T"HH24:MI') as prazo_entrega,
+          semestre
+      FROM Atividades
+      WHERE professor_id = :professorId
+      GROUP BY titulo, descricao, criterios_avaliacao, prazo_entrega, semestre  -- Agrupa as atividades
+      ORDER BY MIN(data_criacao) DESC`,
       [professorId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    const atividades = await Promise.all(result.rows.map(async row => ({
+    const atividades = result.rows.map(row => ({ 
       id: row.ID,
       titulo: row.TITULO,
-      descricao: await lobToString(row.DESCRICAO),
-      criterios_avaliacao: await lobToString(row.CRITERIOS_AVALIACAO),
+      descricao: row.DESCRICAO,  
+      criterios_avaliacao: row.CRITERIOS_AVALIACAO,  
       prazo_entrega: row.PRAZO_ENTREGA,
       semestre: row.SEMESTRE
-    })));
+    }));
 
     res.json(atividades);
   } catch (error) {
@@ -127,6 +118,8 @@ router.put('/atividades/:atividadeId', async (req, res) => {
   try {
     const atividadeId = parseInt(req.params.atividadeId, 10);
     const professorId = parseInt(req.body.professor_id, 10);
+    console.log("ID da atividade recebido:", atividadeId);
+    console.log("Dados recebidos:", JSON.stringify(req.body));
     console.log('📥 Dados recebidos no body:', req.body);
     console.log('🆔 atividadeId:', atividadeId);
     console.log('🧑 professorId:', professorId);
@@ -147,29 +140,29 @@ router.put('/atividades/:atividadeId', async (req, res) => {
       return res.status(404).json({ message: 'Atividade não encontrada ou sem permissão.' });
     }
 
-    const result = await connection.execute(
-      `UPDATE Atividades
-       SET titulo = :titulo,
-           descricao = :descricao,
-           prazo_entrega = TO_TIMESTAMP(:prazo_entrega, 'YYYY-MM-DD"T"HH24:MI'),
-           criterios_avaliacao = :criterios_avaliacao,
-           semestre = :semestre,
-           data_atualizacao = CURRENT_TIMESTAMP
-       WHERE id = :atividadeId AND professor_id = :professorId`,
-      [titulo, descricao, prazo_entrega, criterios_avaliacao, semestre, atividadeId, professorId],
+    await connection.execute(
+      `BEGIN
+          atualizar_atividades_por_data_criacao(:1, :2, :3, TO_TIMESTAMP(:4, 'YYYY-MM-DD"T"HH24:MI'), :5, :6);
+      END;`,
+      [atividadeId, titulo, descricao, prazo_entrega, criterios_avaliacao, semestre],
       { autoCommit: true }
-    );
-
+  );
     res.json({
-      message: result.rowsAffected > 0
-        ? 'Atividade atualizada com sucesso!'
-        : 'Não foi possível atualizar a atividade'
+      success: true,
+      message: 'Atividade atualizada com sucesso!'
     });
   } catch (error) {
     console.error('Erro ao atualizar atividade:', error);
     res.status(500).json({ message: 'Erro no servidor.', error: error.message });
   } finally {
-    if (connection) await connection.close();
+    if (connection) {
+      try {
+        await connection.close();
+        console.log('Conexão com o Oracle fechada com sucesso.');
+      } catch (err) {
+        console.error('Erro ao fechar a conexão com o Oracle:', err);
+      }
+    }
   }
 });
 
@@ -198,16 +191,17 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
       return res.status(403).json({ message: 'Atividade não encontrada ou sem permissão.' });
     }
 
-    const result = await connection.execute(
-      `DELETE FROM Atividades WHERE id = :atividadeId AND professor_id = :professorId`,
-      [atividadeId, professorId],
+    await connection.execute(
+      `BEGIN
+         deletar_atividades_por_data_criacao(:id);
+       END;`,
+      { id: atividadeId },
       { autoCommit: true }
     );
 
     res.json({
-      message: result.rowsAffected > 0
-        ? 'Atividade excluída com sucesso'
-        : 'Erro ao excluir a atividade'
+      success: true,
+      message: 'Atividades excluídas com sucesso'
     });
   } catch (error) {
     console.error('Erro ao excluir atividade:', error);
@@ -216,6 +210,8 @@ router.delete('/atividades/:atividadeId', async (req, res) => {
     if (connection) await connection.close();
   }
 });
+
+
 
 
 // async function notificarAlunosSobreAtividade(connection, atividade) {

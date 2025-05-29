@@ -20,6 +20,11 @@ const grupos = require('./routes/grupos.js');
 const notificacoes = require('./routes/notificacoes.js');
 const usuarios = require ('./routes/usuarios.js');
 const aluno = require('./routes/alunoAtividade.js')
+const entregas = require('./routes/entregas.js')
+const projetos = require('./routes/projetos.js')
+const avaliar = require('./routes/avaliacoes.js')
+const notas = require('./routes/alunoNotas.js')
+const reconsideracoes = require('./routes/professorReconsideracoes.js')
 
 
 
@@ -45,6 +50,11 @@ app.use('/', notificacoes);
 app.use('/',usuarios);
 app.use('/', redefinirSenha);
 app.use('/', aluno);
+app.use('/', entregas);
+app.use('/',projetos);
+app.use('/',avaliar);
+app.use('/',notas);
+app.use('/',reconsideracoes);
 
 
 
@@ -71,10 +81,8 @@ app.post('/login', async (req, res) => {
 
             const userRole = result.rows[0].TIPO;
 
-            // Mapeie os valores do banco para os valores esperados pelo frontend
             let roleFrontend = 'aluno'; // valor padrão
             
-            // Adapte este mapeamento conforme os valores do seu banco
             if (userRole === 'Professor' || userRole === 'professor') {
                 roleFrontend = 'professor';
             } else if (userRole === 'Coordenador' || userRole === 'coordenador') {

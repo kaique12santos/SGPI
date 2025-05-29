@@ -1,0 +1,62 @@
+.avaliar-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #f8f4f4;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
+}
+
+.avaliar-container h1 {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #111;
+  margin-bottom: 2rem;
+}
+
+.avaliar-container label {
+  font-weight: 600;
+  color: #111111;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 0.4rem;
+  margin-top: 1rem;
+}
+
+.avaliar-container input[type="number"],
+.avaliar-container textarea {
+  background-color: #e2e2e2;
+  border: none;
+  border-bottom: #686868 solid 1px;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  font-size: 1rem;
+  color: #111111;
+  margin-bottom: 1rem;
+}
+
+.btn-enviar {
+  background-color: #970000;
+  border: none;
+  border-radius: 15px;
+  padding: 12px;
+  width: 100%;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.3s ease;
+}
+
+.btn-enviar:hover {
+  background-color: #a60000;
+}
+
+#mensagem {
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 500;
+}

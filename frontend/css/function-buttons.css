@@ -53,7 +53,7 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 1rem;
     transition: background-color 0.3s;
 }
 
@@ -67,11 +67,5 @@
 }
 
 
-.dark-mode .logout-btn {
-    background-color: #b71c1c;
-}
 
-.dark-mode .logout-btn:hover {
-    background-color: #f44336;
-}
 

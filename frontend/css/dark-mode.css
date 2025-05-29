@@ -179,6 +179,13 @@ html.dark-mode .container{
 html.dark-mode .container h3{
     color: #ffffff;
 }
+html.dark-mode .filters{
+    background-color: rgb(18 18 18 / 90%);
+}
+html.dark-mode .filters label{
+    color: #ffffff;
+}
+
 
 html.dark-mode .filter-section,
 html.dark-mode .users-table,

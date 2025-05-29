@@ -146,12 +146,12 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 semestre: parseInt(document.getElementById('edit-semestre').value),
                 prazo_entrega: document.getElementById('edit-prazo').value,
                 criterios_avaliacao: document.getElementById('edit-criterios').value,
-                professor_id: professorId, 
-                projeto_id: 1     
+                professor_id: professorId,   
             };
             
             try {
-                
+                console.log("ID da atividade:", atividadeId);
+                console.log("Dados a serem enviados:", JSON.stringify(dadosAtualizados));
                 const response = await fetch(`/professor_orientador/atividades/${atividadeId}`, {
                     method: 'PUT',
                     headers: {
@@ -264,7 +264,6 @@ form.addEventListener('submit', (event) => {
 
 
    
-    const projeto_id = 1;
 
     document.getElementById('semestreError').textContent = '';
 
@@ -289,7 +288,6 @@ form.addEventListener('submit', (event) => {
             titulo,
             descricao,
             professor_id,
-            projeto_id,
             prazo_entrega,
             criterios_avaliacao,
             semestre

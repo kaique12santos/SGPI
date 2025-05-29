@@ -1,0 +1,53 @@
+.entrega-card {
+  background-color: #f5deb3;
+  border: 1px solid #b88a36;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid #928121;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .entrega-info {
+    margin-bottom: 10px;
+  }
+
+  .entrega-info span {
+    display: block;
+    font-size: 14px;
+  }
+
+  .entrega-acoes {
+    display: flex;
+    gap: 10px;
+  }
+
+  .botao-avaliar {
+    background-color: #970000;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .botao-avaliar:hover {
+    background-color: #a60000;
+  }
+
+  .link-arquivo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #10b981;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #entregas-container{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }

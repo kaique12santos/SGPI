@@ -1,0 +1,177 @@
+
+  /*** Estilos para a página de Notas baseado no listaTarefas.css ***/
+.container-conteudo {
+    height: 100%;
+    width: 100%;
+    }
+    h1 {
+    margin: 0 0 20px 0;
+    padding: 20px 0 10px 0;
+    
+    }
+    h2 {
+    margin: 0 0 13px 0;
+    padding: 19px 0 10px 0;
+    }
+    #notas-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 0 5px 20px 5px;
+    width: 98%;
+    }
+    .card-nota {
+    background-color: #f5f5f5;
+    border: 1px solid #d1d5db;
+    overflow-wrap: break-word;
+    border-left: 3px solid #0066cc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    padding: 15px;
+    margin: 10px 0;
+    width: 90%;
+    }
+    .card-nota:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .card-nota strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #4b5563;
+    }
+    .btn-reconsiderar {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #0047cc;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    }
+    .btn-reconsiderar:hover {
+    background-color: #0030ccbb;
+    }
+    /* Status de reconsideração */
+    .card-nota strong:last-of-type {
+    
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    background-color: #e0f2fe;
+    color: #5e5e5e;
+    }
+    /* Modal de reconsideração */
+    .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    }
+    .modal.hidden {
+    display: none;
+    }
+    .modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .modal-content h2 {
+    color: #1e3a8a;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+    }
+    #comentario-reconsideracao {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-family: inherit;
+    resize: vertical;
+    }
+    #enviar-reconsideracao, #cancelar-reconsideracao {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    }
+    #enviar-reconsideracao {
+    background-color: #0066cc;
+    color: white;
+    margin-right: 10px;
+    }
+    #enviar-reconsideracao:hover {
+    background-color: #004f99;
+    }
+    #cancelar-reconsideracao {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    }
+    #cancelar-reconsideracao:hover {
+    background-color: #e5e7eb;
+    }
+    /* Status das avaliações */
+    .status-pendente {
+    background-color: #fef3c7;
+    color: #92400e;
+    }
+    .status-entregue {
+    background-color: #d1fae5;
+    color: #065f46;
+    }
+    .status-reprovado {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    }
+    .status-aprovado {
+    background-color: #d1fae5;
+    color: #065f46;
+    }
+    /* Mensagem quando não há notas */
+    .sem-notas {
+    text-align: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    grid-column: 1 / -1;
+    }
+    .sem-notas h3 {
+    color: #4b5563;
+    margin-bottom: 10px;
+    }
+    /* Responsividade */
+    @media (max-width: 768px) {
+    #notas-container {
+    grid-template-columns: 1fr;
+    }
+    .card-nota {
+        width: 100%;
+    }
+    
+    .modal-content {
+        width: 90%;
+        max-width: 400px;
+    }
+    }

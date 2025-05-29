@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (data.success) {
                     if (data.emailEnviado) {
-                        ativar(data.message, "sucesso");
+                        ativar(data.message, "sucesso",'index.html');
                     } else {
                         ativar(data.message + "\n\n" + data.link, "info");
                     }

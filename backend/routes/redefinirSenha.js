@@ -4,7 +4,6 @@ const { getConnection, oracledb } = require('../connectOracle');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
-
 const router = express.Router();
 
 const transporter = nodemailer.createTransport({
@@ -65,7 +64,7 @@ router.post('/recuperar-senha', async (req, res) => {
             { autoCommit: true }
         );
 
-        console.log(`✅ Token gerado e salvo no banco de dados`);
+        console.log(`✅ Link gerado e salvo no banco de dados`);
 
         const link = `http://localhost:3000/redefine-password.html?token=${token}`;
         let emailEnviado = false;
