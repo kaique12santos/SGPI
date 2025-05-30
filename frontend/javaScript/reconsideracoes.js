@@ -1,75 +1,198 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const professorId = localStorage.getItem('usuarioId');
   const container = document.getElementById('lista-reconsideracoes');
+  
+  // Validar se o professorId existe e é um número válido
+  if (!professorId || isNaN(professorId)) {
+    container.innerHTML = '<p>Erro: ID do professor não encontrado. Faça login novamente.</p>';
+    console.error('Professor ID inválido:', professorId);
+    return;
+  }
 
-  try {
-    const res = await fetch(`/api/professor/reconsideracoes?professor_id=${professorId}`);
-    const data = await res.json();
+  await carregarReconsideracoes();
 
-    if (!data.success || data.reconsideracoes.length === 0) {
-      container.innerHTML = '<p>Sem pedidos de reconsideração pendentes.</p>';
+  async function carregarReconsideracoes() {
+    container.innerHTML = '<p>Carregando pedidos de reconsideração...</p>';
+
+    try {
+      // Garantir que o professorId seja um número válido
+      const profId = parseInt(professorId);
+      if (isNaN(profId)) {
+        throw new Error('ID do professor inválido');
+      }
+
+      const res = await fetch(`/api/professor/reconsideracoes?professor_id=${profId}`);
+      const data = await res.json();
+
+      if (!data.success || data.reconsideracoes.length === 0) {
+        container.innerHTML = '<p>Sem pedidos de reconsideração pendentes.</p>';
+        return;
+      }
+
+      container.innerHTML = ''; // Limpar container
+
+      data.reconsideracoes.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'reconsideracao-card';
+        card.onclick = () => abrirModal(item);
+
+        card.innerHTML = `
+          <h3>${item.ALUNO_NOME}</h3>
+          <div class="info-item">
+            <span class="info-label">Atividade:</span>
+            <span class="info-value">${item.ATIVIDADE}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Nota Atual:</span>
+            <span class="info-value">${item.NOTA}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Status:</span>
+            <span class="info-value">Pendente</span>
+          </div>
+          <div class="motivo">
+            <strong>Motivo:</strong> ${item.MOTIVO}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+    } catch (err) {
+      console.error('Erro ao buscar reconsiderações:', err);
+      container.innerHTML = '<p>Erro ao carregar reconsiderações.</p>';
+    }
+  }
+
+  function abrirModal(item) {
+    // Criar o modal dinamicamente
+    const modal = document.createElement('div');
+    modal.className = 'modal-reconsideracao';
+    modal.id = 'modal-reconsideracao';
+
+    modal.innerHTML = `
+      <div class="modal-reconsideracao-content">
+        <h3>Pedido de Reconsideração</h3>
+        
+        <div class="modal-info-section">
+          <h4>Informações do Pedido</h4>
+          <div class="modal-info-item">
+            <span class="label">Aluno:</span>
+            <span class="value">${item.ALUNO_NOME}</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="label">Atividade:</span>
+            <span class="value">${item.ATIVIDADE}</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="label">Nota Atual:</span>
+            <span class="value">${item.NOTA}</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="label">Comentário Anterior:</span>
+            <span class="value">${item.COMENTARIO || 'Nenhum comentário'}</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="label">Motivo do Aluno:</span>
+            <span class="value" style="font-style: italic; background-color: #fef3c7; padding: 0.5rem; border-radius: 4px; border-left: 3px solid #f59e0b;">${item.MOTIVO}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="resposta-professor">Resposta do Professor *</label>
+          <textarea id="resposta-professor" rows="4" placeholder="Digite sua resposta para o aluno..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="nova-nota">Nova Nota (opcional)</label>
+          <input type="number" id="nova-nota" min="0" max="10" step="0.1" placeholder="Digite a nova nota (0-10)" />
+          <small style="color: #6b7280; font-size: 0.875rem;">Deixe em branco para manter a nota atual</small>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+          <button class="btn-recusar" onclick="processarResposta(${item.ID}, 'recusar')">Recusar</button>
+          <button class="btn-aprovar" onclick="processarResposta(${item.ID}, 'aprovar')">Aprovar</button>
+        </div>
+      </div>
+    `;
+
+    // Adicionar ao body
+    document.body.appendChild(modal);
+
+    // Mostrar modal com animação
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+
+    // Fechar modal ao clicar fora
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        fecharModal();
+      }
+    });
+  }
+
+  window.fecharModal = function() {
+    const modal = document.getElementById('modal-reconsideracao');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      setTimeout(() => {
+        document.body.removeChild(modal);
+      }, 300);
+    }
+  }
+
+  window.processarResposta = async function(id, acao) {
+    const resposta = document.getElementById('resposta-professor').value.trim();
+    const notaInput = document.getElementById('nova-nota').value.trim();
+    
+    // Validações
+    if (!resposta) {
+      alert('Por favor, digite uma resposta para o aluno.');
       return;
     }
 
-    data.reconsideracoes.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'card';
+    const novaNota = notaInput === '' ? null : Number(notaInput);
+    
+    if (novaNota !== null && (isNaN(novaNota) || novaNota < 0 || novaNota > 10)) {
+      alert('Nota inválida. Use um valor entre 0 e 10.');
+      return;
+    }
 
-      div.innerHTML = `
-        <strong>Aluno:</strong> ${item.ALUNO_NOME}<br>
-        <strong>Atividade:</strong> ${item.ATIVIDADE}<br>
-        <strong>Nota Atual:</strong> ${item.NOTA}<br>
-        <strong>Comentário do Professor:</strong> ${item.COMENTARIO || 'Nenhum'}<br>
-        <strong>Motivo do Aluno:</strong> ${item.MOTIVO}<br>
-        <label>Resposta do Professor:</label>
-        <textarea class="resposta" placeholder="Digite sua resposta..."></textarea>
-        <label>Nova Nota (opcional):</label>
-        <input type="number" class="nova-nota" min="0" max="10" step="0.1" />
-        <button class="aprovar">Aprovar</button>
-        <button class="recusar">Recusar</button>
-      `;
+    // Confirmação antes de processar
+    const confirmar = confirm(`Tem certeza que deseja ${acao} este pedido de reconsideração?`);
+    if (!confirmar) return;
 
-      // Evento para aprovar
-      div.querySelector('.aprovar').onclick = async () => {
-        const resposta = div.querySelector('.resposta').value.trim();
-        const notaStr = div.querySelector('.nova-nota').value.trim();
-        const novaNota = notaStr === '' ? null : Number(notaStr);
+    try {
+      const endpoint = `/api/professor/reconsideracoes/${id}/${acao}`;
+      const payload = acao === 'aprovar' ? { resposta, novaNota } : { resposta };
 
-        if (novaNota !== null && (isNaN(novaNota) || novaNota < 0 || novaNota > 10)) {
-          alert('Nota inválida. Use um valor entre 0 e 10.');
-          return;
-        }
+      console.log('Enviando:', payload);
 
-        console.log('Enviando:', { id: item.ID, novaNota, resposta });
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        const res = await fetch(`/api/professor/reconsideracoes/${item.ID}/aprovar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resposta, novaNota })
-        });
+      const data = await res.json();
+      
+      if (res.ok) {
+        alert(data.message || `Pedido ${acao === 'aprovar' ? 'aprovado' : 'recusado'} com sucesso!`);
+        fecharModal();
+        carregarReconsideracoes(); // Recarregar a lista
+      } else {
+        alert(data.message || 'Erro ao processar pedido.');
+      }
 
-        alert((await res.json()).message);
-        div.remove();
-      };
-
-      // Evento para recusar
-      div.querySelector('.recusar').onclick = async () => {
-        const resposta = div.querySelector('.resposta').value.trim();
-
-        const res = await fetch(`/api/professor/reconsideracoes/${item.ID}/recusar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resposta })
-        });
-
-        alert((await res.json()).message);
-        div.remove();
-      };
-
-      container.appendChild(div);
-    });
-  } catch (err) {
-    console.error('Erro ao buscar reconsiderações:', err);
-    container.innerHTML = '<p>Erro ao carregar reconsiderações.</p>';
+    } catch (err) {
+      console.error('Erro ao processar resposta:', err);
+      alert('Erro ao processar pedido. Tente novamente.');
+    }
   }
+
+  // Função para recarregar a lista (pode ser chamada externamente)
+  window.carregarReconsideracoes = carregarReconsideracoes;
 });

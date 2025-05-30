@@ -1,43 +1,257 @@
+/* Estilos para os cards de reconsideração */
 .container-reconsideracoes {
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+  width: 97%;
+  word-break: break-word;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+#lista-reconsideracao{
+  width: 100%;
+}
+
+.reconsideracao-card {
+  width: 70%;
+  background-color: #f5deb3;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  border-left: 4px solid #970000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.reconsideracao-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.reconsideracao-card h3 {
+  color: #970000;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.reconsideracao-card .info-item {
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.reconsideracao-card .info-label {
+  font-weight: 600;
+  color: #2e3136;
+  min-width: 100px;
+}
+
+.reconsideracao-card .info-value {
+  color: #444444;
+  flex: 1;
+}
+
+.reconsideracao-card .motivo {
+  background-color: #fef3c7;
+  border-left: 3px solid #f59e0b;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Modal de Reconsideração */
+.modal-reconsideracao {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-reconsideracao.hidden {
+  display: none;
+}
+
+.modal-reconsideracao.show {
+  display: flex;
+}
+
+.modal-reconsideracao-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+      transform: scale(0.9) translateY(-20px);
+      opacity: 0;
+  }
+  to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+  }
+}
+
+.modal-reconsideracao-content h3 {
+  margin-bottom: 1.5rem;
+  color: #970000;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.modal-info-section {
+  background-color: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.modal-info-section h4 {
+  color: #374151;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.modal-info-item {
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modal-info-item .label {
+  font-weight: 600;
+  color: #374151;
+  min-width: 120px;
+}
+
+.modal-info-item .value {
+  color: #6b7280;
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-group textarea,
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group textarea:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #970000;
+  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-aprovar {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-aprovar:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-recusar {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-recusar:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.btn-cancelar {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container-reconsideracoes {
+      grid-template-columns: 1fr;
+      padding: 0 0.5rem;
   }
   
-  .card {
-    border: 1px solid #ccc;
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 6px;
+  .modal-reconsideracao-content {
+      width: 95%;
+      padding: 1.5rem;
   }
   
-  .card strong {
-    display: block;
-    margin-top: 10px;
+  .modal-actions {
+      flex-direction: column;
   }
   
-  textarea {
-    width: 100%;
-    height: 80px;
-    margin-top: 10px;
+  .modal-actions button {
+      width: 100%;
   }
-  
-  button {
-    margin-top: 10px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    background-color: #0056b3;
-    color: white;
-    cursor: pointer;
-  }
-  
-  button.recusar {
-    background-color: #cc0000;
-  }
-  
-  button:hover {
-    opacity: 0.9;
-  }
+}

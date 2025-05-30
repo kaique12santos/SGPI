@@ -68,6 +68,11 @@
     padding: 1rem;
     margin-bottom: 1rem;
     border-left: 3px solid #922b21;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.atividade-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.5);
 }
 
 .textarea-tamanho{

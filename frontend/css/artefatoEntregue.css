@@ -1,4 +1,5 @@
 .entrega-card {
+
   background-color: #f5deb3;
   border: 1px solid #b88a36;
   border-radius: 8px;
@@ -7,6 +8,10 @@
   border-left: 3px solid #928121;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .entrega-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.5);
   }
 
   .entrega-info {
@@ -45,6 +50,8 @@
     cursor: pointer;
   }
   #entregas-container{
+    word-break: break-word;
+    width: 99dvw;
     margin-top: 10px;
     margin-bottom: 10px;
     display: grid;

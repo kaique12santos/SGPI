@@ -195,8 +195,8 @@ async function abrirModalEdicao({ id, nome, descricao, semestre }) {
             </div>
 
             <div class="btn-group">
-                <button type="submit" class="send-button">Salvar</button>
-                <button type="button" id="cancelar-edicao" class="btn-excluir">Cancelar</button>
+                <button type="submit" class="btn-alterar send-button">Salvar</button>
+                <button type="button" id="cancelar-edicao" class="btn-excluir send-button">Cancelar</button>
             </div>
         </form>
     `;

@@ -33,11 +33,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p><strong>Atividade:</strong><span> ${av.atividade}</span></p>
         <p><strong>Nota:</strong><span> ${av.nota}</span></p>
         <p><strong>Comentário do Professor:</strong><span> ${av.comentario || 'Nenhum'}</span></p>
-        <strong>Data da Avaliação:</strong> ${new Date(av.data_avaliacao).toLocaleDateString('pt-BR')}<br>
+        <p><strong>Data da Avaliação:</strong> ${new Date(av.data_avaliacao).toLocaleDateString('pt-BR')}</p>
       `;
     
       if (jaSolicitado) {
-        card.innerHTML += `<strong>Reconsideração:</strong> ${av.status_reconsideracao}<br>`;
+
+        if (av.status_reconsideracao=="Pendente") {
+          card.innerHTML += `<p ><strong>Reconsideração:</strong><span class="status-badge status-pendente" > ${av.status_reconsideracao}</span></p>`
+        }if (av.status_reconsideracao=="Entregue") {
+          card.innerHTML += `<p ><strong>Reconsideração:</strong><span class="status-badge status-entregue" > ${av.status_reconsideracao}</span></p>`
+        }if (av.status_reconsideracao=="Negado") {
+          card.innerHTML += `<p ><strong>Reconsideração:</strong><span class="status-badge status-reprovado" > ${av.status_reconsideracao}</span></p>`
+        }if (av.status_reconsideracao=="Aprovado") {
+          card.innerHTML += `<p ><strong>Reconsideração:</strong><span class="status-badge status-aprovado" > ${av.status_reconsideracao}</span></p>`
+      
+        }
       }
     
       const podePedir = dentroDoPrazo && !jaSolicitado;
