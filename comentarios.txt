@@ -26,9 +26,15 @@ function obterTipoUsuarioLogado() {
 }
 
 ------------------------------------------------------------------------------------------------------------
-proximas paginas para serem criadas
 
-1- criar grupos
-2- pagina de perfil dos usuarios
-3- pagina de entrega das atividades do perfil aluno
-4- pagina de atividades entregues do perfil do professor/orientador
+topicos para refatorar
+
+1- função do frontend da atividades do professor e orientador para um arquivo so utilizando o id e o tipo
+de conta ja definido e utilizado a "data.userRole" que ja esta sendo salvo no arquivo js do Login.js
+
+2- trocar todos os alerts do navegador padrao nas funções do frontend pelo alert.js criado para substituir
+os padroes do navegador.
+
+3- organizar o script do banco de dados para melhor entendimento e implementação.
+
+
