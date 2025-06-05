@@ -129,14 +129,14 @@ const navigationButtonsByRole = {
       },
       {
         text: "Entregas dos grupos",
-        url: "/coordenador/entregas-grupos",
+        url: "/listaProjetos.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM4 8l2 2 4-4-1-1-3 3-1-1-1 1z"/>
                </svg>`
       },
       {
         text: "Gerar relatórios",
-        url: "/coordenador/relatorios",
+        url: "listaGruposCoordenador.html",
         icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="link-icon" viewBox="0 0 16 16">
                  <path d="M3 0a2 2 0 0 0-2 2v11.5A2.5 2.5 0 0 0 3.5 16H13a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H3zm10 2v12H3.5a.5.5 0 0 1-.5-.5V2h10z"/>
                  <path d="M5 4h6v1H5V4zm0 2h6v1H5V6zm0 2h6v1H5V8z"/>

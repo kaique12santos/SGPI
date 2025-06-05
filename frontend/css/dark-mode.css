@@ -282,3 +282,85 @@ html.dark-mode .page-name-usuario {
 html.dark-mode .label-usuarios{
     color: white;
 }
+
+
+html.dark-mode .card-nota {
+    background-color: #2f2f2f;
+    border: 1px solid #6b6b6b;
+    color: #f5f5f5;
+    box-shadow: 2px 4px 10px rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #922b21;
+}
+
+html.dark-mode .card-nota strong{
+    color: #ffffff;
+}
+
+html.dark-mode .btn-reconsiderar{
+    background-color: #922b21;
+}
+
+html.dark-mode .btn-reconsiderar:hover{
+    background-color: #cf2c1d;
+}
+
+
+html.dark-mode #form-perfil input{
+    background-color: #494949;
+    color: #ffffff;
+}
+
+html.dark-mode #form-perfil label{
+    color: #ffffff;
+}
+
+html.dark-mode .perfil-container h2{
+    color: #ffffff;
+}
+
+html.dark-mode .container .perfil-container{
+    box-shadow: 0px 0px 4px 5px rgba(255, 255, 255, 0.1);
+}
+
+html.dark-mode #tabelaGrupos td{
+    color: #ffffff;
+}
+
+html.dark-mode #tabelaGrupos tr:hover{
+    background-color: #3f3f3f;
+}
+html.dark-mode #tabelaProjetos .td{
+    color: #ffffff;
+}
+html.dark-mode #tabelaProjetos a{
+    color: #ffffff;
+}
+
+html.dark-mode #tabelaProjetos tr:hover{
+    background-color: #3f3f3f;
+}
+
+html.dark-mode .semestre label{
+    color: #ffffff;
+}
+
+html.dark-mode .atividade-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(255, 255, 255, 0.5);
+}
+
+html.dark-mode .reconsideracao-card {
+    background-color: #2f2f2f;
+    border: 1px solid #6b6b6b; 
+    color: #f5f5f5; 
+    box-shadow: 2px 4px 10px rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #922b21;
+}
+html.dark-mode .reconsideracao-card span {     
+    color: #f5f5f5; 
+}
+
+html.dark-mode .reconsideracao-card .motivo{
+    background-color: #656565;
+}
+

@@ -25,6 +25,8 @@ const projetos = require('./routes/projetos.js')
 const avaliar = require('./routes/avaliacoes.js')
 const notas = require('./routes/alunoNotas.js')
 const reconsideracoes = require('./routes/professorReconsideracoes.js')
+const ListaProjetos = require('./routes/CoordenadorProjetos.js')
+const coordenadorRelatorios= require('./routes/CoordenadorRelatorios.js')
 
 
 
@@ -55,6 +57,8 @@ app.use('/',projetos);
 app.use('/',avaliar);
 app.use('/',notas);
 app.use('/',reconsideracoes);
+app.use('/coordenador',ListaProjetos);
+app.use('/coordenador',coordenadorRelatorios);
 
 
 

@@ -46,7 +46,7 @@
 .btn-reconsiderar {
     margin-top: 10px;
     padding: 8px 12px;
-    background-color: #0047cc;
+    background-color: #6f0000;
     color: white;
     border: none;
     cursor: pointer;
@@ -55,7 +55,7 @@
     font-size: 14px;
 }
 .btn-reconsiderar:hover {
-    background-color: #0030ccbb;
+    background-color: #a30000;
 }
 /* Status de reconsideração */
 .card-nota strong:last-of-type {
@@ -94,7 +94,7 @@ margin: 0.5rem;}
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 .modal-content h2 {
-    color: #1e3a8a;
+    color: #8a1e1e;
     margin-bottom: 15px;
     font-size: 20px;
     border-bottom: 1px solid #e5e7eb;
@@ -118,19 +118,19 @@ margin: 0.5rem;}
     transition: background-color 0.2s;
 }
 #enviar-reconsideracao {
-    background-color: #0066cc;
+    background-color: #e23939;
     color: white;
     margin-right: 10px;
 }
 #enviar-reconsideracao:hover {
-    background-color: #004f99;
+    background-color: #a30000;
 }
 #cancelar-reconsideracao {
     background-color: #f3f4f6;
     color: #4b5563;
 }
 #cancelar-reconsideracao:hover {
-    background-color: #e5e7eb;
+    background-color: #c0c0c0;
 }
 /* Status das avaliações */
 .status-badge {

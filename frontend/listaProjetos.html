@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Projetos</title>
+     <!--__________LINKS AQUI__________-->
+    
+     <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
+     <link rel="stylesheet" href="/css/main.css">
+     <link rel="stylesheet" href="/css/dark-mode.css">
+     <link rel="stylesheet" href="/css/alerts.css">
+     <link rel="stylesheet" href="/css/perfil.css">
+     <link rel="stylesheet" href="/css/listaProjetos.css">
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
+     
+     <!--______________________________-->
+</head>
+<body>
+    <header>
+        <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+            <img src="" alt="" class="logo-image">
+            <h1>SGPI</h1>
+            <input type="text" placeholder="Pesquisar..." class="search-box">
+            <div class="espaco"></div>
+            <div id="user-profile-pic" class="profile-pic " >
+                <a href="/TelaPrincipal.html" >
+                <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+                </a>
+            </div>
+        </div>
+    </header>
+    <div class="container"> <!--Div container para facilitar configurações globais-->
+        <div class="wrapper">
+        <div class="menu-dropdown"> <!--Div feita para o menu-->
+            <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                </svg>
+            </button>
+            <div id="menu-itens" class="menu-content">
+                <a href=""></a>
+                <a href=""></a>
+                <a href=""></a>
+                <a href=""></a>
+            </div>
+        </div>
+        <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
+            <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
+        </button>
+        </div>
+        </div>
+            
+
+
+        <div class="container"> <!--Div com o conteúdo principal da página-->
+            <div class="page-name">
+                <h2>Lista de Projetos</h2>
+            </div>
+        </div>
+
+        <div class="semestre">
+            <label for="selectSemestre">Selecione o Semestre:</label>
+            <select id="selectSemestre">
+              <option value="" disabled selected>-- Escolha --</option>
+              <!-- Exemplo:
+                   Esses valores devem corresponder aos valores armazenados em Projetos.semestre,
+                   como “1/2025”, “2/2024” etc. -->
+              <option value="1">1º Semestre</option>
+              <option value="2">2º Semestre</option>
+              <option value="3">3º Semestre</option>
+              <option value="4">4º Semestre</option>
+              <option value="5">5º Semestre</option>
+              <option value="6">6º Semestre</option>
+              <!-- Adicione mais conforme sua convenção -->
+            </select>
+            <button id="btnBuscar">Buscar Projetos</button>
+          </div>
+
+          <!-- SPINNER (Loading) -->
+            <div id="loading" style="display: none; margin-top: 20px;">
+                Carregando projetos...
+            </div>
+
+            <!-- MENSAGEM DE ERRO -->
+            <div id="mensagem-erro" style="display: none; color: red; margin-top: 20px;"></div>
+
+            <!-- MENSAGEM “Sem Projetos” -->
+            <div id="sem-projetos" style="display: none; margin-top: 20px; font-style: italic; color: #555;">
+                Nenhum projeto encontrado para este semestre.
+            </div>
+        
+          <table id="tabelaProjetos" style="display: none;">
+            <thead>
+              <tr>
+                <th>Título do Projeto</th>
+                <th>Membros do Grupo</th>
+                <th>Status</th>
+                <th>Data de Encerramento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas serão inseridas dinamicamente aqui -->
+            </tbody>
+          </table>
+        
+        
+          
+    </div>
+    <script src="/javaScript/listarProjetos.js"></script>
+    <script defer src="/javaScript/efeitoMenu.js"></script>
+    <script defer src="/javaScript/dark_mode.js"></script>
+    <script src="/javaScript/GerarMenu.js"></script>
+    <script src="/javaScript/imagemPerfil.js"></script>
+</body>
+</html>

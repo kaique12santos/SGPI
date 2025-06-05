@@ -69,6 +69,10 @@ h2{
     
 }
 
+.card-desativado {
+    opacity: 0.6;
+    pointer-events: none; /* Garante que o clique não funcione mesmo que o JS falhe */
+}
 .atividade-card {
     background-color: #f5deb3;
     border: 1px solid #b88a36;
