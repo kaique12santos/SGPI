@@ -117,8 +117,8 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 <input type="number" id="edit-criterios" class="input-atividade" value="${criterios_avaliacao}" min="1" max="100" required>
                 
                 <div class="btn-group">
-                    <button type="submit" class="send-button">Salvar</button>
-                    <button type="button" id="cancelar-edicao" class="btn-excluir">Cancelar</button>
+                    <button type="submit" class="send-button btn">Salvar</button>
+                    <button type="button" id="cancelar-edicao" class="btn-excluir btn">Cancelar</button>
                 </div>
             </form>
         `;
@@ -179,7 +179,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 
             } catch (error) {
                 console.error('Erro:', error);
-                alert(`Falha ao atualizar atividade: ${error.message}`);
+                ativar(`Falha ao atualizar atividade: ${error.message}`,'erro','')
             }
         });
     };

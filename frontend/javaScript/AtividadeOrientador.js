@@ -185,7 +185,7 @@ function criarCardAtividade({ id, titulo, descricao, semestre, prazo_entrega, cr
                 
             } catch (error) {
                 console.error('Erro:', error);
-                alert(`Falha ao atualizar atividade: ${error.message}`);
+                ativar(`Falha ao atualizar atividade: ${error.message}`,'erro','')
             }
         });
     };
@@ -303,7 +303,7 @@ form.addEventListener('submit', (event) => {
             });
         } else {
             response.json().then(data => {
-                ativar(data.message, data.success ? 'sucesso' : 'erro');
+                ativar(data.message, data.success ? 'sucesso' : 'erro','');
             });
         }
     })

@@ -1,3 +1,5 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const selectSemestre = document.getElementById('selectSemestre');
     const btnBuscar = document.getElementById('btnBuscarGrupos');
@@ -11,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnBuscar.addEventListener('click', async () => {
       const semestre = selectSemestre.value;
       if (!semestre) {
-        alert('Por favor, selecione um semestre.');
+        ativar('Por favor, selecione um semestre.','info','')
         return;
       }
   
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnGeral.addEventListener('click', () => {
       const semestre = selectSemestre.value;
       if (!semestre) {
-        alert('Selecione um semestre antes de gerar o relatório geral.');
+        ativar('Selecione um semestre antes de gerar o relatório geral.','info','')
         return;
       }
       // Redireciona para a rota que vai gerar O EXCEL COM TODOS OS GRUPOS AQUI

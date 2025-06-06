@@ -1,3 +1,5 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const tabela = document.getElementById('tabelaAtividades');
     const loading = document.getElementById('loading');
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     (async () => {
       const projetoId = getQueryParam('projetoId');
       if (!projetoId) {
-        alert('ID do projeto não fornecido na URL.');
+        ativar('ID do projeto não fornecido na URL.','erro','')
         return;
       }
   

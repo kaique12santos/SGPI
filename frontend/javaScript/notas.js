@@ -1,3 +1,5 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', async () => {
     const alunoId = localStorage.getItem('usuarioId');
     const container = document.getElementById('notas-container');
@@ -92,7 +94,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
   
         const resposta = await res.json();
-        alert(resposta.message);
+
+        ativar(resposta.message,'sucesso','');
         modal.classList.add('hidden');
         comentarioInput.value = '';
       };

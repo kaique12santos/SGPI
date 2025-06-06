@@ -56,11 +56,11 @@ O <b>Sistema de Gestão de PIS</b> é uma plataforma web projetada para centrali
 - [X] Upload de arquivos de artefatos
 - [X] Avaliação e feedback de professores
 - [X] Visualização de avaliações e pedidos de reconsideração
-- [ ] Geração de relatórios acadêmicos
-- [ ] Organização de projetos por semestre letivo
+- [X] Geração de relatórios acadêmicos
+- [X] Organização de projetos por semestre letivo
 - [X] Recuperação de senha
-- [ ] Busca e filtros para projetos, grupos e entregas
-- [ ] Exportação de relatórios (PDF, Excel, CSV)
+- [X] Busca e filtros para projetos, grupos e entregas
+- [X] Exportação de relatórios (PDF, Excel, CSV)
 - [X] Seção para manual do curso e do PIS
 
 ---

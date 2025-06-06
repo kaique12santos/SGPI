@@ -1,6 +1,8 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', async () => {
   const professorId = localStorage.getItem('usuarioId');
-  const container = document.getElementById('lista-reconsideracoes');
+  const container = document.getElementById('container-reconsideracoes');
   
   // Validar se o professorId existe e é um número válido
   if (!professorId || isNaN(professorId)) {
@@ -94,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="modal-info-item">
             <span class="label">Motivo do Aluno:</span>
-            <span class="value" style="font-style: italic; background-color: #fef3c7; padding: 0.5rem; border-radius: 4px; border-left: 3px solid #f59e0b;">${item.MOTIVO}</span>
+            <span class="value modalMotivo">${item.MOTIVO}</span>
           </div>
         </div>
 
@@ -150,14 +152,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Validações
     if (!resposta) {
-      alert('Por favor, digite uma resposta para o aluno.');
+      ativar('Por favor, digite uma resposta para o aluno.','info','');
       return;
     }
 
     const novaNota = notaInput === '' ? null : Number(notaInput);
     
     if (novaNota !== null && (isNaN(novaNota) || novaNota < 0 || novaNota > 10)) {
-      alert('Nota inválida. Use um valor entre 0 e 10.');
+      ativar('Nota inválida. Use um valor entre 0 e 10.','info','');
       return;
     }
 
@@ -180,19 +182,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const data = await res.json();
       
       if (res.ok) {
-        alert(data.message || `Pedido ${acao === 'aprovar' ? 'aprovado' : 'recusado'} com sucesso!`);
+        ativar(data.message || `Pedido ${acao === 'aprovar' ? 'aprovado' : 'recusado'} com sucesso!`,'sucesso','');
         fecharModal();
         carregarReconsideracoes(); // Recarregar a lista
       } else {
-        alert(data.message || 'Erro ao processar pedido.');
+        ativar(data.message || 'Erro ao processar pedido.','erro','');
       }
 
     } catch (err) {
       console.error('Erro ao processar resposta:', err);
-      alert('Erro ao processar pedido. Tente novamente.');
+      ativar('Erro ao processar pedido. Tente novamente.','erro','');
     }
   }
 
-  // Função para recarregar a lista (pode ser chamada externamente)
   window.carregarReconsideracoes = carregarReconsideracoes;
 });

@@ -5,15 +5,16 @@
   margin: 2rem auto;
   padding: 0 1rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 #lista-reconsideracao{
   width: 100%;
+  
 }
 
 .reconsideracao-card {
-  width: 70%;
+  width: 80%;
   background-color: #f5deb3;
   border: 1px solid #d4d4d4;
   border-radius: 12px;
@@ -116,6 +117,14 @@
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
+}
+
+.modalMotivo{
+  font-style: italic;
+  background-color: #fef3c7;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #f59e0b;
 }
 
 .modal-info-section {
@@ -238,7 +247,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .container-reconsideracoes {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       padding: 0 0.5rem;
   }
   

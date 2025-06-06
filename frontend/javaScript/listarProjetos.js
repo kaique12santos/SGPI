@@ -1,3 +1,5 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', () => {
   const selectSemestre = document.getElementById('selectSemestre');
   const btnBuscar = document.getElementById('btnBuscar');
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnBuscar.addEventListener('click', async () => {
     const semestre = selectSemestre.value;
     if (!semestre) {
-      alert('Por favor, selecione um semestre.');
+      ativar('Por favor, selecione um semestre.','info','');
       return;
     }
 

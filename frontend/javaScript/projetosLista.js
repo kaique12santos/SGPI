@@ -1,3 +1,5 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     carregarProjetos();
 });
@@ -109,11 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   
       const data = await res.json();
-      alert(data.message || 'Projeto atualizado!');
+      ativar(data.message || 'Projeto atualizado!','sucesso','');
       fecharModal();
       carregarProjetos();
     } catch (err) {
-      alert('Erro ao salvar alterações.');
+
+      ativar('Erro ao salvar alterações.','erro','');
       console.error(err);
     }
   }
@@ -130,38 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
   
       if (data.success) {
-        alert(data.message);
+
+        ativar(data.message,'sucesso','');
         carregarProjetos();
       } else {
-        alert(data.message || 'Erro ao deletar.');
+        ativar(data.message || 'Erro ao deletar.','erro','');
       }
     } catch (err) {
       console.error('Erro ao deletar projeto:', err);
-      alert('Erro ao deletar projeto.');
+      ativar('Erro ao deletar projeto.','erro','');
     }
   }
   
-  
-  
-//   async function salvarProjeto(id) {
-//     const titulo = document.getElementById(`edit-titulo-${id}`).value;
-//     const descricao = document.getElementById(`edit-descricao-${id}`).value;
-//     const semestre = document.getElementById(`edit-semestre-${id}`).value;
-//     const status = document.getElementById(`edit-status-${id}`).value;
-  
-//     try {
-//       const res = await fetch(`/api/projetos/${id}`, {
-//         method: 'PUT',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ titulo, descricao, semestre, status })
-//       });
-  
-//       const data = await res.json();
-//       alert(data.message || 'Projeto atualizado!');
-//       carregarProjetos(); // recarregar a lista atualizada
-//     } catch (err) {
-//       alert('Erro ao salvar projeto.');
-//       console.error(err);
-//     }
-//   }
   

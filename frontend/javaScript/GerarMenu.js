@@ -21,8 +21,8 @@ function gerarMenu(tipoPerfil) {
         ],
         coordenador: [
             { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios.html' },
-            { texto: 'Relatórios de desempenho', link: '/coordenador/relatorios' },
-            { texto: 'Visualizar entregas', link: '/coordenador/entregas'}
+            { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador.html' },
+            { texto: 'Visualizar entregas', link: '/listaProjeto.html'}
         ],
         professor: [
             { texto: 'Artefatos entregues', link: '/artefatosEntregues.html' },
