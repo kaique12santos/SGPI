@@ -1,125 +1,292 @@
 
 
-<h1 align="center"> <img src="frontend\imagens\teste.png" alt="html5" width="300" height="200"/></h1>
-
-<h3 align="center">Facilitando a organização e gestão dos Projetos Integradores para alunos, professores e coordenadores.</h3>
-
----
-
-<h3 align="left">📌 Sobre o Projeto</h3>
-<p>
-O <b>Sistema de Gestão de PIS</b> é uma plataforma web projetada para centralizar e otimizar o gerenciamento dos Projetos Integradores do curso de Desenvolvimento de Software Multiplataforma (DSM). Com ele, alunos podem organizar suas entregas, professores podem avaliar projetos e coordenadores podem acompanhar o desempenho dos grupos.
-</p>
-
----
-
-<h3 align="left">🎯 Funcionalidades Principais</h3>
-<ul>
-  <li>🔹 Cadastro de usuários (alunos, professores e coordenadores).</li>
-  <li>🔹 Autenticação segura via login e senha.</li>
-  <li>🔹 Notificações automáticas por e-mail sobre prazos e entregas.</li>
-  <li>🔹 Gerenciamento de grupos de alunos e seus projetos.</li>
-  <li>🔹 Upload de arquivos para submissão dos artefatos.</li>
-  <li>🔹 Avaliação e feedback dos professores.</li>
-  <li>🔹 Relatórios acadêmicos e acompanhamento de desempenho.</li>
-</ul>
+<div align="center">
+  <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&crop=center" alt="Sistema de Gestão de PIS" width="400" height="250"/>
+  
+  # 🎓 Sistema de Gestão de PIS
+  
+  ### Facilitando a organização e gestão dos Projetos Integradores para alunos, professores e coordenadores
+  
+  ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+  ![Version](https://img.shields.io/badge/version-1.0.0-blue)
+  ![License](https://img.shields.io/badge/license-MIT-green)
+  ![Contributors](https://img.shields.io/badge/contributors-5-orange)
+</div>
 
 ---
 
-<h3 align="left">🛠️ Tecnologias Utilizadas</h3>
-<p align="left">
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="40" height="40"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="40" height="40"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="nodejs" width="40" height="40"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/oracle/oracle-original.svg" alt="oracle" width="40" height="40"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" alt="git" width="40" height="40"/>
-</p>
+## 📖 Sobre o Projeto
+
+O **Sistema de Gestão de PIS** é uma plataforma web moderna e intuitiva, desenvolvida para centralizar e otimizar o gerenciamento dos Projetos Integradores do curso de **Desenvolvimento de Software Multiplataforma (DSM)**. 
+
+Nossa solução permite que:
+- 👨‍🎓 **Alunos** organizem suas entregas e acompanhem o progresso
+- 👨‍🏫 **Professores** avaliem projetos de forma eficiente
+- 👩‍💼 **Coordenadores** monitorem o desempenho geral dos grupos
 
 ---
 
-<h3 align="left"> 
-	🚧  🚀 Em construção...  🚧
-</h3>
-<ol>
-  <li>link:<a href="/"> link do projeto quando finalizado</a></li>
-</ol>
+## ✨ Funcionalidades Principais
+
+<table>
+<tr>
+<td width="50%">
+
+### 🔐 Autenticação & Usuários
+- ✅ Cadastro multi-perfil (alunos, professores, coordenadores)
+- ✅ Sistema de login seguro
+- ✅ Recuperação de senha
+- ✅ Perfis personalizados por tipo de usuário
+
+</td>
+<td width="50%">
+
+### 📊 Gestão de Projetos
+- ✅ Criação e organização de grupos
+- ✅ Gerenciamento por semestre letivo
+- ✅ Upload de arquivos e artefatos
+- ✅ Sistema de busca e filtros avançados
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📝 Avaliações & Feedback
+- ✅ Sistema de avaliação integrado
+- ✅ Feedback detalhado dos professores
+- ✅ Pedidos de reconsideração
+- ✅ Histórico de avaliações
+
+</td>
+<td width="50%">
+
+### 📈 Relatórios & Notificações
+- ✅ Relatórios acadêmicos automatizados
+- ✅ Exportação (PDF, Excel, CSV)
+- ✅ Notificações por e-mail
+- ✅ Manual do curso integrado
+
+</td>
+</tr>
+</table>
 
 ---
-### Features
 
-- [x] Cadastro de usuário (aluno, professores,professor Orientador, coordenador do curso)
-- [x] Login e autenticação
-- [X] Criação e Gestão de Tarefas
-- [X] Notificações automáticas por e-mail
-- [X] Gerenciamento de grupos de alunos
-- [X] Upload de arquivos de artefatos
-- [X] Avaliação e feedback de professores
-- [X] Visualização de avaliações e pedidos de reconsideração
-- [X] Geração de relatórios acadêmicos
-- [X] Organização de projetos por semestre letivo
-- [X] Recuperação de senha
-- [X] Busca e filtros para projetos, grupos e entregas
-- [X] Exportação de relatórios (PDF, Excel, CSV)
-- [X] Seção para manual do curso e do PIS
+## 🛠️ Stack Tecnológica
+
+<div align="center">
+
+### Frontend
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+### Backend
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![NPM](https://img.shields.io/badge/NPM-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)
+![bcrypt (npm)](https://img.shields.io/badge/bcrypt-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![UUID (npm)](https://img.shields.io/badge/UUID-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![Multer (npm)](https://img.shields.io/badge/Multer-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![Sharp (npm)](https://img.shields.io/badge/Sharp-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![ExcelJS](https://img.shields.io/badge/ExcelJS-217346?style=for-the-badge&logo=microsoftexcel&logoColor=white)
+![Nodemailer (npm)](https://img.shields.io/badge/Nodemailer-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+
+### Banco de Dados
+![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white)
+
+### Ferramentas
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
+
+</div>
 
 ---
 
-<h3 align="left">✒️ Autores</h3>
-<ul>
-  <li><p><b>Desenvolvedora Front-End</b> - <a href="https://github.com/unrealplastic">Nicole Lisboa de Carvalho</a></p></li>
-  <li><p><b>Scrum Master</b> - <a href="https://github.com/yMistikTK">Luiz Carlos Gimenes Fernandes de Sousa</a></p></li>
-  <li><p><b>Documentação</b> - <a href="https://github.com/nome_colaborador">Diego Marques da Costa</a></p></li>
-  <li><p><b>Banco de Dados</b> - <a href="https://github.com/nome_colaborador">Vinicius de Morais Crepaldi</a></p></li>
-  <li><p><b>Desenvolvedor Back-End</b> - <a href="https://github.com/kaique12santos">Kaique Caitano dos Santos</a></p></li>
-</ul>
+## 🏗️ Arquitetura do Projeto
+
+O projeto segue uma arquitetura inspirada no padrão **MVC (Model-View-Controller)** para organizar o código e separar as responsabilidades:
+
+*   ### 📁 Backend (Server-side)
+    *   **Model (Modelo):**
+        *   Localizado principalmente em arquivos como `connectOracle.js` e dentro da lógica de acesso a dados nas rotas.
+        *   Responsável pela interação com o banco de dados Oracle (consultas, inserções, atualizações) e pela lógica de negócio associada aos dados.
+    *   **Controller (Controlador):**
+        *   Implementado nos arquivos dentro da pasta `backend/routes/`.
+        *   Gerencia as requisições HTTP recebidas, processa os dados de entrada, interage com o Model para buscar ou manipular dados, e envia as respostas para o cliente (muitas vezes em formato JSON para APIs ou servindo arquivos HTML).
+        *   O `server.js` atua como o ponto de entrada principal, configurando o Express e montando esses controladores.
+    *   **Outros:**
+        *   A pasta `uploads/` é utilizada para armazenar arquivos enviados pelos usuários, gerenciados por bibliotecas como Multer.
+
+*   ### 🎨 Frontend (Client-side)
+    *   **View (Visão):**
+        *   Composto pelos arquivos HTML localizados em `frontend/views/`.
+        *   Arquivos CSS em `frontend/css/` para estilização.
+        *   Scripts JavaScript em `frontend/javaScript/` para interatividade no navegador e comunicação com o backend (APIs).
+        *   Imagens e outros assets visuais em `frontend/imagens/`.
+        *   Responsável por apresentar a interface ao usuário e capturar suas interações.
+
+Essa estrutura visa promover um código mais modular, fácil de manter e testar, com uma clara distinção entre a lógica de apresentação, a lógica de controle de fluxo da aplicação e a lógica de manipulação de dados.
 
 ---
 
-<h3 align="left">🔗 Conecte-se Conosco</h3>
-<h3 align="left">Kaique Caitano dos Santos</h3>
-<p align="left">
-  <a href="https://linkedin.com/in/kaique-caitano-b68b902ba">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
-  <a href="https://fb.com/kaique.caitano.1/">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" />
-  </a>
-</p>
-<h3 align="left">Nicole Lisboa de Carvalho</h3>
-<p align="left">
-  <a href="https://linkedin.com/in/kaique-caitano-b68b902ba">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
-  <a href="https://fb.com/kaique.caitano.1/">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" />
-  </a>
-</p><h3 align="left">Luiz Carlos Gimenes Fernandes de Sousa</h3>
-<p align="left">
-  <a href="https://www.linkedin.com/in/luiz-carlos-gimenes-fernandes-de-sousa-045b75198/">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
-  <a href="https://www.facebook.com/luizcarlos.gimenes.50/">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" />
-  </a>
-</p><h3 align="left">Vinicius de Morais Crepaldi</h3>
-<p align="left">
-  <a href="https://linkedin.com/in/kaique-caitano-b68b902ba">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
-  <a href="https://fb.com/kaique.caitano.1/">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" />
-  </a>
-</p><h3 align="left">Diego Marques da Costa</h3>
-<p align="left">
-  <a href="https://linkedin.com/in/kaique-caitano-b68b902ba">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
-  <a href="https://fb.com/kaique.caitano.1/">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" />
-  </a>
-</p>
+## 🚀 Status do Projeto
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge" alt="Status"/>
+</div>
+
+### 📋 Roadmap de Desenvolvimento
+
+- [x] **Fase 1:** Sistema de autenticação e cadastro
+- [x] **Fase 2:** Gestão de usuários e perfis
+- [x] **Fase 3:** Criação e gerenciamento de grupos
+- [x] **Fase 4:** Sistema de upload e artefatos
+- [x] **Fase 5:** Módulo de avaliações
+- [x] **Fase 6:** Sistema de notificações
+- [x] **Fase 7:** Relatórios e exportação
+- [x] **Fase 8:** Busca e filtros avançados
+- [ ] **Fase 9:** Testes finais e deploy
+- [X] **Fase 10:** Documentação final
+
 ---
 
-<h3 align="left">📜 Licença</h3>
-<p>Este projeto está licenciado sob a <a href="LICENSE">MIT License</a>.</p>
+## 👥 Equipe de Desenvolvimento
+
+<table align="center">
+<tr>
+<td align="center">
+<img src="https://github.com/unrealplastic.png" width="80px" style="border-radius: 50%"/>
+<br><strong>Nicole Lisboa</strong>
+<br><em>Frontend Developer</em>
+<br>
+<a href="https://github.com/unrealplastic">
+<img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
+</a>
+</td>
+<td align="center">
+<img src="https://github.com/yMistikTK.png" width="80px" style="border-radius: 50%"/>
+<br><strong>Luiz Carlos</strong>
+<br><em>Scrum Master</em>
+<br>
+<a href="https://github.com/yMistikTK">
+<img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
+</a>
+<a href="https://www.linkedin.com/in/luiz-carlos-gimenes-fernandes-de-sousa-045b75198/">
+<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white"/>
+</a>
+</td>
+<td align="center">
+<img src="https://github.com/kaique12santos.png" width="80px" style="border-radius: 50%"/>
+<br><strong>Kaique Santos</strong>
+<br><em>Backend Developer</em>
+<br>
+<a href="https://github.com/kaique12santos">
+<img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
+</a>
+<a href="https://linkedin.com/in/kaique-caitano-b68b902ba">
+<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white"/>
+</a>
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://via.placeholder.com/80/4A90E2/FFFFFF?text=DM" width="80px" style="border-radius: 50%"/>
+<br><strong>Diego Marques</strong>
+<br><em>Documentation</em>
+<br>
+<a href="https://github.com/nome_colaborador">
+<img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
+</a>
+</td>
+<td align="center">
+<img src="https://via.placeholder.com/80/28A745/FFFFFF?text=VC" width="80px" style="border-radius: 50%"/>
+<br><strong>Vinicius Crepaldi</strong>
+<br><em>Database Admin</em>
+<br>
+<a href="https://github.com/nome_colaborador">
+<img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
+</a>
+</td>
+<td align="center">
+<!-- Espaço para manter alinhamento -->
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js (versão 14 ou superior)
+- Oracle Database
+- Git
+
+### Instalação
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/sistema-gestao-pis.git
+
+# Acesse o diretório do projeto
+cd sistema-gestao-pis
+
+# Instale as dependências
+npm install
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+
+# Execute as migrations do banco de dados
+npm run migrate
+
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+### Variáveis de Ambiente
+
+```env
+DATABASE_URL=sua_string_de_conexao_oracle
+EMAIL_SERVICE=seu_servico_de_email
+JWT_SECRET=sua_chave_secreta
+```
+
+---
+
+## 📚 Documentação
+
+- 📖 [Manual do Usuário](docs/manual-usuario.md)
+- 🔧 [Guia de Instalação](docs/instalacao.md)
+- 🎨 [Guia de Estilo](docs/guia-estilo.md)
+- 🔌 [API Documentation](docs/api.md)
+
+---
+
+## 🤝 Como Contribuir
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+---
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+<div align="center">
+  <p>Desenvolvido com ❤️ pela equipe DSM</p>
+  <p>
+    <a href="#top">⬆️ Voltar ao topo</a>
+  </p>
+</div>
+

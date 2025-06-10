@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     btnMeuPerfil.addEventListener("click", () => {
-        window.location.href = "/perfil.html";
+        window.location.href = "/perfil";
     });
 
     btnLogout.addEventListener("click", () => {
         console.log("Logout acionado");
-        window.location.href = "/login.html";
+        window.location.href = "/index";
     });
     btnNotificacoes.addEventListener("click", () => {
         const isVisible = dropdown.style.display === "block";

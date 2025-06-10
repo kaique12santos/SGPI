@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notas</title>
+    <title>Detalhes do Projeto</title>
      <!--__________LINKS AQUI__________-->
     
      <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
@@ -11,7 +11,7 @@
      <link rel="stylesheet" href="/css/dark-mode.css">
      <link rel="stylesheet" href="/css/alerts.css">
      <link rel="stylesheet" href="/css/perfil.css">
-     <link rel="stylesheet" href="/css/notas.css">
+     <link rel="stylesheet" href="/css/detalhesProjeto.css">
      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
      
      <!--______________________________-->
@@ -24,7 +24,7 @@
             <input type="text" placeholder="Pesquisar..." class="search-box">
             <div class="espaco"></div>
             <div id="user-profile-pic" class="profile-pic " >
-                <a href="/TelaPrincipal.html" >
+                <a href="/TelaPrincipal" >
                 <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
                 </a>
             </div>
@@ -55,24 +55,45 @@
 
         <div class="container"> <!--Div com o conteúdo principal da página-->
             <div class="page-name">
-                <h2>Minhas Avaliações</h2>
+                <h2>Artefatos Avaliados do Projeto</h2>
             </div>
         </div>
-        <div class="container">
-            
-            <div id="notas-container"></div>
+
+        <div id="infoProjeto">
+            <!-- Podemos exibir aqui, por exemplo, o título do projeto ou algo
+                 extraído de query params, ou buscar via outra rota se quisermos. -->
           </div>
-        
-          <div id="modal-reconsideracao" class="modal hidden">
-            <div class="modal-content">
-              <h2>Pedir Reconsideração</h2>
-              <textarea id="comentario-reconsideracao" rows="5" placeholder="Explique o motivo do pedido..."></textarea>
-              <button id="enviar-reconsideracao">Enviar</button>
-              <button id="cancelar-reconsideracao">Cancelar</button>
+          <!-- SPINNER (Loading) -->
+            <div id="loading" style="display: none; margin-top: 20px;">
+                Carregando projetos...
             </div>
-          </div> 
+
+            <!-- MENSAGEM DE ERRO -->
+            <div id="mensagem-erro" style="display: none; color: red; margin-top: 20px;"></div>
+
+            <!-- MENSAGEM “Sem Projetos” -->
+            <div id="sem-projetos" style="display: none; margin-top: 20px; font-style: italic; color: #555;">
+                Nenhum Artefato encontrado para este Projeto.
+            </div>
+          <table id="tabelaAtividades" style="display: none;">
+            <thead>
+              <tr>
+                <th>Título da Atividade</th>
+                <th>Professor Orientador</th>
+                <th>Nota</th>
+                <th>Comentário</th>
+                <th>Data de Avaliação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas serão preenchidas dinamicamente -->
+            </tbody>
+          </table>
+        
+        
+          
     </div>
-    <script type="module" src="/javaScript/notas.js"></script>
+    <script type="module" src="/javaScript/detalhesProjeto.js"></script>
     <script defer src="/javaScript/efeitoMenu.js"></script>
     <script defer src="/javaScript/dark_mode.js"></script>
     <script src="/javaScript/GerarMenu.js"></script>

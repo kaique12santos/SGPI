@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         
         if (data.success) {
-          ativar('enviado!','sucesso','artefatosEntregues.html')
+          ativar('enviado!','sucesso','artefatosEntregues')
         }
       } catch (error) {
         console.error('Erro ao enviar avaliação:', error);

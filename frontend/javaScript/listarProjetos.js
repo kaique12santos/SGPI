@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1) Título do Projeto (link para detalhes)
         const tdTitulo = document.createElement('td');
         const aDetalhes = document.createElement('a');
-        aDetalhes.href = `detalhesProjeto.html?projetoId=${proj.PROJETO_ID}`;
+        aDetalhes.href = `detalhesProjeto?projetoId=${proj.PROJETO_ID}`;
         aDetalhes.textContent = proj.TITULO_PROJETO;
         tdTitulo.appendChild(aDetalhes);
         tr.appendChild(tdTitulo);

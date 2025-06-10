@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (logoutButton) {
         logoutButton.addEventListener('click', function() {
             localStorage.removeItem('userRole');
-            window.location.href = '/index.html';
+            window.location.href = '/index';
             
             
         });

@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
       if (result.success) {
         document.getElementById('formProjeto').reset();
-        ativar('Projeto criado com sucesso!', 'sucesso', '/projetos.html');
+        ativar('Projeto criado com sucesso!', 'sucesso', '/projetos');
 
       }
     } catch (err) {

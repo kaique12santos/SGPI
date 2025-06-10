@@ -262,9 +262,6 @@ form.addEventListener('submit', (event) => {
     const criterios_avaliacao = document.getElementById('pontos').value;
     const professor_id = parseInt(localStorage.getItem('usuarioId'));
 
-
-   
-
     document.getElementById('semestreError').textContent = '';
 
     // Validações
@@ -295,7 +292,7 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {
         if (response.ok) {
-            ativar('Atividade criada com sucesso!', 'sucesso', '/professor_orientador/criar-atividade');
+            ativar('Atividade criada com sucesso!', 'sucesso', '/criar-atividade');
             form.reset();
             // Criar e adicionar lembrete abaixo do formulário
             response.json().then(data => {

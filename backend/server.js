@@ -37,7 +37,7 @@ app.use(express.json());
 
 // Rota para servir o index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'frontend','views', 'index.html'));
 });
 
 app.use('/imagens/perfil', express.static(path.join(__dirname, '..', 'frontend', 'imagens', 'perfil')));
@@ -185,79 +185,68 @@ app.post('/cadastro', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
     }
 });
-//atualizações futuras
-//---------------------------------------------------------------------------------------------
 
-// Rota de atualização de dados
-app.put('/atualizar', async (req, res) => {
-    const { userId, username, password, email } = req.body;  // userId para identificar o usuário
 
-    try {
-        const connection = await getConnection();
-        const result = await connection.execute(
-            `UPDATE loginn SET username = :1, senha = :2, email = :3 WHERE id = :4`, // Assumindo que você tem um campo 'id'
-            [username, password, email, userId]
-        );
 
-        if (result.rowsAffected > 0) {
-            res.json({ success: true, message: 'Dados atualizados com sucesso!' });
-        } else {
-            res.json({ success: false, message: 'Erro ao atualizar dados.' });
-        }
+// ROTA DINÂMICA PARA SERVIR OUTRAS PÁGINAS HTML DA PASTA 'views'
+// Ex: /avaliar vai servir frontend/views/avaliar.html
+// Ex: /TelaPrincipal vai servir frontend/views/TelaPrincipal.html
+// Esta rota deve vir DEPOIS de todas as suas rotas de API e rotas estáticas específicas.
+app.get('/:pageName', (req, res, next) => { // Adicionado 'next' para possível encadeamento
+    const pageName = req.params.pageName;
 
-        if (connection) await connection.close();
+    // Lista de nomes de página válidos (opcional, mas recomendado para segurança e evitar conflitos)
+    // Se você não quiser manter uma lista, pode remover esta validação,
+    // mas a validação de caracteres abaixo é altamente recomendada.
+    // const validPages = ['TelaPrincipal', 'avaliar', 'criar-atividade', /* ... outros nomes de arquivo sem .html ... */];
+    // if (!validPages.includes(pageName)) {
+    //     return next(); // Passa para o próximo manipulador (o 404) se não for uma página conhecida
+    // }
 
-    } catch (error) {
-        console.error('Erro ao atualizar dados:', error);
-        res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    // Validação para evitar que `pageName` contenha caracteres perigosos
+    // Permite apenas letras (maiúsculas e minúsculas), números, hífen e underscore.
+    if (!/^[a-zA-Z0-9_-]+$/.test(pageName)) {
+        // Se o nome da página contiver caracteres inesperados, consideramos como não encontrado.
+        // Você pode enviar diretamente o 404 aqui ou chamar next() para o manipulador de 404 global.
+        return res.status(404).sendFile(path.join(frontendPath, 'views', '404.html'), (err404) => {
+            if (err404 && !res.headersSent) {
+                res.status(404).send('Página não encontrada (e 404.html personalizado também não).');
+            }
+        });
     }
-});
 
+    const filePath = path.join(frontendPath, 'views', `${pageName}.html`);
 
-
-// Rota para deletar tarefa
-app.delete('/tarefas/:id', async (req, res) => {  // Usando parâmetro de rota para o ID da tarefa
-    const taskId = req.params.id;
-
-    try {
-        const connection = await getConnection();
-        const result = await connection.execute(
-            `DELETE FROM tarefas WHERE id = :1`, // Substitua 'tarefas' pelo nome da sua tabela de tarefas
-            [taskId]
-        );
-
-        if (result.rowsAffected > 0) {
-            res.json({ success: true, message: 'Tarefa excluída com sucesso!' });
-        } else {
-            res.json({ success: false, message: 'Tarefa não encontrada ou erro ao excluir.' });
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            // Se o arquivo não for encontrado ou outro erro ocorrer ao enviar
+            if (!res.headersSent) { // Verifica se a resposta já não foi iniciada
+                if (err.code === 'ENOENT') { // ENOENT = Error NO ENTry (arquivo ou diretório não encontrado)
+                    // O arquivo HTML específico não foi encontrado, então chamamos next()
+                    // para que o manipulador de 404 global seja acionado.
+                    next();
+                } else {
+                    // Outro tipo de erro (ex: permissão de leitura)
+                    console.error(`Erro ao servir o arquivo ${filePath}:`, err);
+                    res.status(500).send('Ocorreu um erro no servidor ao tentar carregar a página.');
+                }
+            }
         }
-
-        if (connection) await connection.close();
-
-    } catch (error) {
-        console.error('Erro ao excluir tarefa:', error);
-        res.status(500).json({ success: false, message: 'Erro no servidor.' });
-    }
+    });
 });
-
-
-// Rota para a página do dashboard (protegida)
-app.get('/TelaPrincipal', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'TelaPrincipal.html'));
-})
 
 
 app.use(async (req, res) => {
     try {
-      const notFoundPath = path.join(frontendPath, '404.html');
-      // Verificar se existe uma página 404 personalizada
+      const notFoundPath = path.join(frontendPath,'views', '404.html');
       await fs.access(notFoundPath);
       res.status(404).sendFile(notFoundPath);
     } catch (error) {
-      // Se não existir, enviar uma mensagem simples
-      res.status(404).send('Página não encontrada');
+      if (!res.headersSent) {
+          res.status(404).send('Página não encontrada');
+      }
     }
-  });
+});
 
 
 

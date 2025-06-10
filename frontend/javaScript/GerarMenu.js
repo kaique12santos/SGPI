@@ -7,28 +7,28 @@ function gerarMenu(tipoPerfil) {
     const itensMenu = {
         aluno: [
             { texto: 'Artefatos entregues', link: '/aluno/artefatos' },
-            { texto: 'Artefatos pendentes', link: '/listaTarefas.html' },
-            { texto: 'Visualizar Notas', link: '/notas.html' },
+            { texto: 'Artefatos pendentes', link: '/listaTarefas' },
+            { texto: 'Visualizar Notas', link: '/notas' },
             { texto: 'Manual do Curso', link: '/uploads/manuais/Manual_de_Projetos_Interdisciplinares_para_o_CST_em_Desenvolvimento_de_Software Multiplataforma.pdf' }
         ],
         professor_orientador: [
-            { texto: 'Artefatos entregues', link: '/artefatosEntregues.html' },
-            { texto: 'Criar Projetos', link: '/projetos.html' },
-            { texto: 'Gerenciar grupo', link: '/criar-grupos.html' },
-            { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes.html' },
-            { texto: 'Criar Atividades', link: '/professor_orientador/criar-atividade' }
+            { texto: 'Artefatos entregues', link: '/artefatosEntregues' },
+            { texto: 'Criar Projetos', link: '/projetos' },
+            { texto: 'Gerenciar grupo', link: '/criar-grupos' },
+            { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes' },
+            { texto: 'Criar Atividades', link: '/criar-atividade' }
             
         ],
         coordenador: [
-            { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios.html' },
-            { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador.html' },
-            { texto: 'Visualizar entregas', link: '/listaProjeto.html'}
+            { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios' },
+            { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador' },
+            { texto: 'Visualizar entregas', link: '/listaProjeto'}
         ],
         professor: [
-            { texto: 'Artefatos entregues', link: '/artefatosEntregues.html' },
+            { texto: 'Artefatos entregues', link: '/artefatosEntregues' },
             { texto: 'Artefatos pendentes', link: '/professor/atividades' },
-            { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes.html' },
-            { texto: 'Criar Artefato', link: '/professor/criar-atividade' }
+            { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes' },
+            { texto: 'Criar Artefato', link: '/criar-atividade' }
             
         ]
     };

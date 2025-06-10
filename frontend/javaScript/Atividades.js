@@ -282,7 +282,7 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {
         if (response.ok) {
-            ativar('Atividade criada com sucesso!', 'sucesso', '/professor/criar-atividade');
+            ativar('Atividade criada com sucesso!', 'sucesso', '/criar-atividade');
             form.reset();
             response.json().then(data => {
                 carregarAtividades();

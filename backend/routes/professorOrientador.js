@@ -4,20 +4,8 @@ const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
-// function lobToString(lob) {
-//   return new Promise((resolve, reject) => {
-//     if (!lob) return resolve(null);
-//     let content = '';
-//     lob.setEncoding('utf8');
-//     lob.on('data', chunk => content += chunk);
-//     lob.on('end', () => resolve(content));
-//     lob.on('error', reject);
-//   });
-// }
 
-router.get('/criar-atividade', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
-});
+
 
 // Criar nova atividade
 router.post('/atividades', async (req, res) => {

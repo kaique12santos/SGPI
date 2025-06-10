@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           botaoAvaliar.addEventListener('click', () => {
             localStorage.setItem('entrega_id', e.entrega_id);
-            window.location.href = 'avaliar.html';
+            window.location.href = 'avaliar';
           });
         }
       
@@ -95,6 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
   function avaliar(entregaId) {
     localStorage.setItem('entrega_id', entregaId);
-    window.location.href = 'avaliar.html';
+    window.location.href = 'avaliar';
   }
   

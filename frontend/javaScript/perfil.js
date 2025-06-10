@@ -9,7 +9,7 @@ async function obterDadosUsuario() {
         userId = parseInt(localStorage.getItem('usuarioId'));
 
         if (!userId) {
-            ativar('Usuário não autenticado.', 'erro', '/TelaPrincipal.html');
+            ativar('Usuário não autenticado.', 'erro', '/TelaPrincipal');
             return;
         }
 
@@ -129,7 +129,7 @@ async function atualizarPerfil(event) {
                 }
             }
 
-            window.location.href = '/TelaPrincipal.html';
+            window.location.href = '/TelaPrincipal';
         } else {
             ativar(data.message, 'erro', '');
         }

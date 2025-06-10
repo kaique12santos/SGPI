@@ -24,9 +24,7 @@ const transporter = nodemailer.createTransport({
 
 
 
-router.get('/criar-atividade', (req, res) => {
-  return res.sendFile(path.join(frontendPath, 'criar-atividade.html'));
-});
+
 
 router.post('/atividades', async (req, res) => {
   const {

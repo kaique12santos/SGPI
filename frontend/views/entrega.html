@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reconsiderações de Notas</title>
-     <!--__________LINKS AQUI__________-->
+    <title>Entrega de Tarefas</title>
+    <!--__________LINKS AQUI__________-->
     
-     <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
-     <link rel="stylesheet" href="/css/main.css">
-     <link rel="stylesheet" href="/css/dark-mode.css">
-     <link rel="stylesheet" href="/css/alerts.css">
-     <link rel="stylesheet" href="/css/perfil.css">
-     <link rel="stylesheet" href="/css/reconsideracoes.css">
-     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
-     
-     <!--______________________________-->
+    <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/alerts.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/entregas.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
+    
+    <!--______________________________-->
 </head>
 <body>
     <header>
@@ -24,12 +24,13 @@
             <input type="text" placeholder="Pesquisar..." class="search-box">
             <div class="espaco"></div>
             <div id="user-profile-pic" class="profile-pic " >
-                <a href="/TelaPrincipal.html" >
+                <a href="/TelaPrincipal" >
                 <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
                 </a>
             </div>
         </div>
     </header>
+
     <div class="container"> <!--Div container para facilitar configurações globais-->
         <div class="wrapper">
         <div class="menu-dropdown"> <!--Div feita para o menu-->
@@ -50,24 +51,32 @@
         </button>
         </div>
         </div>
-            
-
-
-        <div class="container"> <!--Div com o conteúdo principal da página-->
-            <div class="page-name">
-                <h2>Pedidos de Reconsideração</h2>
-            </div>
+        <div class="page-name">
+            <h2>Minhas Atividades</h2>
         </div>
-        <div class="container-reconsideracoes" id="container-reconsideracoes">
-            
-        </div>
+
+        <div class="atividade-detalhes">
+            <h2 id="titulo"></h2>
+            <p><strong>Descrição:</strong> <span id="descricao"></span></p>
+            <p><strong>Professor:</strong> <span id="professor"></span></p>
+            <p><strong>Prazo:</strong> <span id="prazo"></span></p>
+            <p><strong>Criterios:</strong> <span id="criterios"></span></p>
         
-         
-    </div>
-    <script type="module" src="/javaScript/reconsideracoes.js"></script>
+            <div class="upload-area">
+              <label>Envie sua entrega:</label><br />
+              <input type="file" id="arquivo" accept=".pdf,.doc,.docx,.xls,.xlsx" /><br/>
+              <button class="botao-enviar" onclick="enviarEntrega()">Enviar</button>
+              <div class="alerta-sucesso" id="sucesso">Entrega enviada com sucesso!</div>
+              <div class="alerta-erro" id="erro">Erro ao enviar entrega.</div>
+            </div>
+          </div>
+
     <script defer src="/javaScript/efeitoMenu.js"></script>
     <script defer src="/javaScript/dark_mode.js"></script>
+    <script  src="/javaScript/entregas.js"></script>
     <script src="/javaScript/GerarMenu.js"></script>
     <script src="/javaScript/imagemPerfil.js"></script>
+
+    
 </body>
 </html>

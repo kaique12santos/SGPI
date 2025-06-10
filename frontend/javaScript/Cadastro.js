@@ -57,7 +57,7 @@ form.addEventListener('submit', (event) => {
     })
     .then(response => {  
         if (response.ok) {
-          ativar('Cadastro realizado com sucesso!','sucesso','/index.html')
+          ativar('Cadastro realizado com sucesso!','sucesso','/index')
         } else {
             response.json().then(data => {
                 ativar(data.message, data.success ? 'sucesso' : 'erro');

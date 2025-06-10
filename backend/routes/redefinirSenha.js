@@ -66,7 +66,7 @@ router.post('/recuperar-senha', async (req, res) => {
 
         console.log(`✅ Link gerado e salvo no banco de dados`);
 
-        const link = `http://localhost:3000/redefine-password.html?token=${token}`;
+        const link = `http://localhost:3000/redefine-password?token=${token}`;
         let emailEnviado = false;
 
         try {

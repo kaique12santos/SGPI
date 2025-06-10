@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Atividade no prazo e não atrasada: pode ser editada (mesmo se já entregue)
                 card.addEventListener('click', () => {
                     localStorage.setItem('atividade_id', atividade.id);
-                    window.location.href = 'entrega.html';
+                    window.location.href = 'entrega';
                 });
             } else {
                 card.classList.add('card-desativado');

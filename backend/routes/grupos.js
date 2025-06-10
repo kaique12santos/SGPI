@@ -27,9 +27,7 @@ function lobToString(lob) {
   });
 }
 
-router.get('/criar-grupos', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'criar-grupos.html'));
-});
+
 
 router.post('/grupos', async (req, res) => {
   const connection = await getConnection();

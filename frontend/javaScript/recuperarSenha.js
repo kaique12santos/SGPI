@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (data.success) {
                     if (data.emailEnviado) {
-                        ativar(data.message, "sucesso",'index.html');
+                        ativar(data.message, "sucesso",'index');
                     } else {
                         ativar(data.message + "\n\n" + data.link, "info");
                     }
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     ativar("Senha redefinida com sucesso! Redirecionando para o login...", "sucesso");
                     setTimeout(() => {
-                        window.location.href = "/index.html";
+                        window.location.href = "/index";
                     }, 3000);
                 } else {
                     ativar(data.message || "Erro ao redefinir senha.", "erro");
