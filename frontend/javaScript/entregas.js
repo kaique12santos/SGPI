@@ -20,21 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Erro ao carregar detalhes:', err);
-      document.getElementById('erro').textContent = 'Erro ao carregar detalhes da atividade.';
-      document.getElementById('erro').style.display = 'block';
+      document.getElementById('erro').textContent = 'Erro ao carregar detalhes da atividade.'; //
+      document.getElementById('erro').style.display = 'block';//
     }
   }
   
   async function enviarEntrega() {
     const fileInput = document.getElementById('arquivo');
-    const sucesso = document.getElementById('sucesso');
-    const erro = document.getElementById('erro');
-    sucesso.style.display = 'none';
-    erro.style.display = 'none';
+    const sucesso = document.getElementById('sucesso');//
+    const erro = document.getElementById('erro');//
+    sucesso.style.display = 'none';//
+    erro.style.display = 'none';//
   
     if (!fileInput.files[0]) {
-      erro.textContent = 'Selecione um arquivo.';
-      erro.style.display = 'block';
+      erro.textContent = 'Selecione um arquivo.';//
+      erro.style.display = 'block';//
       return;
     }
   
@@ -52,14 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await res.json();
   
       if (result.success) {
-        sucesso.style.display = 'block';
+        sucesso.style.display = 'block';//
       } else {
-        erro.textContent = result.message || 'Erro ao enviar.';
-        erro.style.display = 'block';
+        erro.textContent = result.message || 'Erro ao enviar.';//
+        erro.style.display = 'block';//
       }
     } catch (e) {
-      erro.textContent = 'Erro de conexão.';
-      erro.style.display = 'block';
+      erro.textContent = 'Erro de conexão.';//
+      erro.style.display = 'block';//
     }
   }
   

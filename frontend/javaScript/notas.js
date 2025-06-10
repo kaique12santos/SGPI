@@ -28,9 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.className = 'card-nota';
         const dentroDoPrazo = av.dentro_prazo;
         const jaSolicitado = av.status_reconsideracao !== null;
-  
-        
-          
+     
         card.innerHTML = `
         <p><strong>Atividade:</strong><span> ${av.atividade}</span></p>
         <p><strong>Nota:</strong><span> ${av.nota}</span></p>

@@ -20,17 +20,34 @@ tr:hover {
 }
 .status-em-andamento {
   color: green;
+  background-color: #d6ffec;
+  border-color: #bbf7d0;
   font-weight: bold;
 }
 .status-em-proposta {
   color: orange;
+  background-color: #fff7d5;
+  border-color: #fed7aa;
   font-weight: bold;
 }
 .status-aguardando {
   color: blue;
+  background-color: #d1e5ff;
+  border-color: #bfdbfe;
   font-weight: bold;
 }
 .status-concluido {
   color: gray;
+  background-color: #f9fafb;
+  border-color: #d1d5db;
   font-weight: bold;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
 }

@@ -1,3 +1,5 @@
+import { ativar } from "./alerts.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     carregarGruposPorSemestre()
     document.getElementById('formProjeto').addEventListener('submit', criarProjeto);
@@ -18,17 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
     grupoSelect.innerHTML = '<option value="">Carregando grupos...</option>';
   
     try {
-      const res = await fetch(`/api/grupos?semestre=${semestre}`);
-      const data = await res.json();
+      const [resGrupos, resProjetos] = await Promise.all([
+        fetch(`/api/grupos?semestre=${semestre}`),
+        fetch(`/api/projetos?orientador_id=${localStorage.getItem('usuarioId')}`)
+      ]);
+  
+      const dataGrupos = await resGrupos.json();
+      const dataProjetos = await resProjetos.json();
   
       grupoSelect.innerHTML = '';
   
-      if (data.success && data.grupos.length > 0) {
-        // 1. Obter grupo_ids já usados nos projetos exibidos
-        const gruposUsados = projetosGlobais.map(p => p.grupo_id);
-  
-        // 2. Filtrar os grupos ainda não usados
-        const gruposDisponiveis = data.grupos.filter(g => !gruposUsados.includes(g.ID));
+      if (dataGrupos.success && dataGrupos.grupos.length > 0) {
+        const gruposUsados = dataProjetos.projetos.map(p => p.grupo_id);
+        const gruposDisponiveis = dataGrupos.grupos.filter(g => !gruposUsados.includes(g.ID));
   
         if (gruposDisponiveis.length === 0) {
           grupoSelect.innerHTML = '<option value="">Nenhum grupo disponível</option>';
@@ -42,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
           opt.textContent = g.NOME;
           grupoSelect.appendChild(opt);
         });
-  
       } else {
         grupoSelect.innerHTML = '<option value="">Nenhum grupo encontrado</option>';
       }
@@ -63,13 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const grupo_id = document.getElementById('grupo').value;
     const orientador_id = localStorage.getItem('usuarioId'); // já salvo no login
   
-    const mensagem = document.getElementById('mensagem');
-    mensagem.style.display = 'none';
   
-    if (!titulo || !grupo_id || !semestre) {
-      mensagem.textContent = 'Preencha todos os campos obrigatórios.';
-      mensagem.className = 'alerta erro';
-      mensagem.style.display = 'block';
+    if (!titulo || !grupo_id || !semestre || !descricao) {
+      ativar('Preencha todos os campos obrigatórios.','info','')
       return;
     }
   
@@ -88,17 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
   
       const result = await res.json();
   
-      mensagem.textContent = result.message;
-      mensagem.className = 'alerta ' + (result.success ? 'sucesso' : 'erro');
-      mensagem.style.display = 'block';
+     
   
       if (result.success) {
         document.getElementById('formProjeto').reset();
+        ativar('Projeto criado com sucesso!', 'sucesso', '/projetos.html');
+
       }
     } catch (err) {
-      mensagem.textContent = 'Erro na requisição.';
-      mensagem.className = 'alerta erro';
-      mensagem.style.display = 'block';
+      ativar('Erro na requisição','erro','')
     }
   }
   

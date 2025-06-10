@@ -41,6 +41,12 @@
     background-color: #a60000;
   }
 
+  .botao-avaliar[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+
   .link-arquivo {
     display: flex;
     align-items: center;

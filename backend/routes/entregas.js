@@ -22,7 +22,8 @@ router.get('/api/entregas/recebidas', async (req, res) => {
       a.titulo AS atividade_titulo,
       a.semestre AS atividade_semestre,
       e.caminho_arquivo,
-      TO_CHAR(e.data_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') AS data_entrega
+      TO_CHAR(e.data_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') AS data_entrega,
+      TO_CHAR(a.prazo_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') AS prazo_entrega
       FROM Entregas e
       JOIN Atividades a ON e.atividade_id = a.id
       JOIN Grupos g ON e.grupo_id = g.id
@@ -49,7 +50,8 @@ router.get('/api/entregas/recebidas', async (req, res) => {
       atividade_titulo: row.ATIVIDADE_TITULO,
       atividade_semestre: row.ATIVIDADE_SEMESTRE,
       caminho_arquivo: row.CAMINHO_ARQUIVO,
-      data_entrega: row.DATA_ENTREGA
+      data_entrega: row.DATA_ENTREGA,
+      prazo_entrega: row.PRAZO_ENTREGA
     }));
 
     res.json({ success: true, entregas });

@@ -1,7 +1,7 @@
 import { ativar } from "./alerts.js";
 
-const btn = document.querySelector(".login-button");
-const divMessage = document.querySelector(".alert");
+// const btn = document.querySelector(".login-button");
+// const divMessage = document.querySelector(".alert");
 
 document.getElementById('loginForm').addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -13,7 +13,6 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     document.getElementById('emailError').textContent = ''; 
     document.getElementById('passwordError').textContent = '';
 
-    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(username)) {
         document.getElementById('emailError').textContent = 'Por favor, insira um endereço de email válido.';
@@ -23,7 +22,6 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     const minLength = 6;
     const maxLength = 12;
     
-    // validação da senha
     if (password.length < minLength) {
         document.getElementById('passwordError').textContent = `A senha deve ter pelo menos ${minLength} caracteres.`;
         return;

@@ -7,7 +7,6 @@ let selectedUserId = null;
 let selectedUserStatus = null;
 let allUsers = [];
 
-// DOM Elements
 const userTableBody = document.getElementById('users-table-body');
 const pagination = document.getElementById('pagination');
 const editTypeModal = document.getElementById('edit-type-modal');
@@ -20,7 +19,6 @@ const searchBtn = document.getElementById('search-btn');
 const confirmStatusBtn = document.getElementById('confirm-status-btn');
 const editTypeForm = document.getElementById('edit-type-form');
 
-// Eventos
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarUsuarios();
     aplicarFiltros();
@@ -79,7 +77,6 @@ confirmStatusBtn.addEventListener('click', async function () {
     }
 });
 
-// Funções
 async function carregarUsuarios() {
     try {
         const res = await fetch('/usuarios');

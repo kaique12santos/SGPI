@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const professorId = localStorage.getItem('usuarioId');
   const container = document.getElementById('container-reconsideracoes');
   
-  // Validar se o professorId existe e é um número válido
+  // Valida se o professorId existe e é um número válido
   if (!professorId || isNaN(professorId)) {
     container.innerHTML = '<p>Erro: ID do professor não encontrado. Faça login novamente.</p>';
     console.error('Professor ID inválido:', professorId);
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      container.innerHTML = ''; // Limpar container
+      container.innerHTML = '';
 
       data.reconsideracoes.forEach(item => {
         const card = document.createElement('div');
@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function abrirModal(item) {
-    // Criar o modal dinamicamente
     const modal = document.createElement('div');
     modal.className = 'modal-reconsideracao';
     modal.id = 'modal-reconsideracao';
@@ -119,15 +118,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // Adicionar ao body
     document.body.appendChild(modal);
 
-    // Mostrar modal com animação
     setTimeout(() => {
       modal.classList.add('show');
     }, 10);
 
-    // Fechar modal ao clicar fora
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         fecharModal();
@@ -150,7 +146,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resposta = document.getElementById('resposta-professor').value.trim();
     const notaInput = document.getElementById('nova-nota').value.trim();
     
-    // Validações
     if (!resposta) {
       ativar('Por favor, digite uma resposta para o aluno.','info','');
       return;
@@ -163,7 +158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Confirmação antes de processar
     const confirmar = confirm(`Tem certeza que deseja ${acao} este pedido de reconsideração?`);
     if (!confirmar) return;
 
@@ -184,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (res.ok) {
         ativar(data.message || `Pedido ${acao === 'aprovar' ? 'aprovado' : 'recusado'} com sucesso!`,'sucesso','');
         fecharModal();
-        carregarReconsideracoes(); // Recarregar a lista
+        carregarReconsideracoes();
       } else {
         ativar(data.message || 'Erro ao processar pedido.','erro','');
       }

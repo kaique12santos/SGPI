@@ -420,22 +420,38 @@ router.delete('/grupos/:id', async (req, res) => {
   }
 
   try {
+    // Verifica se há algum projeto vinculado ao grupo
+    const vinculo = await connection.execute(
+      `SELECT COUNT(*) AS total FROM projetos WHERE grupo_id = :grupoId`,
+      [grupoId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+  
+    if (vinculo.rows[0].TOTAL > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Não é possível excluir o grupo, pois ele está vinculado a um projeto.'
+      });
+    }
+  
+    // Remove membros do grupo
     await connection.execute(
       `DELETE FROM Usuario_Grupo WHERE grupo_id = :grupoId`,
       [grupoId],
       { autoCommit: false }
     );
-
+  
+    // Remove o grupo
     const result = await connection.execute(
       `DELETE FROM Grupos WHERE id = :grupoId`,
       [grupoId],
       { autoCommit: true }
     );
-
+  
     if (result.rowsAffected === 0) {
       return res.status(404).json({ message: 'Grupo não encontrado.' });
     }
-
+  
     res.json({ success: true, message: 'Grupo excluído com sucesso!' });
   } catch (error) {
     console.error('Erro ao excluir grupo:', error);

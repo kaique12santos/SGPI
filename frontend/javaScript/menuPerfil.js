@@ -15,9 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     btnLogout.addEventListener("click", () => {
-        // lógica de logout
         console.log("Logout acionado");
-        window.location.href = "/login.html"; // ou qualquer página de saída
+        window.location.href = "/login.html";
     });
     btnNotificacoes.addEventListener("click", () => {
         const isVisible = dropdown.style.display === "block";

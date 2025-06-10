@@ -3,7 +3,7 @@ import { ativar } from "./alerts.js";
 document.addEventListener('DOMContentLoaded', () => {
     carregarProjetos();
 });
-  
+
 
   let projetoEditandoId = null;
   let projetosGlobais = [];
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       projetosGlobais = data.projetos;
   
-      container.innerHTML = ''; // limpar
+      container.innerHTML = ''; 
   
       data.projetos.forEach(proj => {
         const card = document.createElement('div');
@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <option value="5" ${proj.semestre === '5' ? 'selected' : ''}>5º Semestre</option>
                 <option value="6" ${proj.semestre === '6' ? 'selected' : ''}>6º Semestre</option>
             </select>
-
   
             <label>Status</label>
             <select id="edit-status-${proj.id}">
@@ -87,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal-edicao');
     modal.classList.remove('hidden');
     modal.classList.add('show');
+
   }
 
   function fecharModal() {
@@ -144,5 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ativar('Erro ao deletar projeto.','erro','');
     }
   }
+
+window.mostrarEdicao = mostrarEdicao;
+window.deletarProjeto = deletarProjeto;
+window.fecharModal = fecharModal;
+window.confirmarEdicao=confirmarEdicao;
+
   
   

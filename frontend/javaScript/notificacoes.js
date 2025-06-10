@@ -1,4 +1,3 @@
-// notificacoes.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const usuarioId = localStorage.getItem("usuarioId");

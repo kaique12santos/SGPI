@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       tabela.style.display = 'table';
+      
     } catch (e) {
       console.error('Erro ao carregar projetos:', e);
       loading.style.display = 'none';

@@ -194,7 +194,7 @@ router.get('/api/atividades', async (req, res) => {
        FROM Atividades a
        JOIN Usuarios p ON a.professor_id = p.id
        WHERE a.semestre = :semestre AND a.grupo_id = :grupoId_main
-       ORDER BY a.prazo_entrega ASC`,
+       ORDER BY a.data_criacao DESC, a.id DESC`,
       {
         grupoId_status: grupoId,
         grupoId_entrega: grupoId,
@@ -204,6 +204,12 @@ router.get('/api/atividades', async (req, res) => {
       },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+    // === ADICIONE LOG PARA DEBUG ===
+    console.log('Atividades do banco (ordenadas):', result.rows.map(row => ({
+      id: row.ID,
+      titulo: row.TITULO,
+      data_criacao: row.DATA_CRIACAO
+    })));
 
     const atividades = await Promise.all(result.rows.map(async row => ({
       id: row.ID,

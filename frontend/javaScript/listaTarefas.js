@@ -3,17 +3,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loading = document.getElementById('loading');
     const erro = document.getElementById('mensagem-erro');
     const semAtividades = document.getElementById('sem-atividades');
-
-    // Filtros no HTML
     const filtroStatus = document.getElementById('filtro-status');
     const filtroPrazo = document.getElementById('filtro-prazo');
     const filtroBusca = document.getElementById('filtro-busca');
-
-    // ID do aluno salvo no Login.js
     const alunoId = localStorage.getItem('usuarioId');
-
-    let hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const agora = new Date();
     
     if (!alunoId) {
         erro.style.display = 'block';
@@ -32,71 +26,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        // === 1) Criação dos cards, incluindo data-attributes para filtro ===
+        data.atividades.sort((a, b) => {
+            const dataA = new Date(a.data_criacao);
+            const dataB = new Date(b.data_criacao);
+            return dataB - dataA; 
+        });
+
+        console.log('Atividades ordenadas:', data.atividades.map(a => ({
+            titulo: a.titulo,
+            data_criacao: a.data_criacao
+        })));
+        
         data.atividades.forEach(atividade => {
             const card = document.createElement('div');
             card.classList.add('atividade-card');
-
-            // Normaliza status em minúsculas
+    
             const status = atividade.status_entrega.toLowerCase();
             const statusClasse = `status-${status}`;
-
-            // Parse da data de prazo (string ISO) para facilitar comparação
+    
             const prazoDate = new Date(atividade.prazo_entrega);
-
-            // Coloca atributos data- para usar depois na filtragem
-            card.dataset.status = status;                        // ex: "pendente", "entregue" ou "atrasado"
-            card.dataset.prazodat = atividade.prazo_entrega;     // string ISO (para recriar Date depois)
-            card.dataset.titulo = atividade.titulo.toLowerCase(); // título em minúsculas (para busca)
-
+    
+            card.dataset.status = status;
+            card.dataset.prazodat = atividade.prazo_entrega;
+            card.dataset.titulo = atividade.titulo.toLowerCase();
+            card.dataset.datacriacao = atividade.data_criacao; 
+    
             card.innerHTML = `
                 <h3>${atividade.titulo}</h3>
                 <p class="prazo"><strong>Prazo:</strong> ${prazoDate.toLocaleString('pt-BR')}</p>
                 <p class="info-grupo"><strong>Grupo:</strong> ${atividade.grupo_nome || 'N/A'}</p>
                 <span class="status-badge ${statusClasse}">${atividade.status_entrega}</span>
             `;
-
-            const isVencido = prazoDate < hoje;
-            if (status !== 'entregue' && status !== 'atrasado' && !isVencido) {
+    
+            const isPrazoVencido = prazoDate.getTime() < agora.getTime();
+            const isAtrasado = status === 'atrasado';
+            
+            if (!isPrazoVencido && !isAtrasado) {
+                // Atividade no prazo e não atrasada: pode ser editada (mesmo se já entregue)
                 card.addEventListener('click', () => {
                     localStorage.setItem('atividade_id', atividade.id);
                     window.location.href = 'entrega.html';
                 });
             } else {
-                // desativa (incluindo caso isVencido)
                 card.classList.add('card-desativado');
                 card.style.cursor = 'not-allowed';
-                if (status === 'entregue' || status === 'atrasado') {
-                    card.title = 'Esta atividade não pode mais ser alterada.';
-                } else {
+                
+                if (isAtrasado) {
+                    card.title = 'Esta atividade está marcada como atrasada e não pode ser alterada.';
+                } else if (isPrazoVencido) {
                     card.title = 'Esta atividade está com prazo vencido.';
                 }
             }
-            
-            
-
+    
             atividadesContainer.appendChild(card);
         });
 
-        // === 2) Função que percorre todos os cards e aplica os 3 filtros em cascata ===
         function filtrarCards() {
-            const statusEscolhido = filtroStatus.value; // "todos", "pendente", "entregue" ou "atrasado"
-            const prazoEscolhido = filtroPrazo.value;   // "todos", "proximos", "vencidos"
+            const statusEscolhido = filtroStatus.value;
+            const prazoEscolhido = filtroPrazo.value;  
             const textoBusca = filtroBusca.value.toLowerCase().trim();
 
-            
-
-            // Percorre todos os cards criados
             const cards = atividadesContainer.querySelectorAll('.atividade-card');
             cards.forEach(card => {
-                const statusCard = card.dataset.status; // ex: "pendente"
+                const statusCard = card.dataset.status;
                 const prazoISO = card.dataset.prazodat;
-                const tituloCard = card.dataset.titulo; // já em minúsculas
+                const tituloCard = card.dataset.titulo; 
 
                 const dataPrazo = new Date(prazoISO);
-                dataPrazo.setHours(0, 0, 0, 0); // normaliza horário para comparação só de datas
 
-                // 2.1) Verifica filtro de status
                 let passouStatus = false;
                 if (statusEscolhido === 'todos') {
                     passouStatus = true;
@@ -104,38 +101,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                     passouStatus = (statusCard === statusEscolhido);
                 }
 
-                // 2.2) Verifica filtro de prazo
                 let passouPrazo = false;
                 if (prazoEscolhido === 'todos') {
                     passouPrazo = true;
                 } else if (prazoEscolhido === 'proximos') {
-                    // "Próximos 7 dias": dataPrazo >= hoje e <= hoje + 7 dias
-                    const seteDiasDepois = new Date(hoje);
-                    seteDiasDepois.setDate(seteDiasDepois.getDate() + 7);
-                    passouPrazo = (dataPrazo >= hoje && dataPrazo <= seteDiasDepois);
+                    const seteDiasDepois = new Date(agora.getTime() + 7 * 24*60*60*1000);
+                    passouPrazo = (dataPrazo.getTime() >= agora.getTime() && dataPrazo.getTime() <= seteDiasDepois.getTime());
                 } else if (prazoEscolhido === 'vencidos') {
-                    // "Vencidos": dataPrazo < hoje
-                    passouPrazo = (dataPrazo < hoje);
+                    passouPrazo = (dataPrazo.getTime() < agora.getTime());
                 }
 
-                // 2.3) Verifica busca por título
                 const passouBusca = tituloCard.includes(textoBusca);
 
-                // === Se todos os 3 critérios forem verdadeiros, mostra; senão, esconde ===
                 if (passouStatus && passouPrazo && passouBusca) {
-                    card.style.display = ''; // exibe
+                    card.style.display = '';
                 } else {
-                    card.style.display = 'none'; // esconde
+                    card.style.display = 'none';
                 }
             });
         }
 
-        // === 3) Registra os listeners de filtro que disparam a filtrarCards() ===
         filtroStatus.addEventListener('change', filtrarCards);
         filtroPrazo.addEventListener('change', filtrarCards);
         filtroBusca.addEventListener('input', filtrarCards);
 
-        // Opcional: já aplica o filtro inicial para, por exemplo, esconder cards se houver algo pré-selecionado
         filtrarCards();
 
     } catch (e) {
