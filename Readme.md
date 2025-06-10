@@ -1,7 +1,7 @@
 
 
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&crop=center" alt="Sistema de Gestão de PIS" width="400" height="250"/>
+  <img src="frontend\imagens\teste.png" alt="Sistema de Gestão de PIS" width="400" height="250"/>
   
   # 🎓 Sistema de Gestão de PIS
   
