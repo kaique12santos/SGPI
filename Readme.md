@@ -283,8 +283,10 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
+
 <div align="center">
-  <p>Desenvolvido com ❤️ pela equipe DSM</p>
+  <img src="frontend/imagens/logo-equipe.png" alt="Logo da Equipe DSM" width="200"/> <!-- Ajuste o 'width' conforme necessário -->
+  <p>Desenvolvido com ❤️ pela equipe <strong>CODECEPS</strong></p>
   <p>
     <a href="#top">⬆️ Voltar ao topo</a>
   </p>
