@@ -194,20 +194,20 @@ Essa estrutura visa promover um código mais modular, fácil de manter e testar,
 </tr>
 <tr>
 <td align="center">
-<img src="https://via.placeholder.com/80/4A90E2/FFFFFF?text=DM" width="80px" style="border-radius: 50%"/>
+<img src="https://github.com/diegomarques23.png" width="80px" style="border-radius: 50%"/>
 <br><strong>Diego Marques</strong>
 <br><em>Documentation</em>
 <br>
-<a href="https://github.com/nome_colaborador">
+<a href="https://github.com/diegomarques23">
 <img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
 </a>
 </td>
 <td align="center">
-<img src="https://via.placeholder.com/80/28A745/FFFFFF?text=VC" width="80px" style="border-radius: 50%"/>
+<img src="https://github.com/Vini-Crepaldi.png" width="80px" style="border-radius: 50%"/>
 <br><strong>Vinicius Crepaldi</strong>
 <br><em>Database Admin</em>
 <br>
-<a href="https://github.com/nome_colaborador">
+<a href="https://github.com/Vini-Crepaldi">
 <img src="https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white"/>
 </a>
 </td>
