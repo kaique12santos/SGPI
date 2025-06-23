@@ -132,7 +132,6 @@ O projeto segue uma arquitetura inspirada no padrão **MVC (Model-View-Controlle
 Essa estrutura visa promover um código mais modular, fácil de manter e testar, com uma clara distinção entre a lógica de apresentação, a lógica de controle de fluxo da aplicação e a lógica de manipulação de dados.
 
 ---
-
 ## 🚀 Status do Projeto
 
 <div align="center">
@@ -291,4 +290,3 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
     <a href="#top">⬆️ Voltar ao topo</a>
   </p>
 </div>
-

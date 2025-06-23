@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
         const resposta = await res.json();
 
-        ativar(resposta.message,'sucesso','');
+        ativar(resposta.message,'sucesso','/notas');
         modal.classList.add('hidden');
         comentarioInput.value = '';
       };
