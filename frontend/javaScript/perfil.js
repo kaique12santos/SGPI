@@ -120,7 +120,7 @@ async function atualizarPerfil(event) {
         const data = await response.json();
 
         if (data.success) {
-            ativar(data.message, 'sucesso', '');
+            ativar(data.message, 'sucesso', '/TelaPrincipal');
 
             if (fotoInput.files.length > 0) {
                 const headerProfilePic = document.querySelector('.profile-pic img');
@@ -129,7 +129,7 @@ async function atualizarPerfil(event) {
                 }
             }
 
-            window.location.href = '/TelaPrincipal';
+           
         } else {
             ativar(data.message, 'erro', '');
         }
