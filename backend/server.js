@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { getConnection, oracledb } = require('./connectOracle.js');
+const { getConnection, oracledb, initOraclePool } = require('./connectOracle.js');
 const path = require('path');
 const app = express();
 const port = 3000;
@@ -12,6 +12,7 @@ const {v4: uuidv4}=require('uuid');
 
 
 // Importar as rotas
+const auth = require('./routes/auth.js')
 const redefinirSenha = require('./routes/redefinirSenha.js');
 const professor = require('./routes/professor.js')
 const professorOrientador = require('./routes/professorOrientador.js');
@@ -28,11 +29,20 @@ const reconsideracoes = require('./routes/professorReconsideracoes.js')
 const ListaProjetos = require('./routes/CoordenadorProjetos.js')
 const coordenadorRelatorios= require('./routes/CoordenadorRelatorios.js')
 
+//importar as rotas de tratamento de erros
+const attachResponseHelpers = require('./middlewares/responseMiddleware.js');
+const notFound = require('./middlewares/notFound.js');
+const errorHandler = require('./middlewares/errorHandler.js');
+
+const { AppError } = require('./helpers/response.js');
+
 
 
 app.use(cors());
 app.use(express.static(frontendPath)); 
 app.use(express.json()); 
+app.use(attachResponseHelpers);
+
 
 
 // Rota para servir o index.html
@@ -44,6 +54,7 @@ app.use('/imagens/perfil', express.static(path.join(__dirname, '..', 'frontend',
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usar as rotas importadas
+app.use('/',auth)
 app.use('/professor', professor);
 app.use('/professor_orientador', professorOrientador);
 app.use('/perfil', atualizarPerfil);
@@ -65,126 +76,101 @@ app.use('/coordenador',coordenadorRelatorios);
 
 
 //rota do login
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+// app.post('/login', async (req, res, next) => {
+//     const { username, password } = req.body;
+   
 
-    try {
-        const connection = await getConnection();
-        const usernameString = String(username);
-        const passwordString = String(password);
+  
+//     try {
+//       if (!username || !password) {
+//         throw new AppError('Credenciais inválidas.', { status: 400, code: 'AUTH_INVALID_INPUT' });
+//       }
+  
+//       const connection = await getConnection();
+//       try {
+//         const result = await connection.execute(
+//           `SELECT ID, EMAIL, SENHA, TIPO FROM Usuarios WHERE UPPER(email) = UPPER(:email)`,
+//           { email: String(username) },
+//           { outFormat: oracledb.OUT_FORMAT_OBJECT }
+//         );
+  
+//         const user = result.rows[0];
+//         const genericFail = () => res.fail('AUTH_INVALID_CREDENTIALS', 'Usuário ou senha incorretos.', 401);
+  
+//         if (!user) return genericFail();
+  
+//         const passwordMatch = await bcrypt.compare(String(password), user.SENHA);
+//         if (!passwordMatch) return genericFail();
+  
+//         let roleFrontend = 'aluno';
+//         const tipo = user.TIPO?.toLowerCase();
+//         if (tipo === 'professor') roleFrontend = 'professor';
+//         else if (tipo === 'coordenador') roleFrontend = 'coordenador';
+//         else if (tipo === 'professor_orientador') roleFrontend = 'professor_orientador';
 
+//         const { gerarToken } = require('./helpers/jwt.js');
+//         const payload = { id: user.ID, userRole: roleFrontend };
+//         const token = gerarToken(payload);
         
-        const result = await connection.execute(
-            `SELECT * FROM Usuarios WHERE UPPER(email) = UPPER(:1)`,
-            [usernameString], 
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
-        );
-
-        if (result.rows.length > 0) {
-            const storedHashedPassword = result.rows[0].SENHA;
-
-            const userRole = result.rows[0].TIPO;
-
-            let roleFrontend = 'aluno'; // valor padrão
-            
-            if (userRole === 'Professor' || userRole === 'professor') {
-                roleFrontend = 'professor';
-            } else if (userRole === 'Coordenador' || userRole === 'coordenador') {
-                roleFrontend = 'coordenador';
-            }else if (userRole === 'Professor_Orientador' || userRole === 'professor_orientador') {
-                roleFrontend='professor_orientador'
-            }
-           
-            
-            // Comparando a senha digitada com a senha criptografada
-            const passwordMatch = await bcrypt.compare(passwordString, storedHashedPassword);
-
-            if (passwordMatch) {
-                res.json({ success: true ,userRole: roleFrontend,id: result.rows[0].ID});
-                console.log('LOGIN SUCESSO:', {
-                    id: result.rows[0].ID,
-                    role: roleFrontend
-                  });
-            } else {
-                res.json({ success: false, message: 'Usuário ou senha incorretos.' });
-            }
-        } else {
-            res.json({ success: false, message: 'Usuário ou senha incorretos.' });
-        }
-
-        // Fecha a conexão após o uso
-        if (connection) {
-            try {
-                await connection.close();
-            } catch (closeError) {
-                console.error("Erro ao fechar a conexão:", closeError);
-            }
-        }
-    } catch (error) {
-        console.error('Erro ao realizar login:', error);
-        res.status(500).json({ success: false, message: 'Erro no servidor.' });
-    }
-});
+  
+//         return res.ok({ ...payload,token}, 'Login realizado com sucesso.');
+//       } finally {
+//         try { await connection.close(); } catch (closeError) { console.error('Erro ao fechar a conexão:', closeError); }
+//       }
+//     } catch (err) {
+//       return next(err);
+//     }
+//   });
 
 
 
  
-// Rota de cadastro
-app.post('/cadastro', async (req, res) => {
-  const { nome, email, senha } = req.body;
-  let { semestre, tipo } = req.body;
-    
-  tipo = tipo || 'Aluno'; 
-  semestre = semestre ? parseInt(semestre, 10) : null; 
-
-  const connection = await getConnection();
-    
-  try {
-        
-// Verificar se o email já existe
-      const emailExistsResult = await connection.execute(
-        `SELECT COUNT(*) FROM Usuarios WHERE email = :1`,
-        [email]
-      );
-      const emailExists = emailExistsResult.rows[0][0] > 0;
-
-      if (emailExists) {
-          if (connection) await connection.close();
-            
-          return res.status(400).json({ success: false, message: 'Este e-mail já está cadastrado.' });    
-      }
-       // variavel saltRounds para definir complexidade da criptografia
-       //variavel hashedSenha para receber a criptografia
-      const saltRounds = 10;
-      const hashedSenha = await bcrypt.hash(senha, saltRounds);
-
-       // Inserir usuário
-      const result = await connection.execute(
-          `INSERT INTO Usuarios (nome, email, senha, tipo, semestre, ativo) VALUES (:1, :2, :3, :4, :5, :6)`,
-          [nome, email, hashedSenha, tipo, semestre, 1],
-          { autoCommit: true } 
-      );
-
-      if (result.rowsAffected > 0) {
-
-       const usuariosResult = await connection.execute(`SELECT * FROM Usuarios`);
-           console.log('Lista de usuários:', usuariosResult.rows);
-           if (connection) await connection.close();
-           return res.json({ success: true, message: 'Usuário cadastrado com sucesso!' });
-       } else {
-           if (connection) await connection.close();
-           return res.json({ success: false, message: 'Erro ao cadastrar usuário.' });
-       }
-        
-    } catch (error) {
-        console.error('Erro ao cadastrar usuário:', error);
-        if (connection) { 
-            try { await connection.close(); } catch(innerError) { console.error("Erro fechando conexão:", innerError); } 
-        }
-
-        return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
-    }
-});
+// // Rota de cadastro
+// app.post('/cadastro', async (req, res, next) => {
+//     let { nome, email, senha, semestre, tipo } = req.body;
+  
+//     try {
+//       if (!nome || !email || !senha) {
+//         throw new AppError('Nome, e-mail e senha são obrigatórios.', { status: 400, code: 'USR_MISSING_FIELDS' });
+//       }
+  
+//       tipo = tipo || 'Aluno';
+//       semestre = semestre ? parseInt(semestre, 10) : null;
+  
+//       const connection = await getConnection();
+//       try {
+//         const emailExistsResult = await connection.execute(
+//           `SELECT COUNT(1) AS CNT FROM Usuarios WHERE UPPER(email) = UPPER(:email)`,
+//           { email },
+//           { outFormat: oracledb.OUT_FORMAT_OBJECT }
+//         );
+//         const emailExists = emailExistsResult.rows[0].CNT > 0;
+  
+//         if (emailExists) {
+//           return res.fail('USR_EMAIL_EXISTS', 'Este e-mail já está cadastrado.', 409);
+//         }
+  
+//         const hashedSenha = await bcrypt.hash(String(senha), 10);
+  
+//         const result = await connection.execute(
+//           `INSERT INTO Usuarios (nome, email, senha, tipo, semestre, ativo)
+//            VALUES (:nome, :email, :senha, :tipo, :semestre, 1)`,
+//           { nome, email, senha: hashedSenha, tipo, semestre },
+//           { autoCommit: true }
+//         );
+  
+//         if (result.rowsAffected > 0) {
+//           return res.ok(null, 'Usuário cadastrado com sucesso!', 201);
+//         }
+  
+//         throw new AppError('Erro ao cadastrar usuário.', { status: 500, code: 'USR_CREATE_FAILED' });
+//       } finally {
+//         try { await connection.close(); } catch (closeError) { console.error('Erro ao fechar a conexão:', closeError); }
+//       }
+//     } catch (err) {
+//       return next(err);
+//     }
+//   });
 
 
 
@@ -249,8 +235,28 @@ app.use(async (req, res) => {
 });
 
 
+app.use(notFound);
+app.use(errorHandler);
+
+initOraclePool()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Servidor rodando em http://localhost:${port}/`);
+    });
+  })
+  .catch((err) => {
+    console.error('Erro ao inicializar pool Oracle:', err);
+    process.exit(1);
+  });
 
 
-app.listen(port, async () => { 
-  console.log(`Servidor rodando em http://localhost:${port}/`);
-});
+  process.on('SIGINT', async () => {
+    try {
+      await oracledb.getPool().close(10);
+      console.log('Pool Oracle fechado.');
+      process.exit(0);
+    } catch (err) {
+      console.error('Erro ao fechar pool Oracle:', err);
+      process.exit(1);
+    }
+  });

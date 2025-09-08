@@ -4,7 +4,23 @@ const { getConnection, oracledb } = require('../connectOracle.js');
 const path = require('path');
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
+require('dotenv').config();
+const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_FROM,
+    pass: process.env.EMAIL_PASSWORD
+  }, 
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false
+  },
+    debug: true
+});
 
 
 // Criar nova atividade
@@ -25,27 +41,28 @@ router.post('/atividades', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Campos obrigatórios não preenchidos.' });
     }
 
-    const result = await connection.execute(
+    await connection.execute(
       `BEGIN
           criar_atividade_para_semestre(:1, :2, :3, TO_TIMESTAMP(:4, 'YYYY-MM-DD"T"HH24:MI:SS'), :5, :6);
-      END;`,
+       END;`,
       [titulo, descricao, professor_id, prazo_entrega, criterios_avaliacao, semestre],
       { autoCommit: true }
     );
 
+    // Se chegou até aqui, procedure rodou sem erro
     res.json({
-      success: result.rowsAffected > 0,
-      message: result.rowsAffected > 0
-        ? 'Atividade cadastrada com sucesso!'
-        : 'Erro ao cadastrar atividade.'
+      success: true,
+      message: 'Atividade cadastrada com sucesso!'
     });
 
+    // notificar alunos pode ser rodado depois
     await notificarAlunosSobreAtividade(connection, {
       titulo,
       prazo_entrega,
       semestre,
       professor_id
     });
+
   } catch (error) {
     console.error('Erro ao cadastrar atividade:', error);
     res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
@@ -100,29 +117,28 @@ router.get('/atividades', async (req, res) => {
 
 // Atualizar atividade
 router.put('/atividades/:atividadeId', async (req, res) => {
-  const connection = await getConnection();
-  const atividadeId = parseInt(req.params.atividadeId, 10);
-  const professorId = parseInt(req.body.usuarioId, 10);
-
-  console.log('📥 Dados recebidos no body:', req.body);
-console.log('🆔 atividadeId:', atividadeId);
-console.log('🧑 professorId:', professorId);
-
-
-  if (isNaN(atividadeId) || isNaN(professorId)) {
-    return res.status(400).json({ message: 'ID inválido' });
-  }
-
+  let connection;
   try {
-    const {
-      titulo, descricao, prazo_entrega,
-      criterios_avaliacao, semestre
-    } = req.body;
+    connection = await getConnection();
 
+    const atividadeId = parseInt(req.params.atividadeId, 10);
+    const professorId = parseInt(req.body.professor_id, 10);
+
+    console.log('📥 Dados recebidos no body:', req.body);
+    console.log('🆔 atividadeId:', atividadeId);
+    console.log('🧑 professorId:', professorId);
+
+    if (isNaN(atividadeId) || isNaN(professorId)) {
+      return res.status(400).json({ message: 'ID inválido' });
+    }
+
+    const { titulo, descricao, prazo_entrega, criterios_avaliacao, semestre } = req.body;
+
+    // 🔎 Verifica se a atividade pertence ao professor
     const verificacao = await connection.execute(
       `SELECT COUNT(*) as count
-       FROM Atividades
-       WHERE id = :atividadeId AND professor_id = :professorId`,
+         FROM Atividades
+        WHERE id = :atividadeId AND professor_id = :professorId`,
       [atividadeId, professorId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -131,34 +147,51 @@ console.log('🧑 professorId:', professorId);
       return res.status(404).json({ message: 'Atividade não encontrada ou sem permissão.' });
     }
 
-    const result = await connection.execute(
+    // 🔄 Executa a procedure de atualização
+    await connection.execute(
       `BEGIN
-          atualizar_atividades_por_data_criacao(:1, :2, :3, TO_TIMESTAMP(:4, 'YYYY-MM-DD"T"HH24:MI'), :5, :6);
-      END;`,
+          atualizar_atividades_por_data_criacao(
+            :1, :2, :3, TO_TIMESTAMP(:4, 'YYYY-MM-DD"T"HH24:MI'), :5, :6
+          );
+       END;`,
       [atividadeId, titulo, descricao, prazo_entrega, criterios_avaliacao, semestre],
       { autoCommit: true }
-  );
+    );
 
-    res.json({
-      message: result.rowsAffected > 0
-        ? 'Atividade atualizada com sucesso!'
-        : 'Erro ao atualizar atividade.'
-    });
+    // ✅ Faz SELECT para validar se foi atualizada
+    const check = await connection.execute(
+      `SELECT id, titulo, descricao, semestre, criterios_avaliacao, prazo_entrega
+         FROM Atividades
+        WHERE id = :atividadeId AND professor_id = :professorId`,
+      [atividadeId, professorId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (check.rows.length > 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'Atividade atualizada com sucesso!',
+        atividade: check.rows[0] // devolve os dados atualizados
+      });
+    } else {
+      return res.status(400).json({ message: 'Erro ao atualizar atividade.' });
+    }
 
   } catch (error) {
-    console.error('Erro ao atualizar atividade:', error);
+    console.error('❌ Erro ao atualizar atividade:', error);
     res.status(500).json({ message: 'Erro no servidor.', error: error.message });
   } finally {
     if (connection) {
       try {
         await connection.close();
-        console.log('Conexão com o Oracle fechada com sucesso.');
+        console.log('🔌 Conexão com o Oracle fechada com sucesso.');
       } catch (err) {
-        console.error('Erro ao fechar a conexão com o Oracle:', err);
+        console.error('❌ Erro ao fechar a conexão com o Oracle:', err);
       }
     }
   }
 });
+
 
 // Excluir atividade
 router.delete('/atividades/:atividadeId', async (req, res) => {

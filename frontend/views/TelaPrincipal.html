@@ -24,7 +24,7 @@
         
         <div class="perfil-container">
             <button id="user-profile-pic" class="profile-pic">
-                <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Avatar" width="100%">
+                <img id="imgPerfil" class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Avatar" width="100%">
             </button>
 
             <div id="perfil-menu" class="perfil-menu" style="display: none;">
@@ -99,13 +99,14 @@
         </div>
     </div>
 
-    <script src="./javaScript/menuPerfil.js"></script>
-    <script defer src="./javaScript/efeitoMenu.js"></script>
-    <script defer src="./javaScript/dark_mode.js"></script>
-    <script src="./javaScript/navigation-buttons.js"></script>
-    <script src="./javaScript/GerarMenu.js"></script>
-    <script src="./javaScript/deslogar.js"></script>
-    <script src="./javaScript/imagemPerfil.js"></script>
-    <script src="./javaScript/notificacoes.js" defer></script>
+    <script src="./javaScript/utils/fetchHelper.js"></script>
+    <script src="./javaScript/front_end/menuPerfil.js"></script>
+    <script defer src="./javaScript/utils/efeitoMenu.js"></script>
+    <script defer src="./javaScript/utils/dark_mode.js"></script>
+    <script src="./javaScript/utils/navigation-buttons.js"></script>
+    <script src="./javaScript/front_end/GerarMenu.js"></script>
+    <script src="./javaScript/front_end/deslogar.js"></script>
+    <script src="./javaScript/front_end/imagemPerfil.js"></script>
+    <script type="module" src="./javaScript/front_end/notificacoes.js" defer></script>
 </body>
 </html>
