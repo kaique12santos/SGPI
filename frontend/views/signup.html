@@ -34,37 +34,64 @@
                 <form class="signup-info"> <!-- Formulário de cadastro -->
                     <div class="signup-form">
                         <label for="nome">Nome</label>
-                        <input type="text" id="nome" name="nome" placeholder="Digite aqui" class="signup-input" required>
+                        <input type="text" id="nome" name="nome" placeholder="Digite aqui" class="signup-input" required autocomplete="off">
                     </div>
                 
                     <div class="signup-form">
                         <label for="email">E-mail institucional</label>
-                        <input type="email" id="email" name="email" placeholder="Digite aqui" class="signup-input" required>
+                        <input type="email" id="email" name="email" placeholder="Digite aqui" class="signup-input" required autocomplete="off">
                         <span id="emailError"></span> 
                     </div>
                 
                     <div class="signup-form">
-                        <label for="semestre">Semestre</label>
-                        <select id="semestre" name="semestre" class="signup-input selectSemestre" required>
-                            <option value="0" disabled selected>Selecione o Semestre</option>
-                            <option value="1">1º Semestre</option>
-                            <option value="2">2º Semestre</option>
-                            <option value="3">3º Semestre</option>
-                            <option value="4">4º Semestre</option>
-                            <option value="5">5º Semestre</option>
-                            <option value="6">6º Semestre</option>
-                        </select>
-                        <span id="semestreError"></span> 
+                        <label>Perfil</label>
+                        <div>
+                            <input type="radio" id="perfilAluno" name="perfil" value="aluno" required>
+                            <label for="perfilAluno">Aluno</label>
+                    
+                            <input type="radio" id="perfilProfessor" name="perfil" value="professor">
+                            <label for="perfilProfessor">Professor</label>
+                        </div>
                     </div>
-                
+                    
+                    <!-- Campos que mudam conforme perfil -->
+                    <div class="signup-form" id="materiasBox">
+                        <label>Matérias</label>
+                        <div class="materias-list">
+                            <label><input type="checkbox" name="materias" value="design digital"> Design Digital</label>
+                            <label><input type="checkbox" name="materias" value="desenvolvimento web I"> Desenvolvimento Web I</label>
+                            <label><input type="checkbox" name="materias" value="desenvolvimento web II"> Desenvolvimento Web II</label>
+                            <label><input type="checkbox" name="materias" value="desenvolvimento web III"> Desenvolvimento Web III</label>
+                            <label><input type="checkbox" name="materias" value="engenharia de software I"> Engenharia de Software I</label>
+                            <label><input type="checkbox" name="materias" value="engenharia de software II"> Engenharia de Software II</label>
+                            <label><input type="checkbox" name="materias" value="banco de dados relacional"> Banco de Dados Relacional</label>
+                            <label><input type="checkbox" name="materias" value="banco de dados não relacional"> Banco de Dados Não Relacional</label>
+                            <label><input type="checkbox" name="materias" value="interação humano computador"> Interação Humano Computador</label>
+                            <label><input type="checkbox" name="materias" value="gestao agil de projetos de software"> Gestão Ágil de Projetos de Software</label>
+                            <label><input type="checkbox" name="materias" value="laboratorio de desenvolvimento web"> Laboratório de Desenvolvimento Web</label>
+                            <label><input type="checkbox" name="materias" value="experiencia do usuario"> Experiência do Usuário</label>
+                            <label><input type="checkbox" name="materias" value="programação para dispositivos moveis II"> Programação para Dispositivos Móveis II</label>
+                            <label><input type="checkbox" name="materias" value="laboratorio de desenvolvimento mobile"> Laboratório de Desenvolvimento Mobile</label>
+                            <label><input type="checkbox" name="materias" value="qualidade e testes de software"> Qualidade e Testes de Software</label>
+                            <label><input type="checkbox" name="materias" value="laboratorio de desenvolvimento multiplataforma"> Laboratório de Desenvolvimento Multiplataforma</label>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="signup-form" id="chaveProfessorBox" style="display:none;">
+                        <label for="chaveProfessor">Palavra-chave</label>
+                        <input type="text" id="chaveProfessor" name="chaveProfessor" class="signup-input" placeholder="Digite a chave fornecida pelo coordenador" >
+                    </div>
+                    
+
                     <div class="signup-form">
                         <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha" placeholder="Digite aqui" class="signup-input" required>
+                        <input type="password" id="senha" name="senha" placeholder="Digite aqui" class="signup-input" required autocomplete="new-password">
                     </div>
                 
                     <div class="signup-form">
                         <label for="confirmar-senha">Digite a senha novamente</label>
-                        <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required>
+                        <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required autocomplete="new-password">
                         <span id="passwordError"></span> 
                     </div>
                 

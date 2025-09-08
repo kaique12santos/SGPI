@@ -58,11 +58,27 @@ body{
 .signup-info{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 30px;
+    justify-content: flex-start;
+    gap: 20px;
     background-color: #f3f3f3;
     padding: 10px;
     width: 100%;
+    max-height: 80vh;   /* limite de altura */
+    overflow-y: auto;   /* ativa scroll vertical */
+    scrollbar-width: thin;
+}
+
+.signup-info::-webkit-scrollbar {
+    width: 8px;  /* largura da barra */
+}
+
+.signup-info::-webkit-scrollbar-thumb {
+    background-color: #bbb; 
+    border-radius: 4px;
+}
+
+.signup-info::-webkit-scrollbar-track {
+    background: #f3f3f3;
 }
 
 .signup-actions{
@@ -140,3 +156,27 @@ body{
     border: none;
     cursor: pointer;
 }
+
+#materias, #chaveProfessor {
+    width: 100dvh;
+    margin-top: 5px;
+}
+
+#materias {
+    height: auto; /* lista expandida */
+}
+#materiasBox{
+    display: none;
+}
+.materias-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 colunas */
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.materias-list label {
+    font-size: 0.9rem;
+    color: #000;
+}
+
