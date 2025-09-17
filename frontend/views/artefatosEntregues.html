@@ -7,6 +7,8 @@
     <!--__________LINKS AQUI__________-->
     
     <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/footer-estrutura.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/dark-mode.css">
     <link rel="stylesheet" href="/css/alerts.css">
@@ -33,7 +35,13 @@
 
     <div class="container"> <!--Div container para facilitar configurações globais-->
         <div class="wrapper">
-        <div class="menu-dropdown"> <!--Div feita para o menu-->
+            
+            <nav class="menu-desktop">
+                <div class="menu-desktop-nav" id="menu-desktop">
+                    <!-- Links gerados pelo JavaScript -->
+                </div>
+            </nav>
+         <div class="menu-dropdown"> <!--Div feita para o menu-->
             <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
@@ -46,6 +54,7 @@
                 <a href=""></a>
             </div>
         </div>
+        
         <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
             <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
         </button>
@@ -58,6 +67,22 @@
         <div id="entregas-container">
             <!-- Lista de entregas será preenchida aqui -->
         </div>
+    </div>
+        <footer class="sgpi-footer">
+            <div class="footer-container">
+                <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
+                <span class="footer-text">Desenvolvido para o curso de DSM - FATEC Zona Leste</span>
+                
+                <div class="footer-links">
+                    <span class="footer-separator">|</span>
+                    <a href="/manual-usuario">Manual do Usuário</a>
+                    <span class="footer-separator">|</span>
+                    <a href="/termos-uso">Termos de Uso</a>
+                    <span class="footer-separator">|</span>
+                    <a href="/politica-privacidade">Política de Privacidade</a>
+                </div>
+            </div>
+        </footer>
     <script src="./javaScript/utils/fetchHelper.js"></script>
     <script defer src="/javaScript/utils/efeitoMenu.js"></script>
     <script defer src="/javaScript/utils/dark_mode.js"></script>

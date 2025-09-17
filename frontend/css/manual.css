@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .topo {
+    background: #800000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    font-size: 20px;
+  }
+  
+  .conteudo {
+    padding: 30px;
+  }
+  
+  h1 {
+    color: #800000;
+  }
+  
+  .manual-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .download-btn {
+    background: #800000;
+    color: #fff;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .download-btn:hover {
+    background: #a00000;
+  }
+  

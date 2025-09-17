@@ -7,6 +7,8 @@
      <!--__________LINKS AQUI__________-->
     
      <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
+     <link rel="stylesheet" href="/css/footer.css">
+     <link rel="stylesheet" href="/css/footer-estrutura.css">
      <link rel="stylesheet" href="/css/main.css">
      <link rel="stylesheet" href="/css/dark-mode.css">
      <link rel="stylesheet" href="/css/alerts.css">
@@ -32,6 +34,11 @@
     </header>
     <div class="container"> <!--Div container para facilitar configurações globais-->
         <div class="wrapper">
+            <nav class="menu-desktop">
+                <div class="menu-desktop-nav" id="menu-desktop">
+                    <!-- Links gerados pelo JavaScript -->
+                </div>
+            </nav>
         <div class="menu-dropdown"> <!--Div feita para o menu-->
             <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
@@ -105,6 +112,21 @@
         
           
     </div>
+    <footer class="sgpi-footer">
+        <div class="footer-container">
+            <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
+            <span class="footer-text">Desenvolvido para o curso de DSM - FATEC Zona Leste</span>
+            
+            <div class="footer-links">
+                <span class="footer-separator">|</span>
+                <a href="/manual-usuario">Manual do Usuário</a>
+                <span class="footer-separator">|</span>
+                <a href="/termos-uso">Termos de Uso</a>
+                <span class="footer-separator">|</span>
+                <a href="/politica-privacidade">Política de Privacidade</a>
+            </div>
+        </div>
+    </footer>
     <script src="./javaScript/utils/fetchHelper.js"></script>
     <script type="module" src="/javaScript/front_end/listaGruposCoordenador.js"></script>
     <script defer src="/javaScript/utils/efeitoMenu.js"></script>

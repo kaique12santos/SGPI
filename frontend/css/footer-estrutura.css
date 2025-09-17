@@ -1,0 +1,40 @@
+/* ===== ESTRUTURA PARA FOOTER FIXO NO FINAL ===== */
+
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#navigation-container {
+    flex: 1;
+    padding: 20px;
+}
+
+.sgpi-footer {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+/* Para páginas com muito conteúdo */
+.content-wrapper {
+    min-height: calc(100vh - 200px); /* Ajuste conforme altura do header */
+}

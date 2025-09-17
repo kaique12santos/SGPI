@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Criar grupos</title>
   <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/footer-estrutura.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/dark-mode.css">
   <link rel="stylesheet" href="css/perfil.css">
@@ -27,6 +29,11 @@
 <body>
     <div class="container">
         <div class="wrapper">
+            <nav class="menu-desktop">
+                <div class="menu-desktop-nav" id="menu-desktop">
+                    <!-- Links gerados pelo JavaScript -->
+                </div>
+            </nav>
             <div class="menu-dropdown"> <!--Div feita para o menu, não sei ainda como fazer, favor não modificar-->
                 <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
@@ -45,44 +52,58 @@
             </button>
             </div>
             </div>
-    <div class="page-name">
-        <h2>Criar Grupos</h2>
-    </div>
-    <div class="container-grupo">
-        <form id="formGrupo" class="formulario-grupo">
-        <label for="nomeGrupo" class="label-form">Nome do Grupo:</label>
-        <input type="text" id="nomeGrupo" name="nomeGrupo" class="input-form" placeholder="Ex: Grupo 2" required>
-    
-        <label for="tema" class="label-form">Tema:</label>
-        <textarea id="tema" name="tema" class="textarea-form" placeholder="Descreva o tema do projeto..." required></textarea>
-    
-        <label for="semestre" class="label-form ">Selecione o Semestre:</label>
-        <select id="semestre" name="semestre" class="select-form input-form" required>
-            <option value="0" disabled selected>-- Escolha --</option>
-            <option value="1">1º Semestre</option>
-            <option value="2">2º Semestre</option>
-            <option value="3">3º Semestre</option>
-            <option value="4">4º Semestre</option>
-            <option value="5">5º Semestre</option>
-            <option value="6">6º Semestre</option>
-        </select>
-    
-        <label for="alunos-container" class="label-form">Alunos (selecione até 5):</label>
-        <div id="alunos-container" class="checkbox-container">
-            <p class="p_Check-box" >Selecione um semestre primeiro</p>
+            <div class="page-name">
+                <h2>Criar Grupos</h2>
+            </div>
+        <div class="container-grupo">
+            <form id="formGrupo" class="formulario-grupo">
+            <label for="nomeGrupo" class="label-form">Nome do Grupo:</label>
+            <input type="text" id="nomeGrupo" name="nomeGrupo" class="input-form" placeholder="Ex: Grupo 2" required>
+        
+            <label for="tema" class="label-form">Tema:</label>
+            <textarea id="tema" name="tema" class="textarea-form" placeholder="Descreva o tema do projeto..." required></textarea>
+        
+            <label for="semestre" class="label-form ">Selecione o Semestre:</label>
+            <select id="semestre" name="semestre" class="select-form input-form" required>
+                <option value="0" disabled selected>-- Escolha --</option>
+                <option value="1">1º Semestre</option>
+                <option value="2">2º Semestre</option>
+                <option value="3">3º Semestre</option>
+                <option value="4">4º Semestre</option>
+                <option value="5">5º Semestre</option>
+                <option value="6">6º Semestre</option>
+            </select>
+        
+            <label for="alunos-container" class="label-form">Alunos (selecione até 5):</label>
+            <div id="alunos-container" class="checkbox-container">
+                <p class="p_Check-box" >Selecione um semestre primeiro</p>
+            </div>
+        
+            <button type="submit" class="botao-form send-button">Criar Grupo</button>
+            </form>
         </div>
-    
-        <button type="submit" class="botao-form send-button">Criar Grupo</button>
-        </form>
     </div>
-
- 
+    <footer class="sgpi-footer">
+        <div class="footer-container">
+            <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
+            <span class="footer-text">Desenvolvido para o curso de DSM - FATEC Zona Leste</span>
+            
+            <div class="footer-links">
+                <span class="footer-separator">|</span>
+                <a href="/manual-usuario">Manual do Usuário</a>
+                <span class="footer-separator">|</span>
+                <a href="/termos-uso">Termos de Uso</a>
+                <span class="footer-separator">|</span>
+                <a href="/politica-privacidade">Política de Privacidade</a>
+            </div>
+        </div>
+    </footer>
     <script src="./javaScript/utils/fetchHelper.js"></script>
     <script defer src="./javaScript/utils/efeitoMenu.js"></script>
     <script defer src="./javaScript/utils/dark_mode.js"></script>
     <script defer src="./javaScript/front_end/GerarMenu.js"></script>
     <script src="./javaScript/front_end/imagemPerfil.js"></script>
-    <script type="module" defer src="./javaScript/front_end/gerenciarGrupos.js"></script>
+    <script type="module" src="./javaScript/front_end/gerenciarGrupos.js"></script>
 
 </body>
 </html>
