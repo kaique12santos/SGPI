@@ -127,7 +127,7 @@ const navigationButtonsByRole = {
     ]
   };
 
-function toggleMenu(button) {
+  function toggleMenu(button) {
     const menuContent = document.getElementById('menu-itens');
     const expanded = button.getAttribute('aria-expanded') === 'true';
     
@@ -150,8 +150,8 @@ function toggleMenu(button) {
     const container = document.getElementById(containerId);
     
     if (!container) {
-      console.error(`Container com ID '${containerId}' não encontrado.`);
-      return;
+    console.error(`Container com ID '${containerId}' não encontrado.`);
+    return;
     }
     
     const userRole = obterTipoUsuarioLogado(); 
@@ -167,21 +167,32 @@ function toggleMenu(button) {
     pageLinksDiv.className = 'page-links';
     
     buttonsForRole.forEach(button => {
-      const link = document.createElement('a');
-      link.href = button.url;
-      if (button.target) {
-        link.target = button.target;
-      }
-      
-      const buttonElement = document.createElement('button');
-      buttonElement.className = 'button-link';
-      buttonElement.textContent = button.text;
-      
-      buttonElement.insertAdjacentHTML('beforeend', ' ' + button.icon);
-      
-      link.appendChild(buttonElement);
-      
-      pageLinksDiv.appendChild(link);
+    const link = document.createElement('a');
+    link.href = button.url;
+    if (button.target) {
+    link.target = button.target;
+    }
+    
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'button-link';
+    
+    // Criar div para o ícone
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'button-icon';
+    iconDiv.innerHTML = button.icon;
+    
+    // Criar span para o texto
+    const textSpan = document.createElement('span');
+    textSpan.className = 'button-text';
+    textSpan.textContent = button.text;
+    
+    // Adicionar ícone e texto ao botão
+    buttonElement.appendChild(iconDiv);
+    buttonElement.appendChild(textSpan);
+    
+    link.appendChild(buttonElement);
+    
+    pageLinksDiv.appendChild(link);
     });
     
     container.appendChild(pageLinksDiv);
@@ -191,13 +202,13 @@ function toggleMenu(button) {
     renderNavigationButtons('navigation-container');
     
     function changeUserRole(role) {
-      const container = document.getElementById('navigation-container');
-      
-      container.classList.remove('aluno', 'professor', 'coordenador','professor_orientador');
-      
-      container.classList.add(role);
-      
-      renderNavigationButtons('navigation-container');
+    const container = document.getElementById('navigation-container');
+    
+    container.classList.remove('aluno', 'professor', 'coordenador','professor_orientador');
+    
+    container.classList.add(role);
+    
+    renderNavigationButtons('navigation-container');
     }
     
     window.changeUserRole = changeUserRole;

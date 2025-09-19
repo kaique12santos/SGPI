@@ -5,6 +5,31 @@ html.dark-mode {
 html.dark-mode h1{
     color: #ffffff;
 }
+html.dark-mode .menu-desktop {
+    background-color: #390005;
+}
+
+html.dark-mode .menu-desktop-item {
+    color: #f1f1f1;
+    border-right-color: #6f0000;
+}
+
+html.dark-mode .menu-desktop-item:hover {
+    background-color: #6f0000;
+}
+
+html.dark-mode .menu-dropdown {
+    background-color: #390005;
+}
+
+html.dark-mode .dropbutton {
+    background-color: #390005;
+}
+
+html.dark-mode .dropbutton:hover {
+    background-color: #6f0000;
+}
+
 html.dark-mode .atividade-card {
     background-color: #2f2f2f;
     border: 1px solid #6b6b6b; 

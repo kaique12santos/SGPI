@@ -12,7 +12,6 @@
      <link rel="stylesheet" href="/css/main.css">
      <link rel="stylesheet" href="/css/dark-mode.css">
      <link rel="stylesheet" href="/css/alerts.css">
-     <link rel="stylesheet" href="/css/perfil.css">
      <link rel="stylesheet" href="/css/reconsideracoes.css">
      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
      
@@ -21,14 +20,24 @@
 <body>
     <header>
         <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
-            <img src="" alt="" class="logo-image">
-            <h1>SGPI</h1>
-            <input type="text" placeholder="Pesquisar..." class="search-box">
-            <div class="espaco"></div>
-            <div id="user-profile-pic" class="profile-pic " >
-                <a href="/TelaPrincipal" >
-                <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
-                </a>
+            <!-- Div da esquerda com logos e SGPI -->
+            <div class="header-left">
+                <img src="/imagens/logo_cps.png" alt="logo do centro paula souza" class="logo-image">
+                <h1>SGPI</h1>
+            </div>
+            
+            <!-- Div da direita com mensagem de usuário e perfil -->
+            <div class="header-right">
+                
+                <img src="/imagens/logo_fatec_br.png" alt="logo da fatec Zona Leste" class="logo-image">
+                <div class="perfil-container">
+                    <div id="user-profile-pic" class="profile-pic " >
+                        <a href="/TelaPrincipal" >
+                        <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+                        </a>
+                    </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>

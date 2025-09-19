@@ -31,10 +31,11 @@
   .botao-avaliar {
     background-color: #970000;
     color: white;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 1rem;
   }
 
   .botao-avaliar:hover {
