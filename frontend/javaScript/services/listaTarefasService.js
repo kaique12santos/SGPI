@@ -4,4 +4,4 @@ export async function listarAtividadesAluno(alunoId) {
   
     const data = await fetchJsonComAuth(`/api/atividades?aluno_id=${alunoId}`, null, 'GET');
     return data; // { success: true, atividades: [...] }
-  }
+}

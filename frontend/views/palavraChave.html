@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaliar Atividades</title>
+    <title>Controle de Acesso</title>
     <!--__________LINKS AQUI__________-->
     
     <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/dark-mode.css">
     <link rel="stylesheet" href="/css/alerts.css">
-    <link rel="stylesheet" href="/css/avaliar.css">
+    <link rel="stylesheet" href="/css/palavraChave.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
     
     <!--______________________________-->
@@ -69,22 +69,108 @@
         </div>
         </div>
         <div class="page-name">
-            <h2>Avaliações</h2>
+            <h2>Chaves de Acesso</h2>
         </div>
 
-        <div class="avaliar-container">
-            <h1>Avaliar Entrega</h1>
-            <form id="form-avaliacao">
-              <label for="nota" class="label">Nota (0 a 10):</label>
-              <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" required />
-        
-              <label for="comentario" class="label">Comentário:</label>
-              <textarea id="comentario" name="comentario" rows="5" required></textarea>
-        
-              <button type="submit" class="btn-enviar">Enviar Avaliação</button>
-            </form>
-            <div id="mensagem"></div>
-          </div>
+        <!-- div das chaves aqui -->
+         <!-- div das chaves aqui -->
+<div class="painel-chaves">
+    
+    
+    <div class="card-container">
+        <!-- Card para Professor -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Chave de Acesso - Professor</h3>
+                <span class="card-icon">👨‍🏫</span>
+            </div>
+            <div class="card-body">
+                <div class="chave-display">
+                    <input type="text" id="chaveProfessor" class="chave-input" readonly placeholder="Clique em 'Gerar' para criar uma chave">
+                </div>
+                <div class="card-actions">
+                    <button id="gerarProfessor" class="btn btn-primary">
+                        <span class="btn-icon">🎲</span>
+                        Gerar Chave
+                    </button>
+                    <button id="copiarProfessor" class="btn btn-secondary" disabled>
+                        <span class="btn-icon">📋</span>
+                        Copiar
+                    </button>
+                    <button id="salvarProfessor" class="btn btn-success" disabled>
+                        <span class="btn-icon">💾</span>
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card para Professor Orientador -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Chave de Acesso - Professor Orientador</h3>
+                <span class="card-icon">👨‍💼</span>
+            </div>
+            <div class="card-body">
+                <div class="chave-display">
+                    <input type="text" id="chaveOrientador" class="chave-input" readonly placeholder="Clique em 'Gerar' para criar uma chave">
+                </div>
+                <div class="card-actions">
+                    <button id="gerarOrientador" class="btn btn-primary">
+                        <span class="btn-icon">🎲</span>
+                        Gerar Chave
+                    </button>
+                    <button id="copiarOrientador" class="btn btn-secondary" disabled>
+                        <span class="btn-icon">📋</span>
+                        Copiar
+                    </button>
+                    <button id="salvarOrientador" class="btn btn-success" disabled>
+                        <span class="btn-icon">💾</span>
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico de Chaves -->
+    <div class="historico-section">
+        <h3>Histórico de Chaves Geradas</h3>
+        <div class="historico-container">
+            <table class="historico-table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Data/Hora</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="historicoLista">
+                    <!-- Histórico será carregado aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div id="modalConfirmacao" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>Confirmar Ação</h4>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p id="modalMensagem"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="modalCancelar" class="btn btn-secondary">Cancelar</button>
+            <button id="modalConfirmar" class="btn btn-primary">Confirmar</button>
+        </div>
+    </div>
+</div>
     </div>
     <footer class="sgpi-footer">
         <div class="footer-container">
@@ -102,10 +188,10 @@
         </div>
     </footer>
     <script src="./javaScript/utils/fetchHelper.js"></script>
-    <script type="module" src="/javaScript/front_end/Avaliar.js"></script>
     <script defer src="/javaScript/utils/efeitoMenu.js"></script>
     <script defer src="/javaScript/utils/dark_mode.js"></script>
     <script src="/javaScript/front_end/GerarMenu.js"></script>
     <script src="/javaScript/front_end/imagemPerfil.js"></script>
+    <script type="module" src="/javaScript/front_end/palavraChave.js"></script>
 </body>
 </html>

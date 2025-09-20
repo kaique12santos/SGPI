@@ -1,8 +1,6 @@
-// Função para realizar logout com confirmação
 function realizarLogout(e) {
     e.preventDefault();
     
-    // Exibe mensagem de confirmação
     const confirmacao = confirm('Tem certeza que deseja sair do sistema?');
     
     if (confirmacao) {
@@ -15,7 +13,6 @@ function realizarLogout(e) {
 }
 
 function gerarMenu(tipoPerfil) {
-    // Gera menu para ambas as versões
     gerarMenuMobile(tipoPerfil);
     gerarMenuDesktop(tipoPerfil);
 }
@@ -39,7 +36,6 @@ function gerarMenuMobile(tipoPerfil) {
     link.textContent = item.texto;
     if (item.id) {
         link.id = item.id;
-        // Adiciona evento de logout diretamente
         if (item.id === 'logout-button') {
             link.addEventListener('click', realizarLogout);
         }
@@ -68,7 +64,6 @@ function gerarMenuDesktop(tipoPerfil) {
     link.className = 'menu-desktop-item';
     if (item.id) {
         link.id = item.id;
-        // Adiciona evento de logout diretamente
         if (item.id === 'logout-button') {
             link.addEventListener('click', realizarLogout);
         }
@@ -100,6 +95,7 @@ function getItensMenu() {
     { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios' },
     { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador' },
     { texto: 'Entregas dos Grupos', link: '/listaProjetos'},
+    { texto: 'Controle de Chaves', link: '/palavraChave'},
     {texto: 'Meu Perfil', link: '/perfil'},
     {texto: 'Sair', id:'logout-button'}
     ],
@@ -114,7 +110,6 @@ function getItensMenu() {
     };
 }
 
-// Função para toggle do menu mobile (mantém a existente)
 function toggleMenu(button) {
     const menuContent = button.nextElementSibling;
     menuContent.classList.toggle('show');
