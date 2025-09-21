@@ -43,7 +43,7 @@
             </div>
         </div>
     </header>
-    <div class="container"> <!--Div container para facilitar configurações globais-->
+    <div class="container" style="height: stretch;"> <!--Div container para facilitar configurações globais-->
         <div class="wrapper">
             <nav class="menu-desktop">
                 <div class="menu-desktop-nav" id="menu-desktop">
@@ -63,10 +63,7 @@
                 <a href=""></a>
             </div>
         </div>
-        <div class="div_theme menu-dropdown"><button class="theme theme-toggler">
-            <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm26.67-67.67q131-11.66 218.83-105.5Q813.33-347 813.33-480T725.5-706.83q-87.83-93.84-218.83-105.5v664.66Z"/></svg>
-        </button>
-        </div>
+       
         </div>
             
 
@@ -75,54 +72,55 @@
             <div class="page-name">
                 <h2>Lista de Grupos</h2>
             </div>
+            <div class="semestre">
+                <label for="selectSemestre">Selecione o Semestre:</label>
+                <select id="selectSemestre">
+                  <option value="" disabled selected>-- Escolha --</option>
+                  <option value="1">1º Semestre</option>
+                  <option value="2">2º Semestre</option>
+                  <option value="3">3º Semestre</option>
+                  <option value="4">4º Semestre</option>
+                  <option value="5">5º Semestre</option>
+                  <option value="6">6º Semestre</option>
+                  <!-- Adicione mais conforme sua convenção -->
+                </select>
+                <button id="btnBuscarGrupos">Buscar Grupos</button>
+                <button id="btnRelatorioGeral" style="margin-left: 20px;">Gerar Relatório Geral</button>
+              </div>
+    
+              <!-- SPINNER (Loading) -->
+                <div id="loading" style="display: none; margin-top: 20px;">
+                    Carregando Grupos...
+                </div>
+    
+                <!-- MENSAGEM DE ERRO -->
+                <div id="mensagem-erro" style="display: none; color: red; margin-top: 20px;"></div>
+    
+                <!-- MENSAGEM “Sem Projetos” -->
+                <div id="sem-grupos" style="display: none; margin-top: 20px; font-style: italic; color: #555;">
+                    Nenhum grupo encontrado para este semestre.
+                </div>
+            
+              <!-- Tabela de Grupos -->
+                <table id="tabelaGrupos" style="display: none; border-collapse: collapse; width: 100%; margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>Nome do Grupo</th>
+                        <th>Membros</th>
+                        <th>Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Linhas preenchidas dinamicamente por listaGruposCoordenador.js -->
+                    </tbody>
+                </table>
+            
+            
+              
+        </div>
         </div>
 
-        <div class="semestre">
-            <label for="selectSemestre">Selecione o Semestre:</label>
-            <select id="selectSemestre">
-              <option value="" disabled selected>-- Escolha --</option>
-              <option value="1">1º Semestre</option>
-              <option value="2">2º Semestre</option>
-              <option value="3">3º Semestre</option>
-              <option value="4">4º Semestre</option>
-              <option value="5">5º Semestre</option>
-              <option value="6">6º Semestre</option>
-              <!-- Adicione mais conforme sua convenção -->
-            </select>
-            <button id="btnBuscarGrupos">Buscar Grupos</button>
-            <button id="btnRelatorioGeral" style="margin-left: 20px;">Gerar Relatório Geral</button>
-          </div>
-
-          <!-- SPINNER (Loading) -->
-            <div id="loading" style="display: none; margin-top: 20px;">
-                Carregando Grupos...
-            </div>
-
-            <!-- MENSAGEM DE ERRO -->
-            <div id="mensagem-erro" style="display: none; color: red; margin-top: 20px;"></div>
-
-            <!-- MENSAGEM “Sem Projetos” -->
-            <div id="sem-grupos" style="display: none; margin-top: 20px; font-style: italic; color: #555;">
-                Nenhum grupo encontrado para este semestre.
-            </div>
-        
-          <!-- Tabela de Grupos -->
-            <table id="tabelaGrupos" style="display: none; border-collapse: collapse; width: 100%; margin-top: 20px;">
-                <thead>
-                <tr>
-                    <th>Nome do Grupo</th>
-                    <th>Membros</th>
-                    <th>Ações</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Linhas preenchidas dinamicamente por listaGruposCoordenador.js -->
-                </tbody>
-            </table>
-        
-        
-          
-    </div>
+       
     <footer class="sgpi-footer">
         <div class="footer-container">
             <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
@@ -130,7 +128,7 @@
             
             <div class="footer-links">
                 <span class="footer-separator">|</span>
-                <a href="/manual-usuario">Manual do Usuário</a>
+                <a href="/manual">Manual do Usuário</a>
                 <span class="footer-separator">|</span>
                 <a href="/termos-uso">Termos de Uso</a>
                 <span class="footer-separator">|</span>
@@ -144,5 +142,6 @@
     <script defer src="/javaScript/utils/dark_mode.js"></script>
     <script src="/javaScript/front_end/GerarMenu.js"></script>
     <script src="/javaScript/front_end/imagemPerfil.js"></script>
+    <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
 </body>
 </html>

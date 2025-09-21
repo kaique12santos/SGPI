@@ -58,10 +58,13 @@
   }
   #entregas-container{
     word-break: break-word;
-    width: 99dvw;
+    width: 95dvw;
     margin-top: 10px;
     margin-bottom: 10px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
+  }
+  .container{
+    height: stretch;
   }

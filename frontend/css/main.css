@@ -85,6 +85,7 @@ body{
     width: 100%; 
     max-width: 100%; 
     border-top: 1px solid #970000;
+    border-bottom: 1px solid #970000;
     
 }
 
@@ -621,6 +622,16 @@ body{
     font-style: italic;
 }
 
+.userway_buttons_wrapper  {
+    top: 80% !important;
+    right: 0 !important;
+    bottom: auto !important;
+  transform: translateY(-50%)
+    
+}
+#userwayAccessibilityIcon{
+    left: -28px;
+}
 
 /* Responsividade para mobile */
 @media (max-width: 768px) {

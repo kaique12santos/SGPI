@@ -101,7 +101,6 @@ function getItensMenu() {
     ],
     professor: [
     { texto: 'Artefatos entregues', link: '/artefatosEntregues' },
-    { texto: 'Artefatos pendentes', link: '/professor/atividades' },
     { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes' },
     { texto: 'Criar Artefato', link: '/criar-atividade' },
     {texto: 'Meu Perfil', link: '/perfil'},

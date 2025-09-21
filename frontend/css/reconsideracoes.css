@@ -8,6 +8,9 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
+.container{
+  height: stretch;
+}
 #lista-reconsideracao{
   width: 100%;
   
