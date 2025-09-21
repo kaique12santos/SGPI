@@ -1,0 +1,185 @@
+/* Estilos para a página de Termos de Uso */
+.termos-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    min-height: calc(100vh - 200px);
+}
+
+.termos-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    border-bottom: 3px solid #970000;
+}
+
+.termos-header h1 {
+    color: #970000;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.2rem;
+    font-style: italic;
+    margin: 0;
+}
+
+.termos-content-page {
+    line-height: 1.8;
+    color: #333;
+    font-size: 1rem;
+    width: 70%;
+}
+
+.termo-section {
+    margin-bottom: 35px;
+    padding: 25px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #970000;
+}
+
+.termo-section h2 {
+    color: #970000;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.termo-section p {
+    margin-bottom: 15px;
+    text-align: justify;
+    text-indent: 20px;
+}
+
+.termo-section ul {
+    margin: 15px 0;
+    padding-left: 30px;
+}
+
+.termo-section li {
+    margin-bottom: 10px;
+    list-style-type: disc;
+}
+
+.data-atualizacao-page {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.data-atualizacao-page p {
+    margin: 0;
+    font-style: italic;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.voltar-container {
+    text-align: center;
+    margin: 40px 0;
+    padding: 20px;
+}
+
+.btn-voltar {
+    display: inline-block;
+    background-color: #970000;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 0 10px;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: 2px solid #970000;
+}
+
+.btn-voltar:hover {
+    background-color: #7a0000;
+    border-color: #7a0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.termos-footer {
+    background-color: #970000;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+}
+
+.footer-content p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .termos-container {
+        padding: 15px;
+    }
+    
+    .termos-header h1 {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .termo-section {
+        padding: 20px 15px;
+        margin-bottom: 25px;
+    }
+    
+    .termo-section h2 {
+        font-size: 1.2rem;
+    }
+    
+    .termo-section p {
+        text-indent: 10px;
+    }
+    
+    .voltar-container {
+        padding: 15px;
+    }
+    
+    .btn-voltar {
+        display: block;
+        margin: 10px auto;
+        width: 200px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .termos-header {
+        padding: 20px 0;
+    }
+    
+    .termos-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .termo-section {
+        padding: 15px 10px;
+    }
+    
+    .termo-section h2 {
+        font-size: 1.1rem;
+    }
+    
+    .termos-content-page {
+        font-size: 0.95rem;
+    }
+}

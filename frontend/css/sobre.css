@@ -1,0 +1,334 @@
+/* Estilos específicos para a página Sobre o SGPI */
+/* Evitando conflitos com main.css */
+
+/* Container específico da página sobre */
+.sobre-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    min-height: calc(100vh - 200px);
+}
+
+/* Header específico da página sobre */
+.page-name{
+    margin-bottom: 50px;
+}
+
+
+/* Content específico da página sobre */
+.sobre-content-page {
+    line-height: 1.8;
+    color: #333;
+    font-size: 1rem;
+    padding: 0;
+    width: 90%;
+}
+
+/* Seções específicas da página sobre */
+.sobre-section {
+    margin-bottom: 40px;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    border-left: 5px solid #970000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.sobre-section.destaque {
+    background: linear-gradient(135deg, #fff5f5 0%, #f9f9f9 100%);
+    border-left: 5px solid #970000;
+}
+
+.sobre-section.futuro {
+    background: linear-gradient(135deg, #f0f8ff 0%, #f9f9f9 100%);
+    border-left: 5px solid #0066cc;
+}
+
+.sobre-section .section-icon {
+    position: absolute;
+    top: -15px;
+    left: 25px;
+    background-color: #970000;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.sobre-section.futuro .section-icon {
+    background-color: #0066cc;
+}
+
+.sobre-section .section-icon .material-icons {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.sobre-section h2 {
+    color: #970000;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+.sobre-section.futuro h2 {
+    color: #0066cc;
+}
+
+.sobre-section p {
+    margin-bottom: 15px;
+    text-align: justify;
+    text-indent: 20px;
+    color: #333;
+}
+
+/* Lista de funcionalidades */
+.sobre-section .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.sobre-section .feature-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.sobre-section .feature-list li:hover {
+    transform: translateX(10px);
+}
+
+.sobre-section .feature-list li .material-icons {
+    color: #970000;
+    margin-right: 15px;
+    font-size: 1.3rem;
+}
+
+/* Grid de benefícios */
+.sobre-section .beneficios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin: 25px 0;
+}
+
+.sobre-section .beneficio-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sobre-section .beneficio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.sobre-section .beneficio-icon {
+    background-color: #970000;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.sobre-section .beneficio-icon .material-icons {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.sobre-section .beneficio-card h3 {
+    color: #970000;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.sobre-section .beneficio-card p {
+    text-indent: 0;
+    font-size: 0.95rem;
+    color: #666;
+}
+
+/* Lista de público-alvo */
+.sobre-section .publico-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 25px 0;
+}
+
+.sobre-section .publico-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.sobre-section .publico-item:hover {
+    transform: translateX(10px);
+}
+
+.sobre-section .publico-item .material-icons {
+    color: #970000;
+    font-size: 2rem;
+    margin-right: 20px;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sobre-section .publico-item strong {
+    color: #970000;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.sobre-section .publico-item p {
+    margin: 0;
+    text-indent: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Data de atualização específica da página sobre */
+.sobre-data-atualizacao {
+    margin-top: 50px;
+    padding: 25px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px solid #ddd;
+}
+
+.sobre-data-atualizacao p {
+    margin: 0;
+    font-style: italic;
+    color: #666;
+    font-size: 0.95rem;
+    text-indent: 0;
+}
+
+/* Container de botão voltar específico da página sobre */
+.sobre-voltar-container {
+    text-align: center;
+    margin: 40px 0;
+    padding: 20px;
+}
+
+.sobre-voltar-container .btn-voltar {
+    display: inline-block;
+    background-color: #970000;
+    color: white;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: 2px solid #970000;
+    font-size: 1.1rem;
+}
+
+.sobre-voltar-container .btn-voltar:hover {
+    background-color: #7a0000;
+    border-color: #7a0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsividade específica da página sobre */
+@media (max-width: 768px) {
+    .sobre-container {
+        padding: 15px;
+    }
+    
+    
+    .sobre-section {
+        padding: 20px 15px;
+        margin-bottom: 30px;
+    }
+    
+    .sobre-section h2 {
+        font-size: 1.2rem;
+    }
+    
+    .sobre-section .beneficios-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .sobre-section .publico-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .sobre-section .publico-item .material-icons {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .sobre-section .feature-list li {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .sobre-section .feature-list li .material-icons {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    
+    
+    .sobre-section {
+        padding: 15px 10px;
+    }
+    
+    .sobre-section h2 {
+        font-size: 1.1rem;
+    }
+    
+    .sobre-content-page {
+        font-size: 0.95rem;
+    }
+    
+    .sobre-section .section-icon {
+        width: 40px;
+        height: 40px;
+        top: -10px;
+    }
+    
+    .sobre-section .section-icon .material-icons {
+        font-size: 1.2rem;
+    }
+}
