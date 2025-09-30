@@ -1,173 +1,197 @@
 require('dotenv').config();
 const express = require('express');
-const { getConnection, oracledb } = require('../connectOracle');
+const { getConnection } = require('../conexaoMysql.js');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
+const emailTemplates = require('../utils/emailTemplates.js');
 const router = express.Router();
 
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT),
-    secure: false, 
-    auth: {
-        user: process.env.EMAIL_FROM,
-        pass: process.env.EMAIL_PASSWORD
-    },
-    tls: {
-        ciphers: 'SSLv3',
-        rejectUnauthorized: false
-    },
-    debug: true
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_FROM,
+    pass: process.env.EMAIL_PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  debug: true
 });
 
-transporter.verify(function(error, success) {
-    if (error) {
-        console.error('❌ Erro na configuração do email:', error);
-    } else {
-        console.log('✅ Servidor de email pronto para enviar mensagens');
-    }
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ Erro na configuração do email:', error);
+  } else {
+    console.log('✅ Servidor de email pronto para enviar mensagens');
+  }
 });
 
+// -----------------------------
+// POST - Solicitar recuperação
+// -----------------------------
 router.post('/recuperar-senha', async (req, res) => {
-    const { email } = req.body;
-    console.log(`📧 Solicitação de recuperação para: ${email}`);
+  const { email } = req.body;
+  console.log(`📧 Solicitação de recuperação para: ${email}`);
+
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'E-mail é obrigatório.' });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+
+    // Verifica se o usuário existe
+    const [users] = await connection.execute(
+      `SELECT id, nome FROM Usuarios WHERE email = ? AND ativo = 1 LIMIT 1`,
+      [email]
+    );
+
+    if (users.length === 0) {
+      console.log(`❌ Email não encontrado: ${email}`);
+      return res.status(404).json({ success: false, message: 'E-mail não encontrado.' });
+    }
+
+    const { id: userId, nome: nomeUsuario } = users[0];
+    const token = uuidv4();
+    const expiracao = new Date(Date.now() + 3600 * 1000); // 1 hora
+
+    console.log(`✅ Usuário encontrado ID: ${userId}, gerando token...`);
+
+    // Remove tokens antigos do usuário
+    await connection.execute(
+      `DELETE FROM Recuperacao_Senha WHERE usuario_id = ?`,
+      [userId]
+    );
+
+    // Insere o novo token
+    await connection.execute(
+      `INSERT INTO Recuperacao_Senha (usuario_id, token, data_expiracao) VALUES (?, ?, ?)`,
+      [userId, token, expiracao]
+    );
+
+    console.log(`✅ Token gerado e salvo no banco`);
+
+    const link = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/redefine-password?token=${token}`;
+    let emailEnviado = false;
 
     try {
-        const connection = await getConnection();
-        const result = await connection.execute(
-            `SELECT id FROM Usuarios WHERE email = :email`,
-            [email],
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
-        );
+      const template = emailTemplates.recuperacaoSenha(link);
+      
+      const info = await transporter.sendMail({
+        from: `"SGPI Suporte" <${process.env.EMAIL_FROM}>`,
+        to: email,
+        subject: template.subject,
+        html: template.html
+      });
 
-        if (result.rows.length === 0) {
-            console.log(`❌ Email não encontrado: ${email}`);
-            return res.status(404).json({ success: false, message: 'E-mail não encontrado.' });
-        }
-
-        const userId = result.rows[0].ID;
-        const token = uuidv4();
-        const expiracao = new Date(Date.now() + 3600 * 1000); // 1h
-
-        console.log(`✅ Usuário encontrado ID: ${userId}, gerando token...`);
-
-        await connection.execute(
-            `DELETE FROM Recuperacao_Senha WHERE usuario_id = :1`,
-            [userId],
-            { autoCommit: true }
-        );
-
-        await connection.execute(
-            `INSERT INTO Recuperacao_Senha (usuario_id, token, data_expiracao) VALUES (:1, :2, :3)`,
-            [userId, token, expiracao],
-            { autoCommit: true }
-        );
-
-        console.log(`✅ Link gerado e salvo no banco de dados`);
-
-        const link = `http://localhost:3000/redefine-password?token=${token}`;
-        let emailEnviado = false;
-
-        try {
-            console.log(`📧 Tentando enviar email para ${email}...`);
-            const info = await transporter.sendMail({
-                from: `"SGPI Suporte" <${process.env.EMAIL_FROM}>`,
-                to: email,
-                subject: 'Redefinição de Senha - SGPI',
-                html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                    <h2 style="color: #333;">Redefinição de Senha - SGPI</h2>
-                    <p>Você solicitou a redefinição de senha para sua conta no Sistema de Gerenciamento de Projetos Interdisciplinares.</p>
-                    <p>Clique no botão abaixo para redefinir sua senha:</p>
-                    <p style="text-align: center;">
-                        <a href="${link}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Senha</a>
-                    </p>
-                    <p>Ou copie e cole o link abaixo no seu navegador:</p>
-                    <p style="word-break: break-all;"><a href="${link}">${link}</a></p>
-                    <p><strong>Este link expira em 1 hora.</strong></p>
-                    <p>Se você não solicitou a redefinição de senha, por favor ignore este e-mail.</p>
-                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #777;">Este é um e-mail automático, por favor não responda.</p>
-                </div>
-                `
-            });
-            
-            console.log(`✅ Email enviado: ${info.messageId}`);
-            emailEnviado = true;
-        } catch (emailError) {
-            console.error('❌ Erro ao enviar e-mail:', emailError);
-        }
-
-        await connection.close();
-
-        return res.json({
-            success: true,
-            emailEnviado,
-            link: emailEnviado ? null : link,
-            message: emailEnviado
-                ? "E-mail enviado com sucesso! Verifique sua caixa de entrada e caixa de spam."
-                : "Não foi possível enviar o e-mail."
-        });
-
-    } catch (error) {
-        console.error('❌ Erro ao recuperar senha:', error);
-        return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
+      console.log(`✅ Email enviado: ${info.messageId}`);
+      emailEnviado = true;
+    } catch (emailError) {
+      console.error('❌ Erro ao enviar e-mail:', emailError);
     }
+
+    return res.json({
+      success: true,
+      emailEnviado,
+      link: emailEnviado ? null : link, // só retorna link se email falhou (para debug)
+      message: emailEnviado
+        ? "E-mail enviado com sucesso! Verifique sua caixa de entrada e spam."
+        : "Não foi possível enviar o e-mail. Tente novamente mais tarde."
+    });
+
+  } catch (error) {
+    console.error('❌ Erro ao recuperar senha:', error);
+    return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
+  } finally {
+    if (connection) await connection.end();
+  }
 });
 
+// -----------------------------
+// POST - Redefinir senha
+// -----------------------------
 router.post('/redefinir-senha', async (req, res) => {
-    const { token, novaSenha } = req.body;
+  const { token, novaSenha } = req.body;
 
-    if (!token || !novaSenha) {
-        return res.status(400).json({ success: false, message: 'Token e nova senha são obrigatórios.' });
+  if (!token || !novaSenha) {
+    return res.status(400).json({ success: false, message: 'Token e nova senha são obrigatórios.' });
+  }
+
+  if (novaSenha.length < 6) {
+    return res.status(400).json({ success: false, message: 'A nova senha deve ter pelo menos 6 caracteres.' });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+
+    // Busca token e dados do usuário
+    const [rows] = await connection.execute(
+      `SELECT rs.usuario_id, rs.data_expiracao, u.email, u.nome 
+       FROM Recuperacao_Senha rs
+       JOIN Usuarios u ON rs.usuario_id = u.id
+       WHERE rs.token = ? LIMIT 1`,
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Token inválido ou expirado.' });
     }
 
+    const tokenInfo = rows[0];
+    const agora = new Date();
+    const dataExpiracao = new Date(tokenInfo.data_expiracao);
+
+    if (agora > dataExpiracao) {
+      // Remove token expirado
+      await connection.execute(`DELETE FROM Recuperacao_Senha WHERE token = ?`, [token]);
+      return res.status(400).json({ success: false, message: 'Token expirado. Solicite um novo.' });
+    }
+
+    // Gera senha criptografada
+    const saltRounds = 10;
+    const hashedSenha = await bcrypt.hash(novaSenha, saltRounds);
+
+    // Atualiza senha
+    await connection.execute(
+      `UPDATE Usuarios SET senha = ?, data_atualizacao = CURRENT_TIMESTAMP WHERE id = ?`,
+      [hashedSenha, tokenInfo.usuario_id]
+    );
+
+    // Remove token usado
+    await connection.execute(
+      `DELETE FROM Recuperacao_Senha WHERE token = ?`,
+      [token]
+    );
+
+    // Envia e-mail de confirmação
     try {
-        const connection = await getConnection();
-        
-        const result = await connection.execute(
-            `SELECT usuario_id, data_expiracao FROM Recuperacao_Senha WHERE token = :1`,
-            [token],
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
-        );
+      const template = emailTemplates.senhaAlterada();
+      
+      await transporter.sendMail({
+        from: `"SGPI Suporte" <${process.env.EMAIL_FROM}>`,
+        to: tokenInfo.email,
+        subject: template.subject,
+        html: template.html
+      });
 
-        if (result.rows.length === 0) {
-            await connection.close();
-            return res.status(404).json({ success: false, message: 'Token inválido ou expirado.' });
-        }
-
-        const tokenInfo = result.rows[0];
-        const agora = new Date();
-        const dataExpiracao = new Date(tokenInfo.DATA_EXPIRACAO);
-
-        if (agora > dataExpiracao) {
-            await connection.close();
-            return res.status(400).json({ success: false, message: 'Token expirado. Solicite um novo link de redefinição.' });
-        }
-
-        const saltRounds = 10;
-        const hashedSenha = await bcrypt.hash(novaSenha, saltRounds);
-
-        await connection.execute(
-            `UPDATE Usuarios SET senha = :1 WHERE id = :2`,
-            [hashedSenha, tokenInfo.USUARIO_ID],
-            { autoCommit: true }
-        );
-
-        await connection.execute(
-            `DELETE FROM Recuperacao_Senha WHERE token = :1`,
-            [token],
-            { autoCommit: true }
-        );
-
-        await connection.close();
-        return res.json({ success: true, message: 'Senha redefinida com sucesso!' });
-        
-    } catch (error) {
-        console.error('Erro ao redefinir senha:', error);
-        return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
+      console.log(`✅ E-mail de confirmação enviado para ${tokenInfo.email}`);
+    } catch (emailError) {
+      console.warn('⚠️ Falha ao enviar e-mail de confirmação:', emailError.message);
     }
+
+    return res.json({ success: true, message: 'Senha redefinida com sucesso!' });
+        
+  } catch (error) {
+    console.error('❌ Erro ao redefinir senha:', error);
+    return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
+  } finally {
+    if (connection) await connection.end();
+  }
 });
 
 module.exports = router;

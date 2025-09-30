@@ -1,546 +1,250 @@
 const express = require('express');
 const router = express.Router();
-const { getConnection, oracledb } = require('../connectOracle.js');
-const path = require('path');
-const frontendPath = path.join(__dirname, '..', '..', 'frontend');
-const multer = require('multer');
-const fs = require('fs');
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const nomeOriginal = file.originalname.replace(/\s+/g, '_');
-    const extensao = path.extname(nomeOriginal);
-    const baseNome = path.basename(nomeOriginal, extensao);
-    const nomeFinal = `${Date.now()}_${baseNome}${extensao}`;
-    cb(null, nomeFinal);
+const { getConnection } = require('../conexaoMysql.js');
+
+/**
+ * GET /aluno/atividades/:semestreId
+ * Lista todas as atividades do semestre para o aluno logado
+ */
+router.get('/atividades/:semestreId', async (req, res) => {
+  const semestreId = parseInt(req.params.semestreId);
+  const alunoId = req.user?.id;
+
+  if (!alunoId || isNaN(semestreId)) {
+    return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
   }
-});
-const upload = multer({ storage });
 
-// Função para converter LOBs para string
-function lobToString(lob) {
-  return new Promise((resolve, reject) => {
-    if (!lob || typeof lob === 'string') return resolve(lob);
-    let content = '';
-    lob.setEncoding('utf8');
-    lob.on('data', chunk => content += chunk);
-    lob.on('end', () => resolve(content));
-    lob.on('error', err => reject(err));
-  });
-}
-
-
-
-
-
-
-router.post('/api/entregas', upload.single('arquivo'), async (req, res) => {
-  const connection = await getConnection();
-
+  let connection;
   try {
-    const { aluno_id, atividade_id } = req.body;
-    const arquivo = req.file;
+    connection = await getConnection();
 
-    if (!arquivo) {
-      return res.status(400).json({ success: false, message: 'Arquivo não enviado.' });
-    }
+    const sqlAtividades = `
+      SELECT DISTINCT
+        a.id AS atividade_id,
+        a.titulo AS atividade_titulo,
+        a.descricao AS atividade_descricao,
+        a.prazo_entrega AS atividade_prazo,
+        a.criterios_avaliacao AS atividade_criterios,
+        d.nome AS disciplina_nome,
+        u_prof.nome AS professor_nome,
+        g.id AS grupo_id,
+        g.nome AS grupo_nome,
+        e.id AS entrega_id,
+        e.status AS entrega_status,
+        e.data_entrega AS entrega_data,
+        av.nota AS avaliacao_nota,
+        av.comentario AS avaliacao_comentario,
+        av.data_avaliacao AS avaliacao_data
+      FROM Atividades a
+      INNER JOIN Semestres s ON a.semestre_id = s.id
+      LEFT JOIN Disciplinas d ON a.disciplina_id = d.id
+      LEFT JOIN Usuarios u_prof ON a.professor_id = u_prof.id
+      LEFT JOIN Grupos g ON a.grupo_id = g.id
+      LEFT JOIN Usuario_Grupo ug ON g.id = ug.grupo_id AND ug.usuario_id = ?
+      LEFT JOIN Entregas e ON a.id = e.atividade_id AND e.grupo_id = g.id
+      LEFT JOIN Avaliacoes av ON e.id = av.entrega_id
+      WHERE a.semestre_id = ?
+        AND (ug.usuario_id IS NOT NULL OR a.grupo_id IS NULL)
+      ORDER BY a.prazo_entrega ASC, a.titulo ASC
+    `;
+    //select funcional
 
-    const nomeFinal = arquivo.filename;
-    const tamanho = arquivo.size;
+    const [rows] = await connection.execute(sqlAtividades, [alunoId, semestreId]);
+    return res.json({ success: true, atividades: rows });
 
-    // Verificar prazo da atividade
-    const atividadePrazoResult = await connection.execute(
-      `SELECT prazo_entrega FROM Atividades WHERE id = :id`,
-      [atividade_id],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    const prazoEntrega = new Date(atividadePrazoResult.rows[0].PRAZO_ENTREGA);
-    const agora = new Date();
-    const status = agora > prazoEntrega ? 'Atrasado' : 'Entregue';
-
-    // Verificar grupo do aluno
-    const grupoIdResult = await connection.execute(
-      `SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :aluno_id FETCH FIRST 1 ROWS ONLY`,
-      { aluno_id },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    if (grupoIdResult.rows.length === 0) {
-      return res.status(400).json({ success: false, message: 'Grupo do aluno não encontrado.' });
-    }
-
-    const grupoId = grupoIdResult.rows[0].GRUPO_ID;
-
-    // Verificar se já existe entrega para essa atividade e grupo
-    const entregaResult = await connection.execute(
-      `SELECT id, caminho_arquivo FROM Entregas
-       WHERE atividade_id = :atividade_id AND grupo_id = :grupo_id`,
-      { atividade_id, grupo_id: grupoId },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    if (entregaResult.rows.length > 0) {
-      const entregaExistente = entregaResult.rows[0];
-
-      // Apagar arquivo antigo
-      const caminhoAntigo = path.join(__dirname, '..', 'uploads', entregaExistente.CAMINHO_ARQUIVO);
-      if (fs.existsSync(caminhoAntigo)) {
-        fs.unlinkSync(caminhoAntigo);
-      }
-
-      // Atualizar entrega existente - INCLUINDO aluno_id
-      await connection.execute(
-        `UPDATE Entregas
-         SET caminho_arquivo = :caminho, tamanho_arquivo = :tamanho,
-             data_entrega = CURRENT_TIMESTAMP, status = :status, aluno_id = :aluno_id
-         WHERE id = :id`,
-        {
-          caminho: nomeFinal,
-          tamanho,
-          status,
-          aluno_id,
-          id: entregaExistente.ID
-        },
-        { autoCommit: true }
-      );
-
-      return res.json({ success: true, message: 'Entrega substituída com sucesso.' });
-    } else {
-      // Criar nova entrega - INCLUINDO aluno_id
-      await connection.execute(
-        `INSERT INTO Entregas (atividade_id, grupo_id, aluno_id, caminho_arquivo, tamanho_arquivo, status, data_entrega)
-         VALUES (:atividade_id, :grupo_id, :aluno_id, :caminho_arquivo, :tamanho_arquivo, :status, CURRENT_TIMESTAMP)`,
-        {
-          atividade_id,
-          grupo_id: grupoId,
-          aluno_id,
-          caminho_arquivo: nomeFinal,
-          tamanho_arquivo: tamanho,
-          status
-        },
-        { autoCommit: true }
-      );
-
-      return res.json({ success: true, message: 'Entrega enviada com sucesso.' });
-    }
   } catch (err) {
-    console.error('Erro ao enviar entrega:', err);
-    res.status(500).json({ success: false, message: 'Erro ao enviar entrega.' });
+    console.error('Erro ao buscar atividades do aluno:', err);
+    return res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.release();
   }
 });
 
+/**
+ * GET /aluno/atividades/:atividadeId/detalhes
+ * Busca detalhes específicos de uma atividade
+ */
+router.get('/atividades/:atividadeId/detalhes', async (req, res) => {
+  const atividadeId = parseInt(req.params.atividadeId);
+  const alunoId = req.user?.id;
 
-
-
-// Página de listagem de atividades do aluno
-router.get('/atividades', (req, res) => {
-  return res.sendFile(path.join(frontendPath, 'aluno-atividades.html'));
-});
-
-// Página de detalhes da atividade
-router.get('/atividade/:id', (req, res) => {
-  return res.sendFile(path.join(frontendPath, 'aluno-detalhe-atividade.html'));
-});
-
-// API para buscar todas as atividades disponíveis para o aluno
-router.get('/api/atividades', async (req, res) => {
-  const connection = await getConnection();
-
-  try {
-    const alunoId = parseInt(req.query.aluno_id, 10);
-
-    if (isNaN(alunoId)) {
-      return res.status(400).json({ success: false, message: 'ID de aluno inválido.' });
-    }
-
-    // Obter semestre e grupo do aluno
-    const grupoSemestreResult = await connection.execute(
-      `SELECT g.id as grupo_id, u.semestre
-       FROM Usuario_Grupo ug
-       JOIN Grupos g ON ug.grupo_id = g.id
-       JOIN Usuarios u ON ug.usuario_id = u.id
-       WHERE ug.usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY`,
-      [alunoId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    if (grupoSemestreResult.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Aluno sem grupo ou semestre não encontrado.' });
-    }
-
-    const grupoId = grupoSemestreResult.rows[0].GRUPO_ID;
-    const semestre = grupoSemestreResult.rows[0].SEMESTRE;
-
-    // Buscar apenas 1 atividade por grupo para o semestre do aluno
-    const result = await connection.execute(
-      `SELECT a.id, a.titulo, a.descricao, a.semestre, 
-              TO_CHAR(a.prazo_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') as prazo_entrega,
-              a.criterios_avaliacao, a.professor_id,
-              p.nome as professor_nome,
-              TO_CHAR(a.data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-              TO_CHAR(a.data_atualizacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_atualizacao,
-              (SELECT e.status FROM Entregas e 
-               WHERE e.atividade_id = a.id AND e.grupo_id = :grupoId_status FETCH FIRST 1 ROWS ONLY
-              ) as status_entrega,
-              (SELECT e.id FROM Entregas e 
-               WHERE e.atividade_id = a.id AND e.grupo_id = :grupoId_entrega FETCH FIRST 1 ROWS ONLY
-              ) as entrega_id,
-              (SELECT nome FROM Grupos WHERE id = :grupoId_nome FETCH FIRST 1 ROWS ONLY) as grupo_nome
-       FROM Atividades a
-       JOIN Usuarios p ON a.professor_id = p.id
-       WHERE a.semestre = :semestre AND a.grupo_id = :grupoId_main
-       ORDER BY a.data_criacao DESC, a.id DESC`,
-      {
-        grupoId_status: grupoId,
-        grupoId_entrega: grupoId,
-        grupoId_nome: grupoId,
-        grupoId_main: grupoId,
-        semestre
-      },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-    // === ADICIONE LOG PARA DEBUG ===
-    console.log('Atividades do banco (ordenadas):', result.rows.map(row => ({
-      id: row.ID,
-      titulo: row.TITULO,
-      data_criacao: row.DATA_CRIACAO
-    })));
-
-    const atividades = await Promise.all(result.rows.map(async row => ({
-      id: row.ID,
-      titulo: row.TITULO,
-      descricao: await lobToString(row.DESCRICAO),
-      semestre: row.SEMESTRE,
-      prazo_entrega: row.PRAZO_ENTREGA,
-      criterios_avaliacao: await lobToString(row.CRIOS_AVALIACAO),
-      professor_id: row.PROFESSOR_ID,
-      professor_nome: row.PROFESSOR_NOME,
-      data_criacao: row.DATA_CRIACAO,
-      data_atualizacao: row.DATA_ATUALIZACAO,
-      status_entrega: row.STATUS_ENTREGA || 'Pendente',
-      entrega_id: row.ENTREGA_ID,
-      grupo_nome: row.GRUPO_NOME
-    })));
-
-    res.json({ success: true, atividades });
-  } catch (error) {
-    console.error('Erro ao buscar atividades do aluno:', error);
-    res.status(500).json({ success: false, message: 'Erro ao buscar atividades.', error: error.message });
-  } finally {
-    if (connection) await connection.close();
+  if (!alunoId || isNaN(atividadeId)) {
+    return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
   }
-});
 
-
-
-
-router.get('/api/atividade/:id', async (req, res) => {
-    const connection = await getConnection();
-  
-    try {
-      const atividadeId = parseInt(req.params.id, 10);
-      const alunoId = parseInt(req.query.aluno_id, 10);
-  
-      if (isNaN(atividadeId) || isNaN(alunoId)) {
-        return res.status(400).json({ success: false, message: 'IDs inválidos.' });
-      }
-  
-      const result = await connection.execute(
-        `SELECT a.id, a.titulo, a.descricao, a.semestre, 
-                TO_CHAR(a.prazo_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') as prazo_entrega,
-                a.criterios_avaliacao, a.professor_id,
-                p.nome as professor_nome,
-                p.email as professor_email,
-                TO_CHAR(a.data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-                TO_CHAR(a.data_atualizacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_atualizacao,
-  
-                (SELECT e.status FROM Entregas e 
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId1)) as status_entrega,
-  
-                (SELECT e.id FROM Entregas e 
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId2)) as entrega_id,
-  
-                (SELECT e.caminho_arquivo FROM Entregas e 
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId3)) as arquivo_entrega,
-  
-                (SELECT g.id FROM Grupos g 
-                 WHERE g.id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId4)) as grupo_id,
-  
-                (SELECT g.nome FROM Grupos g 
-                 WHERE g.id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId5)) as grupo_nome,
-  
-                (SELECT av.nota FROM Avaliacoes av 
-                 JOIN Entregas e ON av.entrega_id = e.id
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId6)) as nota,
-  
-                (SELECT av.comentario FROM Avaliacoes av 
-                 JOIN Entregas e ON av.entrega_id = e.id
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId7)) as comentario_avaliacao
-  
-         FROM Atividades a
-         JOIN Usuarios p ON a.professor_id = p.id
-         WHERE a.id = :atividadeId`,
-        [
-          alunoId, alunoId, alunoId,
-          alunoId, alunoId, alunoId,
-          alunoId, atividadeId
-        ],
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-  
-      if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Atividade não encontrada.' });
-      }
-  
-      const row = result.rows[0];
-  
-      const atividade = {
-        id: row.ID,
-        titulo: row.TITULO,
-        descricao: await lobToString(row.DESCRICAO),
-        semestre: row.SEMESTRE,
-        prazo_entrega: row.PRAZO_ENTREGA,
-        criterios_avaliacao: await lobToString(row.CRITERIOS_AVALIACAO),
-        professor_id: row.PROFESSOR_ID,
-        professor_nome: row.PROFESSOR_NOME,
-        professor_email: row.PROFESSOR_EMAIL,
-        data_criacao: row.DATA_CRIACAO,
-        data_atualizacao: row.DATA_ATUALIZACAO,
-        status_entrega: row.STATUS_ENTREGA || 'Pendente',
-        entrega_id: row.ENTREGA_ID,
-        arquivo_entrega: row.ARQUIVO_ENTREGA,
-        grupo_id: row.GRUPO_ID,
-        grupo_nome: row.GRUPO_NOME,
-        nota: row.NOTA,
-        comentario_avaliacao: await lobToString(row.COMENTARIO_AVALIACAO)
-      };
-  
-      res.json({ success: true, atividade });
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da atividade:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erro ao buscar detalhes da atividade.',
-        error: error.message
-      });
-    } finally {
-      if (connection) await connection.close();
-    }
-  });
-  
-
-router.get('/api/atividade/:id', async (req, res) => {
-    const connection = await getConnection();
-  
-    try {
-      const atividadeId = parseInt(req.params.id, 10);
-      const alunoId = parseInt(req.query.aluno_id, 10);
-  
-      if (isNaN(atividadeId) || isNaN(alunoId)) {
-        return res.status(400).json({ success: false, message: 'IDs inválidos.' });
-      }
-  
-      const result = await connection.execute(
-        `SELECT a.id, a.titulo, a.descricao, a.semestre, 
-                TO_CHAR(a.prazo_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') as prazo_entrega,
-                a.criterios_avaliacao, a.professor_id,
-                p.nome as professor_nome,
-                p.email as professor_email,
-                TO_CHAR(a.data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-                TO_CHAR(a.data_atualizacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_atualizacao,
-  
-                (SELECT e.status FROM Entregas e 
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId1)) as status_entrega,
-  
-                (SELECT e.id FROM Entregas e 
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId2)) as entrega_id,
-  
-                (SELECT e.caminho_arquivo FROM Entregas e 
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId3)) as arquivo_entrega,
-  
-                (SELECT g.id FROM Grupos g 
-                 WHERE g.id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId4)) as grupo_id,
-  
-                (SELECT g.nome FROM Grupos g 
-                 WHERE g.id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId5)) as grupo_nome,
-  
-                (SELECT av.nota FROM Avaliacoes av 
-                 JOIN Entregas e ON av.entrega_id = e.id
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId6)) as nota,
-  
-                (SELECT av.comentario FROM Avaliacoes av 
-                 JOIN Entregas e ON av.entrega_id = e.id
-                 WHERE e.atividade_id = a.id AND 
-                       e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId7)) as comentario_avaliacao
-  
-         FROM Atividades a
-         JOIN Usuarios p ON a.professor_id = p.id
-         WHERE a.id = :atividadeId`,
-        [
-          alunoId, alunoId, alunoId,
-          alunoId, alunoId, alunoId,
-          alunoId, atividadeId
-        ],
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-  
-      if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Atividade não encontrada.' });
-      }
-  
-      const row = result.rows[0];
-  
-      const atividade = {
-        id: row.ID,
-        titulo: row.TITULO,
-        descricao: await lobToString(row.DESCRICAO),
-        semestre: row.SEMESTRE,
-        prazo_entrega: row.PRAZO_ENTREGA,
-        criterios_avaliacao: await lobToString(row.CRITERIOS_AVALIACAO),
-        professor_id: row.PROFESSOR_ID,
-        professor_nome: row.PROFESSOR_NOME,
-        professor_email: row.PROFESSOR_EMAIL,
-        data_criacao: row.DATA_CRIACAO,
-        data_atualizacao: row.DATA_ATUALIZACAO,
-        status_entrega: row.STATUS_ENTREGA || 'Pendente',
-        entrega_id: row.ENTREGA_ID,
-        arquivo_entrega: row.ARQUIVO_ENTREGA,
-        grupo_id: row.GRUPO_ID,
-        grupo_nome: row.GRUPO_NOME,
-        nota: row.NOTA,
-        comentario_avaliacao: await lobToString(row.COMENTARIO_AVALIACAO)
-      };
-  
-      res.json({ success: true, atividade });
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da atividade:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erro ao buscar detalhes da atividade.',
-        error: error.message
-      });
-    } finally {
-      if (connection) await connection.close();
-    }
-  });
-  
-
-// API para buscar detalhes de uma atividade específica
-router.get('/api/atividade/:id', async (req, res) => {
-  const connection = await getConnection();
-
+  let connection;
   try {
-    const atividadeId = parseInt(req.params.id, 10);
-    const alunoId = parseInt(req.query.aluno_id, 10);
+    connection = await getConnection();
 
-    if (isNaN(atividadeId) || isNaN(alunoId)) {
-      return res.status(400).json({ success: false, message: 'IDs inválidos.' });
-    }
+    const sqlDetalhes = `
+      SELECT 
+        a.id AS atividade_id,
+        a.titulo AS atividade_titulo,
+        a.descricao AS atividade_descricao,
+        a.criterios_avaliacao AS atividade_criterios,
+        a.prazo_entrega AS atividade_prazo,
+        a.data_criacao AS atividade_data_criacao,
+        d.nome AS disciplina_nome,
+        d.codigo AS disciplina_codigo,
+        u_prof.nome AS professor_nome,
+        u_prof.email AS professor_email,
+        g.id AS grupo_id,
+        g.nome AS grupo_nome,
+        s.periodo AS semestre_periodo,
+        s.ano AS semestre_ano,
+        s.descricao AS semestre_descricao
+      FROM Atividades a
+      INNER JOIN Semestres s ON a.semestre_id = s.id
+      LEFT JOIN Disciplinas d ON a.disciplina_id = d.id
+      LEFT JOIN Usuarios u_prof ON a.professor_id = u_prof.id
+      LEFT JOIN Grupos g ON a.grupo_id = g.id
+      LEFT JOIN Usuario_Grupo ug ON g.id = ug.grupo_id AND ug.usuario_id = ?
+      WHERE a.id = ?
+        AND (ug.usuario_id IS NOT NULL OR a.grupo_id IS NULL)
+    `;
+    //select funcional
 
-    // Buscar detalhes da atividade com FETCH FIRST para evitar ORA-01427
-    const result = await connection.execute(
-      `SELECT a.id, a.titulo, a.descricao, a.semestre, 
-              TO_CHAR(a.prazo_entrega, 'YYYY-MM-DD"T"HH24:MI:SS') as prazo_entrega,
-              a.criterios_avaliacao, a.professor_id,
-              p.nome as professor_nome,
-              p.email as professor_email,
-              TO_CHAR(a.data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-              TO_CHAR(a.data_atualizacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_atualizacao,
-
-              (SELECT e.status FROM Entregas e 
-               WHERE e.atividade_id = a.id AND 
-                     e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as status_entrega,
-
-              (SELECT e.id FROM Entregas e 
-               WHERE e.atividade_id = a.id AND 
-                     e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as entrega_id,
-
-              (SELECT e.caminho_arquivo FROM Entregas e 
-               WHERE e.atividade_id = a.id AND 
-                     e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as arquivo_entrega,
-
-              (SELECT g.id FROM Grupos g 
-               WHERE g.id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as grupo_id,
-
-              (SELECT g.nome FROM Grupos g 
-               WHERE g.id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as grupo_nome,
-
-              (SELECT av.nota FROM Avaliacoes av 
-               JOIN Entregas e ON av.entrega_id = e.id
-               WHERE e.atividade_id = a.id AND 
-                     e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as nota,
-
-              (SELECT av.comentario FROM Avaliacoes av 
-               JOIN Entregas e ON av.entrega_id = e.id
-               WHERE e.atividade_id = a.id AND 
-                     e.grupo_id IN (SELECT grupo_id FROM Usuario_Grupo WHERE usuario_id = :alunoId FETCH FIRST 1 ROWS ONLY)
-               FETCH FIRST 1 ROWS ONLY) as comentario_avaliacao
-
-       FROM Atividades a
-       JOIN Usuarios p ON a.professor_id = p.id
-       WHERE a.id = :atividadeId`,
-      {
-        alunoId,
-        atividadeId
-      },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    if (result.rows.length === 0) {
+    const [rows] = await connection.execute(sqlDetalhes, [alunoId, atividadeId]);
+    
+    if (rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Atividade não encontrada.' });
     }
 
-    const row = result.rows[0];
+    return res.json({ success: true, atividade: rows[0] });
 
-    const atividade = {
-      id: row.ID,
-      titulo: row.TITULO,
-      descricao: await lobToString(row.DESCRICAO),
-      semestre: row.SEMESTRE,
-      prazo_entrega: row.PRAZO_ENTREGA,
-      criterios_avaliacao: await lobToString(row.CRIOS_AVALIACAO),
-      professor_id: row.PROFESSOR_ID,
-      professor_nome: row.PROFESSOR_NOME,
-      professor_email: row.PROFESSOR_EMAIL,
-      data_criacao: row.DATA_CRIACAO,
-      data_atualizacao: row.DATA_ATUALIZACAO,
-      status_entrega: row.STATUS_ENTREGA || 'Pendente',
-      entrega_id: row.ENTREGA_ID,
-      arquivo_entrega: row.ARQUIVO_ENTREGA,
-      grupo_id: row.GRUPO_ID,
-      grupo_nome: row.GRUPO_NOME,
-      nota: row.NOTA,
-      comentario_avaliacao: await lobToString(row.COMENTARIO_AVALIACAO)
-    };
-
-    res.json({ success: true, atividade });
-  } catch (error) {
-    console.error('Erro ao buscar detalhes da atividade:', error);
-    res.status(500).json({ success: false, message: 'Erro ao buscar detalhes da atividade.', error: error.message });
+  } catch (err) {
+    console.error('Erro ao buscar detalhes da atividade:', err);
+    return res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.release();
   }
 });
 
+/**
+ * POST /aluno/atividades/:atividadeId/entregar
+ * Realiza a entrega de uma atividade
+ */
+router.post('/atividades/:atividadeId/entregar', async (req, res) => {
+  const atividadeId = parseInt(req.params.atividadeId);
+  const alunoId = req.user?.id;
+  const { caminhoArquivo, tamanhoArquivo } = req.body;
+
+  if (!alunoId || isNaN(atividadeId)) {
+    return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+
+    // Verificar se o aluno pertence a um grupo para esta atividade
+    const sqlVerificarGrupo = `
+      SELECT g.id AS grupo_id
+      FROM Atividades a
+      INNER JOIN Grupos g ON a.grupo_id = g.id
+      INNER JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      WHERE a.id = ? AND ug.usuario_id = ?
+    `;
+    //select funcional
+
+    const [grupoRows] = await connection.execute(sqlVerificarGrupo, [atividadeId, alunoId]);
+    
+    if (grupoRows.length === 0) {
+      return res.status(403).json({ success: false, message: 'Você não tem permissão para entregar esta atividade.' });
+    }
+
+    const grupoId = grupoRows[0].grupo_id;
+
+    // Verificar se já existe uma entrega
+    const sqlVerificarEntrega = `
+      SELECT id FROM Entregas 
+      WHERE atividade_id = ? AND grupo_id = ?
+    `;
+    //select funcional
+
+    const [entregaRows] = await connection.execute(sqlVerificarEntrega, [atividadeId, grupoId]);
+
+    if (entregaRows.length > 0) {
+      // Atualizar entrega existente
+      const sqlAtualizarEntrega = `
+        UPDATE Entregas 
+        SET caminho_arquivo = ?, tamanho_arquivo = ?, status = 'Entregue', data_entrega = CURRENT_TIMESTAMP
+        WHERE atividade_id = ? AND grupo_id = ?
+      `;
+      //update funcional
+      
+      await connection.execute(sqlAtualizarEntrega, [caminhoArquivo, tamanhoArquivo, atividadeId, grupoId]);
+    } else {
+      // Criar nova entrega
+      const sqlNovaEntrega = `
+        INSERT INTO Entregas (atividade_id, grupo_id, aluno_id, caminho_arquivo, tamanho_arquivo, status)
+        VALUES (?, ?, ?, ?, ?, 'Entregue')
+      `;
+      //insert funcional
+      
+      await connection.execute(sqlNovaEntrega, [atividadeId, grupoId, alunoId, caminhoArquivo, tamanhoArquivo]);
+    }
+
+    return res.json({ success: true, message: 'Entrega realizada com sucesso.' });
+
+  } catch (err) {
+    console.error('Erro ao realizar entrega:', err);
+    return res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+/**
+ * GET /aluno/entregas/:semestreId
+ * Lista todas as entregas do aluno no semestre
+ */
+router.get('/entregas/:semestreId', async (req, res) => {
+  const semestreId = parseInt(req.params.semestreId);
+  const alunoId = req.user?.id;
+
+  if (!alunoId || isNaN(semestreId)) {
+    return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const sqlEntregas = `
+      SELECT 
+        e.id AS entrega_id,
+        e.status AS entrega_status,
+        e.data_entrega AS entrega_data,
+        e.caminho_arquivo AS entrega_arquivo,
+        a.id AS atividade_id,
+        a.titulo AS atividade_titulo,
+        a.prazo_entrega AS atividade_prazo,
+        g.nome AS grupo_nome,
+        d.nome AS disciplina_nome,
+        av.nota AS avaliacao_nota,
+        av.comentario AS avaliacao_comentario,
+        av.data_avaliacao AS avaliacao_data
+      FROM Entregas e
+      INNER JOIN Atividades a ON e.atividade_id = a.id
+      INNER JOIN Grupos g ON e.grupo_id = g.id
+      INNER JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      LEFT JOIN Disciplinas d ON a.disciplina_id = d.id
+      LEFT JOIN Avaliacoes av ON e.id = av.entrega_id
+      WHERE ug.usuario_id = ? AND a.semestre_id = ?
+      ORDER BY e.data_entrega DESC
+    `;
+    //select funcional
+
+    const [rows] = await connection.execute(sqlEntregas, [alunoId, semestreId]);
+    return res.json({ success: true, entregas: rows });
+
+  } catch (err) {
+    console.error('Erro ao buscar entregas do aluno:', err);
+    return res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
 
 module.exports = router;

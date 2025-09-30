@@ -1,8 +1,6 @@
-// routes/coordenadorRelatorios.js
-
 const express = require('express');
 const router = express.Router();
-const { getConnection, oracledb } = require('../connectOracle.js');
+const { getConnection } = require('../conexaoMysql.js');
 const ExcelJS = require('exceljs');
 
 /**
@@ -18,29 +16,20 @@ router.get('/grupos/:semestre', async (req, res) => {
 
     const sqlListarGrupos = `
       SELECT
-        g.id                AS grupo_id,
-        g.nome              AS grupo_nome,
-        LISTAGG(u.nome, ', ') WITHIN GROUP (ORDER BY u.nome) AS nomes_membros
-      FROM
-        Grupos g
-        JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
-        JOIN Usuarios u ON ug.usuario_id = u.id
-      WHERE
-        g.semestre = :semestre_param
-      GROUP BY
-        g.id,
-        g.nome
-      ORDER BY
-        g.nome
+        g.id AS grupo_id,
+        g.nome AS grupo_nome,
+        GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS nomes_membros
+      FROM Grupos g
+      JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      JOIN Usuarios u ON ug.usuario_id = u.id
+      WHERE g.semestre = ?
+      GROUP BY g.id, g.nome
+      ORDER BY g.nome
     `;
 
-    const result = await connection.execute(
-      sqlListarGrupos,
-      { semestre_param: semestreEscolhido },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    const [rows] = await connection.execute(sqlListarGrupos, [semestreEscolhido]);
+    return res.json({ success: true, grupos: rows });
 
-    return res.json({ success: true, grupos: result.rows });
   } catch (err) {
     console.error('Erro ao buscar grupos do semestre:', err.stack || err);
     return res.status(500).json({ success: false, message: 'Erro ao buscar grupos.' });
@@ -179,104 +168,73 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         nome AS grupo_nome,
         semestre AS grupo_semestre,
         descricao AS grupo_descricao
-      FROM
-        Grupos
-      WHERE id = :gid
-        AND semestre = :semParam
+      FROM Grupos
+      WHERE id = ? AND semestre = ?
     `;
-    const resultGrupo = await connection.execute(
-      sqlGrupo,
-      { gid: grupoId, semParam: semestreParam },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-    if (resultGrupo.rows.length === 0) {
+    const [resultGrupo] = await connection.execute(sqlGrupo, [grupoId, semestreParam]);
+    
+    if (resultGrupo.length === 0) {
       return res.status(404).json({ success: false, message: 'Grupo não encontrado.' });
     }
-    const grupo = resultGrupo.rows[0];
+    const grupo = resultGrupo[0];
 
     // 2) Buscar dados do PROJETO vinculado a esse grupo/semestre
     const sqlProjeto = `
       SELECT
-        p.id               AS projeto_id,
-        p.titulo           AS projeto_titulo,
-        p.descricao        AS projeto_descricao,
-        p.status           AS projeto_status,
-        uorient.nome       AS projeto_orientador,
-        p.data_criacao     AS projeto_data_criacao,
+        p.id AS projeto_id,
+        p.titulo AS projeto_titulo,
+        p.descricao AS projeto_descricao,
+        p.status AS projeto_status,
+        uorient.nome AS projeto_orientador,
+        p.data_criacao AS projeto_data_criacao,
         p.data_atualizacao AS projeto_data_atualizacao
-      FROM
-        Projetos p
-        JOIN Usuarios uorient ON p.orientador_id = uorient.id
-      WHERE
-        p.grupo_id = :gid
-        AND p.semestre = :semParam
+      FROM Projetos p
+      JOIN Usuarios uorient ON p.orientador_id = uorient.id
+      WHERE p.grupo_id = ? AND p.semestre = ?
     `;
-    const resultProjeto = await connection.execute(
-      sqlProjeto,
-      { gid: grupoId, semParam: semestreParam },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-    const projeto = (resultProjeto.rows.length > 0) ? resultProjeto.rows[0] : null;
+    const [resultProjeto] = await connection.execute(sqlProjeto, [grupoId, semestreParam]);
+    const projeto = (resultProjeto.length > 0) ? resultProjeto[0] : null;
 
     // 3) Buscar lista de MEMBROS (detalhado)
     const sqlMembros = `
       SELECT
-        u.nome           AS membro_nome,
-        u.email          AS membro_email,
-        ug.papel         AS membro_papel,
-        u.semestre       AS membro_semestre,
-        ug.data_entrada  AS membro_data_entrada
-      FROM
-        Usuario_Grupo ug
-        JOIN Usuarios u ON ug.usuario_id = u.id
-      WHERE
-        ug.grupo_id = :gid
-      ORDER BY
-        u.nome
+        u.nome AS membro_nome,
+        u.email AS membro_email,
+        ug.papel AS membro_papel,
+        u.semestre AS membro_semestre,
+        ug.data_entrada AS membro_data_entrada
+      FROM Usuario_Grupo ug
+      JOIN Usuarios u ON ug.usuario_id = u.id
+      WHERE ug.grupo_id = ?
+      ORDER BY u.nome
     `;
-    const resultMembros = await connection.execute(
-      sqlMembros,
-      { gid: grupoId },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-    const membros = resultMembros.rows;
+    const [resultMembros] = await connection.execute(sqlMembros, [grupoId]);
+    const membros = resultMembros;
 
     // 4) Buscar "desempenho em atividades" (entregas/avaliações) deste grupo
     const sqlAtividades = `
       SELECT
-        a.id                     AS atividade_id,
-        a.titulo                 AS atividade_titulo,
-        upr.nome                 AS professor_titular,
-        a.prazo_entrega          AS atividade_prazo,
-        e.status                 AS entrega_status,
-        e.data_entrega           AS entrega_data,
-        av.nota                  AS avaliacao_nota,
-        av.comentario            AS avaliacao_comentario
-      FROM
-        Atividades a
-        LEFT JOIN Entregas e
-          ON a.id = e.atividade_id
-          AND e.grupo_id = :gid
-        LEFT JOIN Avaliacoes av
-          ON e.id = av.entrega_id
-        LEFT JOIN Usuarios upr
-          ON a.professor_id = upr.id
-      WHERE
-        a.grupo_id = :gid
-      ORDER BY
-        a.titulo,
-        e.data_entrega DESC
+        a.id AS atividade_id,
+        a.titulo AS atividade_titulo,
+        upr.nome AS professor_titular,
+        a.prazo_entrega AS atividade_prazo,
+        e.status AS entrega_status,
+        e.data_entrega AS entrega_data,
+        av.nota AS avaliacao_nota,
+        av.comentario AS avaliacao_comentario
+      FROM Atividades a
+      LEFT JOIN Entregas e ON a.id = e.atividade_id AND e.grupo_id = ?
+      LEFT JOIN Avaliacoes av ON e.id = av.entrega_id
+      LEFT JOIN Usuarios upr ON a.professor_id = upr.id
+      WHERE a.grupo_id = ?
+      ORDER BY a.titulo, e.data_entrega DESC
     `;
-    const resultAtividades = await connection.execute(
-      sqlAtividades,
-      { gid: grupoId },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-    const atividades = resultAtividades.rows;
+    const [resultAtividades] = await connection.execute(sqlAtividades, [grupoId, grupoId]);
+    const atividades = resultAtividades;
 
     // 5) Criar arquivo Excel com formatação melhorada
     const workbook = new ExcelJS.Workbook();
-    const safeGrupoNome = grupo.GRUPO_NOME.replace(/[^a-zA-Z0-9]/g, '_');
+    const safeGrupoNome = grupo.grupo_nome.replace(/[^a-zA-Z0-9]/g, '_');
     const worksheetName = `Relatorio_${safeGrupoNome}`;
     const sheet = workbook.addWorksheet(worksheetName);
 
@@ -295,7 +253,7 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     // === TÍTULO PRINCIPAL ===
     sheet.mergeCells(`A${currentRow}:G${currentRow}`);
     const titleCell = sheet.getCell(`A${currentRow}`);
-    titleCell.value = `RELATÓRIO ACADÊMICO - ${grupo.GRUPO_NOME}`;
+    titleCell.value = `RELATÓRIO ACADÊMICO - ${grupo.grupo_nome}`;
     Object.assign(titleCell, styles.titleStyle);
     sheet.getRow(currentRow).height = 30;
     currentRow += 2;
@@ -310,9 +268,9 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
 
     // Dados do grupo
     const grupoData = [
-      ['Nome do Grupo', grupo.GRUPO_NOME],
-      ['Semestre', grupo.GRUPO_SEMESTRE],
-      ['Descrição', grupo.GRUPO_DESCRICAO || 'Não informado'],
+      ['Nome do Grupo', grupo.grupo_nome],
+      ['Semestre', grupo.grupo_semestre],
+      ['Descrição', grupo.grupo_descricao || 'Não informado'],
       ['Relatório gerado em', formatDate(new Date())]
     ];
 
@@ -343,12 +301,12 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
 
     // Dados do projeto
     const projetoData = [
-      ['Título do Projeto', projeto?.PROJETO_TITULO || 'Não atribuído'],
-      ['Descrição', projeto?.PROJETO_DESCRICAO || 'Não informado'],
-      ['Status', projeto?.PROJETO_STATUS || 'Não informado'],
-      ['Professor Orientador', projeto?.PROJETO_ORIENTADOR || 'Não atribuído'],
-      ['Data de Criação', projeto?.PROJETO_DATA_CRIACAO ? formatDate(projeto.PROJETO_DATA_CRIACAO) : 'Não informado'],
-      ['Última Atualização', projeto?.PROJETO_DATA_ATUALIZACAO ? formatDate(projeto.PROJETO_DATA_ATUALIZACAO) : 'Não informado']
+      ['Título do Projeto', projeto?.projeto_titulo || 'Não atribuído'],
+      ['Descrição', projeto?.projeto_descricao || 'Não informado'],
+      ['Status', projeto?.projeto_status || 'Não informado'],
+      ['Professor Orientador', projeto?.projeto_orientador || 'Não atribuído'],
+      ['Data de Criação', projeto?.projeto_data_criacao ? formatDate(projeto.projeto_data_criacao) : 'Não informado'],
+      ['Última Atualização', projeto?.projeto_data_atualizacao ? formatDate(projeto.projeto_data_atualizacao) : 'Não informado']
     ];
 
     projetoData.forEach(([label, value]) => {
@@ -394,11 +352,11 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
       const rowStyle = isAlternate ? styles.tableRowAlternateStyle : styles.tableRowStyle;
 
       const memberData = [
-        membro.MEMBRO_NOME,
-        membro.MEMBRO_EMAIL,
-        membro.MEMBRO_PAPEL,
-        membro.MEMBRO_SEMESTRE,
-        membro.MEMBRO_DATA_ENTRADA ? formatDate(membro.MEMBRO_DATA_ENTRADA) : 'Não informado'
+        membro.membro_nome,
+        membro.membro_email,
+        membro.membro_papel,
+        membro.membro_semestre,
+        membro.membro_data_entrada ? formatDate(membro.membro_data_entrada) : 'Não informado'
       ];
 
       membrosColumns.forEach((col, idx) => {
@@ -449,13 +407,13 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         const rowStyle = isAlternate ? styles.tableRowAlternateStyle : styles.tableRowStyle;
 
         const atividadeData = [
-          atividade.ATIVIDADE_TITULO,
-          atividade.PROFESSOR_TITULAR || 'Não informado',
-          atividade.ATIVIDADE_PRAZO ? formatDate(atividade.ATIVIDADE_PRAZO) : 'Não definido',
-          atividade.ENTREGA_STATUS || 'Não entregue',
-          atividade.ENTREGA_DATA ? formatDate(atividade.ENTREGA_DATA) : '—',
-          atividade.AVALIACAO_NOTA != null ? atividade.AVALIACAO_NOTA : '—',
-          atividade.AVALIACAO_COMENTARIO || '—'
+          atividade.atividade_titulo,
+          atividade.professor_titular || 'Não informado',
+          atividade.atividade_prazo ? formatDate(atividade.atividade_prazo) : 'Não definido',
+          atividade.entrega_status || 'Não entregue',
+          atividade.entrega_data ? formatDate(atividade.entrega_data) : '—',
+          atividade.avaliacao_nota != null ? atividade.avaliacao_nota : '—',
+          atividade.avaliacao_comentario || '—'
         ];
 
         atividadesColumns.forEach((col, idx) => {
@@ -464,8 +422,8 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
           Object.assign(cell, rowStyle);
           
           // Formatação especial para nota
-          if (idx === 5 && atividade.AVALIACAO_NOTA != null) {
-            const nota = Number(atividade.AVALIACAO_NOTA);
+          if (idx === 5 && atividade.avaliacao_nota != null) {
+            const nota = Number(atividade.avaliacao_nota);
             if (nota >= 7) {
               cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD5E8D4' } };
             } else if (nota >= 5) {
@@ -492,7 +450,7 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     });
 
     // 6) Enviar o arquivo Excel
-    const fileName = `Relatorio_${safeGrupoNome}_${grupo.GRUPO_SEMESTRE}.xlsx`;
+    const fileName = `Relatorio_${safeGrupoNome}_${grupo.grupo_semestre}.xlsx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
@@ -509,291 +467,281 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
   }
 });
 
-
 router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
-    const semestreParam = String(req.params.semestre || '').trim();
-    if (!semestreParam) {
-      return res.status(400).json({ success: false, message: 'Semestre não informado.' });
-    }
-  
-    let connection;
-    try {
-      connection = await getConnection();
-  
-      // 1) Buscar todos os grupos do semestre com lista de membros
-      const sqlConsolidado = `
-        SELECT
-          g.nome                     AS grupo_nome,
-          u.nome                     AS membro_nome,
-          u.email                    AS membro_email,
-          COUNT(*) OVER (PARTITION BY g.id) AS total_membros
-        FROM
-          Grupos g
-          JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
-          JOIN Usuarios u ON ug.usuario_id = u.id
-        WHERE
-          g.semestre = :semParam
-        ORDER BY
-          g.nome,
-          u.nome
-      `;
-      
-      const result = await connection.execute(
-        sqlConsolidado,
-        { semParam: semestreParam },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-      const rows = result.rows;
-  
-      // 2) Criar o workbook estilizado
-      const workbook = new ExcelJS.Workbook();
-      const safeNomePlanilha = `Grupos_${semestreParam.replace(/[^a-zA-Z0-9]/g, '_')}`;
-      const sheet = workbook.addWorksheet(safeNomePlanilha);
-  
-      // === CONFIGURAÇÕES DE ESTILO ===
-      
-      // Cores personalizadas
-      const cores = {
-        azulPrimario: 'FF1F4E79',    // Azul escuro profissional
-        azulSecundario: 'FF4472C4',  // Azul médio
-        cinzaClaro: 'FFF2F2F2',      // Cinza claro para alternância
-        cinzaMedio: 'FFD9D9D9',      // Cinza médio para bordas
-        branco: 'FFFFFFFF',          // Branco
-        verde: 'FF70AD47'            // Verde para destaque
-      };
-  
-      // Configurar larguras das colunas
-      sheet.getColumn('A').width = 35; // Nome do Grupo/Membro
-      sheet.getColumn('B').width = 40; // Email (se incluído)
-      sheet.getColumn('C').width = 15; // Total de Membros
-  
-      // === CABEÇALHO PRINCIPAL ===
-      
-      // Título principal (linha 1-2)
-      sheet.mergeCells('A1:C2');
-      const tituloCell = sheet.getCell('A1');
-      tituloCell.value = `RELATÓRIO GERAL DE GRUPOS\nSemestre ${semestreParam}`;
-      tituloCell.font = { 
-        bold: true, 
-        size: 18, 
-        color: { argb: 'FFFFFFFF' },
-        name: 'Calibri'
-      };
-      tituloCell.alignment = { 
-        horizontal: 'center', 
-        vertical: 'middle',
-        wrapText: true
-      };
-      tituloCell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: cores.azulPrimario }
-      };
-      tituloCell.border = {
-        top: { style: 'thick', color: { argb: cores.azulPrimario } },
-        left: { style: 'thick', color: { argb: cores.azulPrimario } },
-        bottom: { style: 'thick', color: { argb: cores.azulPrimario } },
-        right: { style: 'thick', color: { argb: cores.azulPrimario } }
-      };
-  
-      // Data de geração (linha 3)
-      sheet.mergeCells('A3:C3');
-      const dataCell = sheet.getCell('A3');
-      dataCell.value = `Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`;
-      dataCell.font = { 
+  const semestreParam = String(req.params.semestre || '').trim();
+  if (!semestreParam) {
+    return res.status(400).json({ success: false, message: 'Semestre não informado.' });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+
+    // 1) Buscar todos os grupos do semestre com lista de membros
+    const sqlConsolidado = `
+      SELECT
+        g.nome AS grupo_nome,
+        u.nome AS membro_nome,
+        u.email AS membro_email,
+        COUNT(*) OVER (PARTITION BY g.id) AS total_membros
+      FROM Grupos g
+      JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      JOIN Usuarios u ON ug.usuario_id = u.id
+      WHERE g.semestre = ?
+      ORDER BY g.nome, u.nome
+    `;
+    
+    const [rows] = await connection.execute(sqlConsolidado, [semestreParam]);
+
+    // 2) Criar o workbook estilizado
+    const workbook = new ExcelJS.Workbook();
+    const safeNomePlanilha = `Grupos_${semestreParam.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const sheet = workbook.addWorksheet(safeNomePlanilha);
+
+    // === CONFIGURAÇÕES DE ESTILO ===
+    
+    // Cores personalizadas
+    const cores = {
+      azulPrimario: 'FF1F4E79',    // Azul escuro profissional
+      azulSecundario: 'FF4472C4',  // Azul médio
+      cinzaClaro: 'FFF2F2F2',      // Cinza claro para alternância
+      cinzaMedio: 'FFD9D9D9',      // Cinza médio para bordas
+      branco: 'FFFFFFFF',          // Branco
+      verde: 'FF70AD47'            // Verde para destaque
+    };
+
+    // Configurar larguras das colunas
+    sheet.getColumn('A').width = 35; // Nome do Grupo/Membro
+    sheet.getColumn('B').width = 40; // Email (se incluído)
+    sheet.getColumn('C').width = 15; // Total de Membros
+
+    // === CABEÇALHO PRINCIPAL ===
+    
+    // Título principal (linha 1-2)
+    sheet.mergeCells('A1:C2');
+    const tituloCell = sheet.getCell('A1');
+    tituloCell.value = `RELATÓRIO GERAL DE GRUPOS\nSemestre ${semestreParam}`;
+    tituloCell.font = { 
+      bold: true, 
+      size: 18, 
+      color: { argb: 'FFFFFFFF' },
+      name: 'Calibri'
+    };
+    tituloCell.alignment = { 
+      horizontal: 'center', 
+      vertical: 'middle',
+      wrapText: true
+    };
+    tituloCell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: cores.azulPrimario }
+    };
+    tituloCell.border = {
+      top: { style: 'thick', color: { argb: cores.azulPrimario } },
+      left: { style: 'thick', color: { argb: cores.azulPrimario } },
+      bottom: { style: 'thick', color: { argb: cores.azulPrimario } },
+      right: { style: 'thick', color: { argb: cores.azulPrimario } }
+    };
+
+    // Data de geração (linha 3)
+    sheet.mergeCells('A3:C3');
+    const dataCell = sheet.getCell('A3');
+    dataCell.value = `Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`;
+    dataCell.font = { 
+      italic: true, 
+      size: 10, 
+      color: { argb: 'FF666666' }
+    };
+    dataCell.alignment = { horizontal: 'center' };
+
+    // Linha em branco para espaçamento
+    let linhaAtual = 5;
+
+    // === CONTEÚDO DOS GRUPOS ===
+    
+    if (rows.length === 0) {
+      // Nenhum grupo encontrado
+      const semGruposCell = sheet.getCell(`A${linhaAtual}`);
+      semGruposCell.value = 'Nenhum grupo encontrado para este semestre.';
+      semGruposCell.font = { 
         italic: true, 
-        size: 10, 
+        size: 12, 
         color: { argb: 'FF666666' }
       };
-      dataCell.alignment = { horizontal: 'center' };
-  
-      // Linha em branco para espaçamento
-      let linhaAtual = 5;
-  
-      // === CONTEÚDO DOS GRUPOS ===
-      
-      if (rows.length === 0) {
-        // Nenhum grupo encontrado
-        const semGruposCell = sheet.getCell(`A${linhaAtual}`);
-        semGruposCell.value = 'Nenhum grupo encontrado para este semestre.';
-        semGruposCell.font = { 
-          italic: true, 
-          size: 12, 
-          color: { argb: 'FF666666' }
-        };
-        semGruposCell.alignment = { horizontal: 'center' };
-        sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
-      } else {
-        // Processar grupos e membros
-        let grupoAtual = null;
-        let contadorGrupo = 0;
-        let totalGrupos = new Set(rows.map(r => r.GRUPO_NOME)).size;
-  
-        // Adicionar cabeçalho de resumo
-        const resumoCell = sheet.getCell(`A${linhaAtual}`);
-        resumoCell.value = `📊 RESUMO: ${totalGrupos} grupo(s) encontrado(s)`;
-        resumoCell.font = { 
-          bold: true, 
-          size: 12, 
-          color: { argb: cores.verde }
-        };
-        sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
-        linhaAtual += 2;
-  
-        rows.forEach((row, index) => {
-          if (row.GRUPO_NOME !== grupoAtual) {
-            // Novo grupo encontrado
-            grupoAtual = row.GRUPO_NOME;
-            contadorGrupo++;
-  
-            // Aplicar espaçamento entre grupos (exceto no primeiro)
-            if (contadorGrupo > 1) {
-              linhaAtual++;
-            }
-  
-            // === CABEÇALHO DO GRUPO ===
-            sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
-            const grupoCell = sheet.getCell(`A${linhaAtual}`);
-            grupoCell.value = `🏆 ${grupoAtual}`;
-            grupoCell.font = { 
-              bold: true, 
-              size: 14, 
-              color: { argb: 'FFFFFFFF' }
-            };
-            grupoCell.alignment = { 
-              horizontal: 'left', 
-              vertical: 'middle',
-              indent: 1
-            };
-            grupoCell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: cores.azulSecundario }
-            };
-            
-            // Aplicar bordas ao cabeçalho do grupo
-            ['A', 'B', 'C'].forEach(col => {
-              const cell = sheet.getCell(`${col}${linhaAtual}`);
-              cell.border = {
-                top: { style: 'medium', color: { argb: cores.azulSecundario } },
-                bottom: { style: 'medium', color: { argb: cores.azulSecundario } },
-                left: { style: 'medium', color: { argb: cores.azulSecundario } },
-                right: { style: 'medium', color: { argb: cores.azulSecundario } }
-              };
-            });
-  
-            linhaAtual++;
-  
-            // Subcabeçalho com total de membros
-            sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
-            const totalCell = sheet.getCell(`A${linhaAtual}`);
-            totalCell.value = `👥 Total de membros: ${row.TOTAL_MEMBROS}`;
-            totalCell.font = { 
-              size: 10, 
-              italic: true,
-              color: { argb: 'FF666666' }
-            };
-            totalCell.alignment = { indent: 2 };
-            totalCell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: cores.cinzaClaro }
-            };
-  
+      semGruposCell.alignment = { horizontal: 'center' };
+      sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
+    } else {
+      // Processar grupos e membros
+      let grupoAtual = null;
+      let contadorGrupo = 0;
+      let totalGrupos = new Set(rows.map(r => r.grupo_nome)).size;
+
+      // Adicionar cabeçalho de resumo
+      const resumoCell = sheet.getCell(`A${linhaAtual}`);
+      resumoCell.value = `📊 RESUMO: ${totalGrupos} grupo(s) encontrado(s)`;
+      resumoCell.font = { 
+        bold: true, 
+        size: 12, 
+        color: { argb: cores.verde }
+      };
+      sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
+      linhaAtual += 2;
+
+      rows.forEach((row, index) => {
+        if (row.grupo_nome !== grupoAtual) {
+          // Novo grupo encontrado
+          grupoAtual = row.grupo_nome;
+          contadorGrupo++;
+
+          // Aplicar espaçamento entre grupos (exceto no primeiro)
+          if (contadorGrupo > 1) {
             linhaAtual++;
           }
-  
-          // === LINHA DO MEMBRO ===
-          const membroCell = sheet.getCell(`A${linhaAtual}`);
-          const emailCell = sheet.getCell(`B${linhaAtual}`);
+
+          // === CABEÇALHO DO GRUPO ===
+          sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
+          const grupoCell = sheet.getCell(`A${linhaAtual}`);
+          grupoCell.value = `🏆 ${grupoAtual}`;
+          grupoCell.font = { 
+            bold: true, 
+            size: 14, 
+            color: { argb: 'FFFFFFFF' }
+          };
+          grupoCell.alignment = { 
+            horizontal: 'left', 
+            vertical: 'middle',
+            indent: 1
+          };
+          grupoCell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: cores.azulSecundario }
+          };
           
-          membroCell.value = `• ${row.MEMBRO_NOME}`;
-          membroCell.font = { size: 11 };
-          membroCell.alignment = { indent: 3 };
-          
-          if (row.MEMBRO_EMAIL) {
-            emailCell.value = row.MEMBRO_EMAIL;
-            emailCell.font = { size: 10, color: { argb: 'FF666666' } };
-          }
-  
-          // Alternância de cores nas linhas dos membros
-          const linhaMembro = linhaAtual;
-          const corFundo = (linhaMembro % 2 === 0) ? cores.branco : cores.cinzaClaro;
-          
+          // Aplicar bordas ao cabeçalho do grupo
           ['A', 'B', 'C'].forEach(col => {
-            const cell = sheet.getCell(`${col}${linhaMembro}`);
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: corFundo }
-            };
+            const cell = sheet.getCell(`${col}${linhaAtual}`);
             cell.border = {
-              left: { style: 'thin', color: { argb: cores.cinzaMedio } },
-              right: { style: 'thin', color: { argb: cores.cinzaMedio } },
-              bottom: { style: 'hair', color: { argb: cores.cinzaMedio } }
+              top: { style: 'medium', color: { argb: cores.azulSecundario } },
+              bottom: { style: 'medium', color: { argb: cores.azulSecundario } },
+              left: { style: 'medium', color: { argb: cores.azulSecundario } },
+              right: { style: 'medium', color: { argb: cores.azulSecundario } }
             };
           });
-  
+
           linhaAtual++;
+
+          // Subcabeçalho com total de membros
+          sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
+          const totalCell = sheet.getCell(`A${linhaAtual}`);
+          totalCell.value = `👥 Total de membros: ${row.total_membros}`;
+          totalCell.font = { 
+            size: 10, 
+            italic: true,
+            color: { argb: 'FF666666' }
+          };
+          totalCell.alignment = { indent: 2 };
+          totalCell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: cores.cinzaClaro }
+          };
+
+          linhaAtual++;
+        }
+
+        // === LINHA DO MEMBRO ===
+        const membroCell = sheet.getCell(`A${linhaAtual}`);
+        const emailCell = sheet.getCell(`B${linhaAtual}`);
+        
+        membroCell.value = `• ${row.membro_nome}`;
+        membroCell.font = { size: 11 };
+        membroCell.alignment = { indent: 3 };
+        
+        if (row.membro_email) {
+          emailCell.value = row.membro_email;
+          emailCell.font = { size: 10, color: { argb: 'FF666666' } };
+        }
+
+        // Alternância de cores nas linhas dos membros
+        const linhaMembro = linhaAtual;
+        const corFundo = (linhaMembro % 2 === 0) ? cores.branco : cores.cinzaClaro;
+        
+        ['A', 'B', 'C'].forEach(col => {
+          const cell = sheet.getCell(`${col}${linhaMembro}`);
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: corFundo }
+          };
+          cell.border = {
+            left: { style: 'thin', color: { argb: cores.cinzaMedio } },
+            right: { style: 'thin', color: { argb: cores.cinzaMedio } },
+            bottom: { style: 'hair', color: { argb: cores.cinzaMedio } }
+          };
         });
-      }
-  
-      // === RODAPÉ ===
-      linhaAtual += 2;
-      sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
-      const rodapeCell = sheet.getCell(`A${linhaAtual}`);
-      rodapeCell.value = `Relatório gerado automaticamente pelo sistema • ${new Date().getFullYear()}`;
-      rodapeCell.font = { 
-        size: 9, 
-        italic: true, 
-        color: { argb: 'FF999999' }
-      };
-      rodapeCell.alignment = { horizontal: 'center' };
-  
-      // === CONFIGURAÇÕES FINAIS DA PLANILHA ===
-      
-      // Congelar primeira linha
-      sheet.views = [{ state: 'frozen', ySplit: 3 }];
-      
-      // Configurações de impressão
-      sheet.pageSetup = {
-        paperSize: 9, // A4
-        orientation: 'portrait',
-        horizontalCentered: true,
-        verticalCentered: false,
-        margins: {
-          left: 0.7,
-          right: 0.7,
-          top: 0.75,
-          bottom: 0.75,
-          header: 0.3,
-          footer: 0.3
-        }
-      };
-  
-      // 3) Enviar o arquivo Excel estilizado
-      const fileName = `Relatorio_Grupos_${semestreParam}_${new Date().toISOString().split('T')[0]}.xlsx`;
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-      
-      await workbook.xlsx.write(res);
-      res.status(200).end();
-      
-    } catch (err) {
-      console.error('Erro ao gerar relatório geral de grupos:', err.stack || err);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Erro interno ao gerar relatório. Tente novamente.' 
+
+        linhaAtual++;
       });
-    } finally {
-      if (connection) {
-        try { 
-          await connection.close(); 
-        } catch (closeErr) { 
-          console.warn('Aviso: Erro ao fechar conexão:', closeErr.message);
-        }
+    }
+
+    // === RODAPÉ ===
+    linhaAtual += 2;
+    sheet.mergeCells(`A${linhaAtual}:C${linhaAtual}`);
+    const rodapeCell = sheet.getCell(`A${linhaAtual}`);
+    rodapeCell.value = `Relatório gerado automaticamente pelo sistema • ${new Date().getFullYear()}`;
+    rodapeCell.font = { 
+      size: 9, 
+      italic: true, 
+      color: { argb: 'FF999999' }
+    };
+    rodapeCell.alignment = { horizontal: 'center' };
+
+    // === CONFIGURAÇÕES FINAIS DA PLANILHA ===
+    
+    // Congelar primeira linha
+    sheet.views = [{ state: 'frozen', ySplit: 3 }];
+    
+    // Configurações de impressão
+    sheet.pageSetup = {
+      paperSize: 9, // A4
+      orientation: 'portrait',
+      horizontalCentered: true,
+      verticalCentered: false,
+      margins: {
+        left: 0.7,
+        right: 0.7,
+        top: 0.75,
+        bottom: 0.75,
+        header: 0.3,
+        footer: 0.3
+      }
+    };
+
+    // 3) Enviar o arquivo Excel estilizado
+    const fileName = `Relatorio_Grupos_${semestreParam}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    
+    await workbook.xlsx.write(res);
+    res.status(200).end();
+    
+  } catch (err) {
+    console.error('Erro ao gerar relatório geral de grupos:', err.stack || err);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Erro interno ao gerar relatório. Tente novamente.' 
+    });
+  } finally {
+    if (connection) {
+      try { 
+        await connection.close(); 
+      } catch (closeErr) { 
+        console.warn('Aviso: Erro ao fechar conexão:', closeErr.message);
       }
     }
-  });
+  }
+});
 
 module.exports = router;

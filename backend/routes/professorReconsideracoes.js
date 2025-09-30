@@ -1,41 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { getConnection, oracledb } = require('../connectOracle.js');
+const { getConnection } = require('../conexaoMysql.js');
+const nodemailer = require('nodemailer');
+const emailTemplates = require('../utils/emailTemplates.js');
+const notificationUtils = require('../utils/notificationUtils.js');
+require('dotenv').config();
 
-// GET - listar pedidos pendentes
-router.get('/api/professor/reconsideracoes', async (req, res) => {
-  const professorId = parseInt(req.query.professor_id, 10);
-  const connection = await getConnection();
-
-  try {
-    const result = await connection.execute(
-      `SELECT
-         r.id AS id,
-         r.motivo AS motivo,
-         r.avaliacao_id AS avaliacao_id,
-         TO_CHAR(r.data_solicitacao, 'YYYY-MM-DD"T"HH24:MI:SS') AS data_solicitacao,
-         a.titulo AS atividade,
-         av.nota AS nota,
-         av.comentario AS comentario,
-         u.nome AS aluno_nome
-       FROM Reconsideracoes r
-       JOIN Avaliacoes av ON r.avaliacao_id = av.id
-       JOIN Entregas e ON av.entrega_id = e.id
-       JOIN Atividades a ON e.atividade_id = a.id
-       JOIN Usuarios u ON r.aluno_id = u.id
-       WHERE r.status = 'Pendente' AND av.professor_id = :professorId`,
-      { professorId },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    res.json({ success: true, reconsideracoes: result.rows });
-  } catch (err) {
-    
-    console.error('Erro ao buscar reconsiderações:', err);
-    res.status(500).json({ success: false, message: 'Erro ao buscar reconsiderações.' });
-  } finally {
-    if (connection) await connection.close();
-  }
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_FROM,
+    pass: process.env.EMAIL_PASSWORD
+  },
+  tls: { rejectUnauthorized: false }
 });
 
 // POST - Aprovar
@@ -45,43 +24,68 @@ router.post('/api/professor/reconsideracoes/:id/aprovar', async (req, res) => {
   const connection = await getConnection();
 
   try {
+    await connection.beginTransaction();
+
     await connection.execute(
       `UPDATE Reconsideracoes
-       SET status = 'Aprovado', resposta = :resposta, data_resposta = CURRENT_TIMESTAMP
-       WHERE id = :id`,
-      { resposta, id },
-      { autoCommit: false }
+       SET status = 'Aprovado', resposta = ?, data_resposta = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [resposta, id]
     );
 
-    let notaConvertida = null;
-    if (novaNota !== undefined && novaNota !== null && novaNota !== '') {
-      const parsed = Number(novaNota);
-      if (!isNaN(parsed)) {
-        notaConvertida = parsed;
-      } else {
-        return res.status(400).json({ success: false, message: 'Nota inválida.' });
-      }
-    }
+    if (novaNota) {
+      const nota = Number(novaNota);
+      if (isNaN(nota)) return res.status(400).json({ success: false, message: 'Nota inválida.' });
 
-    if (notaConvertida !== null) {
       await connection.execute(
         `UPDATE Avaliacoes
-         SET nota = :novaNota, data_avaliacao = CURRENT_TIMESTAMP
-         WHERE id = (SELECT avaliacao_id FROM Reconsideracoes WHERE id = :id)`,
-        { novaNota: notaConvertida, id },
-        { autoCommit: false }
+           SET nota = ?, data_avaliacao = CURRENT_TIMESTAMP
+         WHERE id = (SELECT avaliacao_id FROM Reconsideracoes WHERE id = ?)`,
+        [nota, id]
       );
     }
 
+    const [dados] = await connection.execute(
+      `SELECT r.aluno_id, r.resposta, a.titulo, u.email, u.nome 
+         FROM Reconsideracoes r
+         JOIN Avaliacoes av ON r.avaliacao_id = av.id
+         JOIN Entregas e ON av.entrega_id = e.id
+         JOIN Atividades a ON e.atividade_id = a.id
+         JOIN Usuarios u ON r.aluno_id = u.id
+        WHERE r.id = ?`,
+      [id]
+    );
+
     await connection.commit();
-    res.json({ success: true, message: 'Pedido aprovado com sucesso!' });
+
+    if (dados.length > 0) {
+      const aluno = dados[0];
+
+      // Notificação interna
+      await connection.execute(
+        `CALL enviar_notificacao(?, ?, ?, ?)`,
+        [aluno.aluno_id, '📢 Pedido de reconsideração aprovado',
+          notificationUtils.reconsideracaoAprovada(aluno.titulo, resposta, novaNota),
+          'Reconsideracao_Aprovada']
+      );
+
+      // Email
+      const template = emailTemplates.reconsideracaoAprovada(aluno, aluno.titulo, resposta, novaNota);
+      await transporter.sendMail({
+        from: `SGPI <${process.env.EMAIL_FROM}>`,
+        to: aluno.email,
+        subject: template.subject,
+        html: template.html
+      });
+    }
+
+    res.json({ success: true, message: 'Pedido aprovado e notificação enviada.' });
   } catch (err) {
     await connection.rollback();
-    console.log("nota: "+novaNota+" resposta: "+resposta+" id: "+id)
     console.error('Erro ao aprovar reconsideração:', err);
     res.status(500).json({ success: false, message: 'Erro ao aprovar pedido.' });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.end();
   }
 });
 
@@ -92,22 +96,57 @@ router.post('/api/professor/reconsideracoes/:id/recusar', async (req, res) => {
   const connection = await getConnection();
 
   try {
+    await connection.beginTransaction();
+
     await connection.execute(
       `UPDATE Reconsideracoes
-       SET status = 'Negado', resposta = :resposta, data_resposta = CURRENT_TIMESTAMP
-       WHERE id = :id`,
-      { resposta, id },
-      { autoCommit: true }
+       SET status = 'Negado', resposta = ?, data_resposta = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [resposta, id]
     );
 
-    res.json({ success: true, message: 'Pedido negado com sucesso.' });
+    const [dados] = await connection.execute(
+      `SELECT r.aluno_id, r.resposta, a.titulo, u.email, u.nome 
+         FROM Reconsideracoes r
+         JOIN Avaliacoes av ON r.avaliacao_id = av.id
+         JOIN Entregas e ON av.entrega_id = e.id
+         JOIN Atividades a ON e.atividade_id = a.id
+         JOIN Usuarios u ON r.aluno_id = u.id
+        WHERE r.id = ?`,
+      [id]
+    );
+
+    await connection.commit();
+
+    if (dados.length > 0) {
+      const aluno = dados[0];
+
+      // Notificação interna
+      await connection.execute(
+        `CALL enviar_notificacao(?, ?, ?, ?)`,
+        [aluno.aluno_id, '📢 Pedido de reconsideração negado',
+          notificationUtils.reconsideracaoNegada(aluno.titulo, resposta),
+          'Reconsideracao_Negada']
+      );
+
+      // Email
+      const template = emailTemplates.reconsideracaoNegada(aluno, aluno.titulo, resposta);
+      await transporter.sendMail({
+        from: `SGPI <${process.env.EMAIL_FROM}>`,
+        to: aluno.email,
+        subject: template.subject,
+        html: template.html
+      });
+    }
+
+    res.json({ success: true, message: 'Pedido negado e notificação enviada.' });
   } catch (err) {
+    await connection.rollback();
     console.error('Erro ao negar reconsideração:', err);
     res.status(500).json({ success: false, message: 'Erro ao negar pedido.' });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.end();
   }
 });
 
 module.exports = router;
-

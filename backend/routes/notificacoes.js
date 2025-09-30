@@ -1,78 +1,59 @@
 const express = require('express');
 const router = express.Router();
-const { getConnection, oracledb } = require('../connectOracle.js');
-const path = require('path');
-const frontendPath = path.join(__dirname, '..', '..', 'frontend');
+const { getConnection } = require('../conexaoMysql.js');
 
-
-function lobToString(lob) {
-  return new Promise((resolve, reject) => {
-    if (!lob) return resolve('');
-
-    // Se já é uma string, retorna direto
-    if (typeof lob === 'string') return resolve(lob);
-
-    // Se não for um stream válido, converte como string mesmo assim
-    if (typeof lob.setEncoding !== 'function') return resolve(String(lob));
-
-    let content = '';
-    lob.setEncoding('utf8');
-    lob.on('data', chunk => content += chunk);
-    lob.on('end', () => resolve(content));
-    lob.on('error', err => reject(err));
-  });
-}
-
+// Listar notificações do usuário
 router.get('/notificacoes', async (req, res) => {
   const connection = await getConnection();
 
   try {
     const usuarioId = parseInt(req.query.usuario_id, 10);
-    if (isNaN(usuarioId)) return res.status(400).json({ message: 'ID de usuário inválido.' });
+    if (isNaN(usuarioId)) {
+      return res.status(400).json({ message: 'ID de usuário inválido.' });
+    }
 
-    const contadorQuery = await connection.execute(
-      `SELECT COUNT(*) as total FROM Notificacoes 
-       WHERE usuario_id = :usuarioId AND lida = 0`,
-      [usuarioId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    // Contador de notificações não lidas
+    const resultCount = await connection.execute(
+      `SELECT COUNT(*) as total 
+       FROM Notificacoes 
+       WHERE usuario_id = ? AND lida = 0`,
+      [usuarioId]
     );
-    
-    const totalNaoLidas = contadorQuery.rows[0].TOTAL;
+    const totalNaoLidas = resultCount.rows[0]?.total ?? 0;
 
-    const result = await connection.execute(
-      `SELECT id, titulo, mensagem, tipo, lida, 
-              TO_CHAR(data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-              TO_CHAR(data_leitura, 'YYYY-MM-DD"T"HH24:MI:SS') as data_leitura
+    // Listar últimas 20 notificações
+    const resultRows = await connection.execute(
+      `SELECT id, titulo, mensagem, tipo, lida, data_criacao, data_leitura
        FROM Notificacoes
-       WHERE usuario_id = :usuarioId
+       WHERE usuario_id = ?
        ORDER BY data_criacao DESC
-       FETCH FIRST 20 ROWS ONLY`,
-      [usuarioId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+       LIMIT 20`,
+      [usuarioId]
     );
 
-    const notificacoes = await Promise.all(result.rows.map(async row => ({
-      id: row.ID,
-      titulo: row.TITULO,
-      mensagem: await lobToString(row.MENSAGEM),
-      tipo: row.TIPO,
-      lida: row.LIDA === 1,
-      data_criacao: row.DATA_CRIACAO,
-      data_leitura: row.DATA_LEITURA
-    })));
+    const notificacoes = resultRows.rows.map(row => ({
+      id: row.id,
+      titulo: row.titulo,
+      mensagem: row.mensagem,
+      tipo: row.tipo,
+      lida: row.lida === 1,
+      data_criacao: row.data_criacao,
+      data_leitura: row.data_leitura
+    }));
 
     res.json({
       total_nao_lidas: totalNaoLidas,
-      notificacoes: notificacoes
+      notificacoes
     });
   } catch (error) {
     console.error('Erro ao buscar notificações:', error);
     res.status(500).json({ message: 'Erro ao buscar notificações', error: error.message });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.release();
   }
 });
 
+// Marcar uma notificação como lida
 router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
   const connection = await getConnection();
 
@@ -84,29 +65,27 @@ router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
       return res.status(400).json({ message: 'IDs inválidos.' });
     }
 
-    const verificacao = await connection.execute(
-      `SELECT COUNT(*) as count FROM Notificacoes 
-       WHERE id = :notificacaoId AND usuario_id = :usuarioId`,
-      [notificacaoId, usuarioId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    const verificacaoResult = await connection.execute(
+      `SELECT COUNT(*) as count 
+       FROM Notificacoes 
+       WHERE id = ? AND usuario_id = ?`,
+      [notificacaoId, usuarioId]
     );
 
-    if (verificacao.rows[0].COUNT === 0) {
+    if (verificacaoResult.rows[0].count === 0) {
       return res.status(403).json({ message: 'Notificação não encontrada ou sem permissão.' });
     }
 
-    const result = await connection.execute(
+    const updateResult = await connection.execute(
       `UPDATE Notificacoes
-       SET lida = 1, 
-           data_leitura = CURRENT_TIMESTAMP
-       WHERE id = :notificacaoId AND usuario_id = :usuarioId`,
-      [notificacaoId, usuarioId],
-      { autoCommit: true }
+       SET lida = 1, data_leitura = CURRENT_TIMESTAMP
+       WHERE id = ? AND usuario_id = ?`,
+      [notificacaoId, usuarioId]
     );
 
     res.json({
-      success: result.rowsAffected > 0,
-      message: result.rowsAffected > 0
+      success: updateResult.rowsAffected > 0,
+      message: updateResult.rowsAffected > 0
         ? 'Notificação marcada como lida.'
         : 'Não foi possível atualizar a notificação.'
     });
@@ -114,35 +93,72 @@ router.put('/notificacoes/:notificacaoId/lida', async (req, res) => {
     console.error('Erro ao marcar notificação como lida:', error);
     res.status(500).json({ message: 'Erro no servidor.', error: error.message });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.release();
   }
 });
 
+// Marcar todas as notificações como lidas
 router.put('/notificacoes/todas/lidas', async (req, res) => {
   const connection = await getConnection();
 
   try {
     const usuarioId = parseInt(req.body.usuario_id, 10);
-    if (isNaN(usuarioId)) return res.status(400).json({ message: 'ID de usuário inválido.' });
+    if (isNaN(usuarioId)) {
+      return res.status(400).json({ message: 'ID de usuário inválido.' });
+    }
 
-    const result = await connection.execute(
+    const updateResult = await connection.execute(
       `UPDATE Notificacoes
-       SET lida = 1, 
-           data_leitura = CURRENT_TIMESTAMP
-       WHERE usuario_id = :usuarioId AND lida = 0`,
-      [usuarioId],
-      { autoCommit: true }
+       SET lida = 1, data_leitura = CURRENT_TIMESTAMP
+       WHERE usuario_id = ? AND lida = 0`,
+      [usuarioId]
     );
 
     res.json({
       success: true,
-      message: `${result.rowsAffected} notificações marcadas como lidas.`
+      message: `${updateResult.rowsAffected} notificações marcadas como lidas.`
     });
   } catch (error) {
     console.error('Erro ao marcar notificações como lidas:', error);
     res.status(500).json({ message: 'Erro no servidor.', error: error.message });
   } finally {
-    if (connection) await connection.close();
+    if (connection) await connection.release();
+  }
+});
+
+// Criar notificação manualmente usando procedure
+router.post('/notificacoes', async (req, res) => {
+  const connection = await getConnection();
+
+  try {
+    const { usuario_id, titulo, mensagem, tipo } = req.body;
+
+    if (!usuario_id || !titulo || !mensagem || !tipo) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Campos obrigatórios: usuario_id, titulo, mensagem, tipo'
+      });
+    }
+
+    // Chama a procedure enviar_notificacao
+    await connection.execute(
+      `CALL enviar_notificacao(?, ?, ?, ?)`,
+      [usuario_id, titulo, mensagem, tipo]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Notificação criada e enviada com sucesso!'
+    });
+  } catch (error) {
+    console.error('Erro ao criar notificação:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Erro ao criar notificação.',
+      error: error.message
+    });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 

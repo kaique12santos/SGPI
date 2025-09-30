@@ -192,7 +192,7 @@ form.addEventListener("submit", async (event) => {
     const data = await criarAtividade(
       { titulo, descricao, semestre, prazo_entrega, criterios_avaliacao, professor_id: usuarioId },
       baseEndpoint
-    ); // já JSON
+    ); 
     if (!data.success) throw new Error(data.message);
 
     ativar("Atividade criada com sucesso!", "sucesso", "/criar-atividade");

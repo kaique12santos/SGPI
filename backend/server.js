@@ -1,20 +1,47 @@
 const express = require('express');
 const cors = require('cors');
-const { getConnection, oracledb, initOraclePool } = require('./connectOracle.js');
+const helmet = require('helmet');
+const {closePool}=require ('./conexaoMysql.js');
 const path = require('path');
 const app = express();
 const port = 3000;
-const bcrypt = require('bcrypt');
 const frontendPath = path.join(__dirname, '..', 'frontend');
 const fs = require('fs').promises; 
-const {v4: uuidv4}=require('uuid');
 
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://cdn.userway.org", "'unsafe-inline'"],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.userway.org",
+          "https://*.userway.org",
+          "https://fonts.googleapis.com"
+          
+        ],
+        connectSrc: ["'self'", "https://api.userway.org"],
+        imgSrc: ["'self'", "data:", "https://cdn.userway.org", "https://*.userway.org","https://static.vecteezy.com"],
+        fontSrc: [
+          "'self'",
+          "https://cdn.userway.org",
+          "https://*.userway.org",
+          "https://fonts.gstatic.com"
+        ],
+        frameSrc: ["'self'", "https://cdn.userway.org", "https://*.userway.org"],
+      },
+    },
+  })
+);
 
 
 // Importar as rotas
 const auth = require('./routes/auth.js')
 const redefinirSenha = require('./routes/redefinirSenha.js');
-const professor = require('./routes/professor.js')
+const palavraChaveRoutes = require('./routes/palavraChave');
+// const professor = require('./routes/professor.js')
 const professorOrientador = require('./routes/professorOrientador.js');
 const atualizarPerfil = require('./routes/atualizarPerfil.js');
 const grupos = require('./routes/grupos.js');
@@ -28,6 +55,7 @@ const notas = require('./routes/alunoNotas.js')
 const reconsideracoes = require('./routes/professorReconsideracoes.js')
 const ListaProjetos = require('./routes/CoordenadorProjetos.js')
 const coordenadorRelatorios= require('./routes/CoordenadorRelatorios.js')
+
 
 //importar as rotas de tratamento de erros
 const attachResponseHelpers = require('./middlewares/responseMiddleware.js');
@@ -55,7 +83,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usar as rotas importadas
 app.use('/',auth)
-app.use('/professor', professor);
+app.use('/professor', professorOrientador);
 app.use('/professor_orientador', professorOrientador);
 app.use('/perfil', atualizarPerfil);
 app.use('/',grupos);
@@ -70,110 +98,7 @@ app.use('/',notas);
 app.use('/',reconsideracoes);
 app.use('/coordenador',ListaProjetos);
 app.use('/coordenador',coordenadorRelatorios);
-
-
-
-
-
-//rota do login
-// app.post('/login', async (req, res, next) => {
-//     const { username, password } = req.body;
-   
-
-  
-//     try {
-//       if (!username || !password) {
-//         throw new AppError('Credenciais inválidas.', { status: 400, code: 'AUTH_INVALID_INPUT' });
-//       }
-  
-//       const connection = await getConnection();
-//       try {
-//         const result = await connection.execute(
-//           `SELECT ID, EMAIL, SENHA, TIPO FROM Usuarios WHERE UPPER(email) = UPPER(:email)`,
-//           { email: String(username) },
-//           { outFormat: oracledb.OUT_FORMAT_OBJECT }
-//         );
-  
-//         const user = result.rows[0];
-//         const genericFail = () => res.fail('AUTH_INVALID_CREDENTIALS', 'Usuário ou senha incorretos.', 401);
-  
-//         if (!user) return genericFail();
-  
-//         const passwordMatch = await bcrypt.compare(String(password), user.SENHA);
-//         if (!passwordMatch) return genericFail();
-  
-//         let roleFrontend = 'aluno';
-//         const tipo = user.TIPO?.toLowerCase();
-//         if (tipo === 'professor') roleFrontend = 'professor';
-//         else if (tipo === 'coordenador') roleFrontend = 'coordenador';
-//         else if (tipo === 'professor_orientador') roleFrontend = 'professor_orientador';
-
-//         const { gerarToken } = require('./helpers/jwt.js');
-//         const payload = { id: user.ID, userRole: roleFrontend };
-//         const token = gerarToken(payload);
-        
-  
-//         return res.ok({ ...payload,token}, 'Login realizado com sucesso.');
-//       } finally {
-//         try { await connection.close(); } catch (closeError) { console.error('Erro ao fechar a conexão:', closeError); }
-//       }
-//     } catch (err) {
-//       return next(err);
-//     }
-//   });
-
-
-
- 
-// // Rota de cadastro
-// app.post('/cadastro', async (req, res, next) => {
-//     let { nome, email, senha, semestre, tipo } = req.body;
-  
-//     try {
-//       if (!nome || !email || !senha) {
-//         throw new AppError('Nome, e-mail e senha são obrigatórios.', { status: 400, code: 'USR_MISSING_FIELDS' });
-//       }
-  
-//       tipo = tipo || 'Aluno';
-//       semestre = semestre ? parseInt(semestre, 10) : null;
-  
-//       const connection = await getConnection();
-//       try {
-//         const emailExistsResult = await connection.execute(
-//           `SELECT COUNT(1) AS CNT FROM Usuarios WHERE UPPER(email) = UPPER(:email)`,
-//           { email },
-//           { outFormat: oracledb.OUT_FORMAT_OBJECT }
-//         );
-//         const emailExists = emailExistsResult.rows[0].CNT > 0;
-  
-//         if (emailExists) {
-//           return res.fail('USR_EMAIL_EXISTS', 'Este e-mail já está cadastrado.', 409);
-//         }
-  
-//         const hashedSenha = await bcrypt.hash(String(senha), 10);
-  
-//         const result = await connection.execute(
-//           `INSERT INTO Usuarios (nome, email, senha, tipo, semestre, ativo)
-//            VALUES (:nome, :email, :senha, :tipo, :semestre, 1)`,
-//           { nome, email, senha: hashedSenha, tipo, semestre },
-//           { autoCommit: true }
-//         );
-  
-//         if (result.rowsAffected > 0) {
-//           return res.ok(null, 'Usuário cadastrado com sucesso!', 201);
-//         }
-  
-//         throw new AppError('Erro ao cadastrar usuário.', { status: 500, code: 'USR_CREATE_FAILED' });
-//       } finally {
-//         try { await connection.close(); } catch (closeError) { console.error('Erro ao fechar a conexão:', closeError); }
-//       }
-//     } catch (err) {
-//       return next(err);
-//     }
-//   });
-
-
-
+app.use('/api', palavraChaveRoutes);
 // ROTA DINÂMICA PARA SERVIR OUTRAS PÁGINAS HTML DA PASTA 'views'
 // Ex: /avaliar vai servir frontend/views/avaliar.html
 // Ex: /TelaPrincipal vai servir frontend/views/TelaPrincipal.html
@@ -235,28 +160,31 @@ app.use(async (req, res) => {
 });
 
 
+
 app.use(notFound);
 app.use(errorHandler);
 
-initOraclePool()
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Servidor rodando em http://localhost:${port}/`);
-    });
-  })
-  .catch((err) => {
-    console.error('Erro ao inicializar pool Oracle:', err);
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}/`);
+});
+
+process.on('SIGINT', async () => {
+  try {
+    await closePool();
+    console.log('Pool MySQL fechado.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Erro ao fechar pool MySQL:', err);
     process.exit(1);
-  });
-
-
-  process.on('SIGINT', async () => {
-    try {
-      await oracledb.getPool().close(10);
-      console.log('Pool Oracle fechado.');
-      process.exit(0);
-    } catch (err) {
-      console.error('Erro ao fechar pool Oracle:', err);
-      process.exit(1);
-    }
-  });
+  }
+});
+process.on('SIGTERM', async () => {
+  try {
+    await closePool();
+    console.log('Pool MySQL fechado.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Erro ao fechar pool MySQL:', err);
+    process.exit(1);
+  }
+});

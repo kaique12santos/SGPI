@@ -5,59 +5,6 @@
 class PalavraChaveService {
     constructor() {
         this.baseUrl = '/api/chaves'; // URL base para API
-        this.historico = this.carregarHistoricoLocal();
-        this.inicializarDadosTeste();
-    }
-
-    /**
-     * Inicializa dados de teste se não houver histórico
-     */
-    inicializarDadosTeste() {
-        if (this.historico.length === 0) {
-            this.historico = [
-                {
-                    id: 1,
-                    chave: 'RXF4-AS5G',
-                    tipo: 'professor',
-                    dataGeracao: new Date('2024-09-15T10:30:00'),
-                    status: 'ativo',
-                    criadoPor: 'admin'
-                },
-                {
-                    id: 2,
-                    chave: 'MNP8-QW2E',
-                    tipo: 'orientador',
-                    dataGeracao: new Date('2024-09-14T14:15:00'),
-                    status: 'usado',
-                    criadoPor: 'admin'
-                },
-                {
-                    id: 3,
-                    chave: 'ZXC9-VBN3',
-                    tipo: 'professor',
-                    dataGeracao: new Date('2024-09-13T09:45:00'),
-                    status: 'ativo',
-                    criadoPor: 'admin'
-                },
-                {
-                    id: 4,
-                    chave: 'LKJ7-HGF6',
-                    tipo: 'orientador',
-                    dataGeracao: new Date('2024-09-12T16:20:00'),
-                    status: 'usado',
-                    criadoPor: 'admin'
-                },
-                {
-                    id: 5,
-                    chave: 'POI5-UYT4',
-                    tipo: 'professor',
-                    dataGeracao: new Date('2024-09-11T11:10:00'),
-                    status: 'ativo',
-                    criadoPor: 'admin'
-                }
-            ];
-            this.salvarHistoricoLocal();
-        }
     }
 
     /**
@@ -67,7 +14,7 @@ class PalavraChaveService {
      */
     async gerarChave(tipo) {
         return new Promise((resolve) => {
-            // Simula delay de API
+            // Simula delay de geração
             setTimeout(() => {
                 const novaChave = this.gerarChaveAleatoria();
                 resolve(novaChave);
@@ -76,116 +23,93 @@ class PalavraChaveService {
     }
 
     /**
-     * Salva uma chave no sistema
+     * Salva uma chave no sistema (banco de dados)
      * @param {string} chave - Chave a ser salva
      * @param {string} tipo - Tipo da chave
      * @returns {Promise<Object>} Resultado da operação
      */
     async salvarChave(chave, tipo) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                try {
-                    // Verifica se a chave já existe
-                    const chaveExistente = this.historico.find(item => item.chave === chave);
-                    if (chaveExistente) {
-                        resolve({
-                            sucesso: false,
-                            mensagem: 'Esta chave já foi salva anteriormente!'
-                        });
-                        return;
-                    }
-
-                    // Valida formato da chave
-                    if (!this.validarFormatoChave(chave)) {
-                        resolve({
-                            sucesso: false,
-                            mensagem: 'Formato de chave inválido!'
-                        });
-                        return;
-                    }
-
-                    // Adiciona ao histórico
-                    const novoItem = {
-                        id: this.gerarProximoId(),
-                        chave: chave,
-                        tipo: tipo,
-                        dataGeracao: new Date(),
-                        status: 'ativo',
-                        criadoPor: 'usuario_atual' // Em produção, pegar do contexto
-                    };
-
-                    this.historico.unshift(novoItem); // Adiciona no início
-                    this.salvarHistoricoLocal();
-
-                    resolve({
-                        sucesso: true,
-                        mensagem: 'Chave salva com sucesso!',
-                        dados: novoItem
-                    });
-
-                } catch (error) {
-                    resolve({
-                        sucesso: false,
-                        mensagem: 'Erro interno ao salvar chave'
-                    });
-                }
-            }, 300);
-        });
+        try {
+            const usuarioId = localStorage.getItem('usuarioId'); // coordenador logado
+            const resposta = await fetch(`${this.baseUrl}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ chave, tipo, geradoPor: usuarioId })
+            });
+    
+            return await resposta.json();
+        } catch (err) {
+            return { sucesso: false, mensagem: 'Erro ao salvar chave no servidor' };
+        }
     }
 
     /**
      * Marca uma chave como usada
-     * @param {string} chave - Chave a ser marcada
+     * @param {number} chaveId - ID da chave a ser marcada
      * @returns {Promise<Object>} Resultado da operação
      */
-    async marcarChaveComoUsada(chave) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const item = this.historico.find(h => h.chave === chave);
-                
-                if (!item) {
-                    resolve({
-                        sucesso: false,
-                        mensagem: 'Chave não encontrada!'
-                    });
-                    return;
+    async marcarChaveComoUsada(chaveId) {
+        try {
+            const resposta = await fetch(`${this.baseUrl}/${chaveId}/usar`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
+            });
 
-                if (item.status === 'usado') {
-                    resolve({
-                        sucesso: false,
-                        mensagem: 'Esta chave já foi marcada como usada!'
-                    });
-                    return;
-                }
+            const data = await resposta.json();
+            
+            if (!resposta.ok) {
+                return {
+                    sucesso: false,
+                    mensagem: data.mensagem || 'Erro ao marcar chave como usada'
+                };
+            }
 
-                item.status = 'usado';
-                item.dataUso = new Date();
-                this.salvarHistoricoLocal();
-
-                resolve({
-                    sucesso: true,
-                    mensagem: 'Chave marcada como usada!',
-                    dados: item
-                });
-            }, 200);
-        });
+            return data;
+        } catch (error) {
+            console.error('Erro ao marcar chave como usada:', error);
+            return { 
+                sucesso: false, 
+                mensagem: 'Erro de conexão com o servidor' 
+            };
+        }
     }
 
     /**
-     * Obtém o histórico de chaves
+     * Obtém o histórico de chaves do banco de dados
      * @returns {Promise<Array>} Lista do histórico
      */
     async obterHistorico() {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // Ordena por data de geração (mais recente primeiro)
-                const historicoOrdenado = [...this.historico].sort((a, b) => 
-                    new Date(b.dataGeracao) - new Date(a.dataGeracao)
-                );
-                resolve(historicoOrdenado);
-            }, 100);
-        });
+        try {
+            const resposta = await fetch(`${this.baseUrl}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await resposta.json();
+    
+            if (!data.sucesso) return [];
+    
+            return data.dados.map(item => ({
+                id: item.chave_id,
+                chave: item.chave,
+                tipo: this.mapearTipoUsuario(item.tipo_usuario),
+                dataGeracao: new Date(item.data_geracao),
+                status: item.usos >= item.limite_uso ? 'usado' : 'ativo',
+                usos: item.usos,
+                limiteUso: item.limite_uso,
+                geradoPor: item.gerado_por,
+                usadoPor: item.usuario_destino_id
+            }));
+        } catch (err) {
+            return [];
+        }
     }
 
     /**
@@ -220,50 +144,21 @@ class PalavraChaveService {
      */
     validarFormatoChave(chave) {
         // Formato: XXX-XXXX ou XXXX-XXXX (8-9 caracteres total)
-        const regex = /^[A-Z0-9]{3,4}-[A-Z0-9]{4}$/;
-        return regex.test(chave) && chave.length >= 8 && chave.length <= 9;
+        const regex = /^[A-Z0-9]{3,4}-[A-Z0-9]{4,5}$/;
+        return regex.test(chave);
     }
 
     /**
-     * Gera o próximo ID sequencial
-     * @returns {number} Próximo ID
+     * Mapeia o tipo de usuário do banco para o formato do frontend
+     * @param {string} tipoUsuario - Tipo do banco ('Professor' ou 'Professor_Orientador')
+     * @returns {string} Tipo formatado ('professor' ou 'orientador')
      */
-    gerarProximoId() {
-        if (this.historico.length === 0) return 1;
-        return Math.max(...this.historico.map(item => item.id)) + 1;
-    }
-
-    /**
-     * Carrega histórico do localStorage
-     * @returns {Array} Histórico salvo
-     */
-    carregarHistoricoLocal() {
-        try {
-            const dados = localStorage.getItem('palavras_chave_historico');
-            if (dados) {
-                const historico = JSON.parse(dados);
-                // Converte strings de data de volta para objetos Date
-                return historico.map(item => ({
-                    ...item,
-                    dataGeracao: new Date(item.dataGeracao),
-                    dataUso: item.dataUso ? new Date(item.dataUso) : null
-                }));
-            }
-        } catch (error) {
-            console.error('Erro ao carregar histórico local:', error);
-        }
-        return [];
-    }
-
-    /**
-     * Salva histórico no localStorage
-     */
-    salvarHistoricoLocal() {
-        try {
-            localStorage.setItem('palavras_chave_historico', JSON.stringify(this.historico));
-        } catch (error) {
-            console.error('Erro ao salvar histórico local:', error);
-        }
+    mapearTipoUsuario(tipoUsuario) {
+        const mapeamento = {
+            'Professor': 'professor',
+            'Professor_Orientador': 'orientador'
+        };
+        return mapeamento[tipoUsuario] || 'professor';
     }
 
     /**
@@ -287,14 +182,26 @@ class PalavraChaveService {
 
     /**
      * Obtém estatísticas do histórico
+     * @param {Array} historico - Lista do histórico
      * @returns {Object} Estatísticas
      */
-    obterEstatisticas() {
-        const total = this.historico.length;
-        const ativas = this.historico.filter(item => item.status === 'ativo').length;
-        const usadas = this.historico.filter(item => item.status === 'usado').length;
-        const professores = this.historico.filter(item => item.tipo === 'professor').length;
-        const orientadores = this.historico.filter(item => item.tipo === 'orientador').length;
+    obterEstatisticas(historico) {
+        if (!historico || historico.length === 0) {
+            return {
+                total: 0,
+                ativas: 0,
+                usadas: 0,
+                professores: 0,
+                orientadores: 0,
+                percentualUso: 0
+            };
+        }
+
+        const total = historico.length;
+        const ativas = historico.filter(item => item.status === 'ativo').length;
+        const usadas = historico.filter(item => item.status === 'usado').length;
+        const professores = historico.filter(item => item.tipo === 'professor').length;
+        const orientadores = historico.filter(item => item.tipo === 'orientador').length;
 
         return {
             total,
@@ -307,36 +214,59 @@ class PalavraChaveService {
     }
 
     /**
-     * Limpa todo o histórico (apenas para desenvolvimento)
+     * Verifica se há conexão com o servidor
+     * @returns {Promise<boolean>} Se há conexão
      */
-    limparHistorico() {
-        this.historico = [];
-        this.salvarHistoricoLocal();
-        this.inicializarDadosTeste(); // Recarrega dados de teste
+    async verificarConexao() {
+        try {
+            const resposta = await fetch(`${this.baseUrl}/ping`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            return resposta.ok;
+        } catch (error) {
+            return false;
+        }
     }
 
     /**
-     * Simula chamada para API externa (para futuro)
-     * @param {string} endpoint - Endpoint da API
-     * @param {Object} dados - Dados a serem enviados
-     * @returns {Promise<Object>} Resposta da API
+     * Busca uma chave específica por valor
+     * @param {string} valorChave - Valor da chave a ser buscada
+     * @returns {Promise<Object|null>} Dados da chave ou null se não encontrada
      */
-    async chamarAPI(endpoint, dados = null) {
-        // Simulação de chamada HTTP
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                // Simula sucesso/erro baseado no endpoint
-                if (endpoint.includes('erro')) {
-                    reject(new Error('Erro simulado da API'));
-                } else {
-                    resolve({
-                        sucesso: true,
-                        dados: dados,
-                        timestamp: new Date().toISOString()
-                    });
-                }
-            }, Math.random() * 1000 + 500); // 500-1500ms de delay
-        });
+    async buscarChave(valorChave) {
+        try {
+            const historico = await this.obterHistorico();
+            return historico.find(item => item.chave === valorChave) || null;
+        } catch (error) {
+            console.error('Erro ao buscar chave:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Valida se uma chave pode ser usada
+     * @param {Object} chave - Objeto da chave
+     * @returns {boolean} Se a chave pode ser usada
+     */
+    async usarChave(chaveId) {
+        try {
+            const usuarioDestinoId = localStorage.getItem('usuarioId'); // professor logado
+            const resposta = await fetch(`${this.baseUrl}/${chaveId}/usar`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ usuarioDestinoId })
+            });
+    
+            return await resposta.json();
+        } catch (err) {
+            return { sucesso: false, mensagem: 'Erro ao consumir chave no servidor' };
+        }
     }
 }
 

@@ -1,40 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getConnection, oracledb } = require('../connectOracle.js');
-const path = require('path');
-const frontendPath = path.join(__dirname, '..', '..', 'frontend');
-
-// Utilitário para converter CLOB em string
-function lobToString(lob) {
-  return new Promise((resolve, reject) => {
-    // Se o lob é null ou undefined, retorna null
-    if (!lob) return resolve(null);
-    
-    // Se já é uma string, retorna diretamente
-    if (typeof lob === 'string') return resolve(lob);
-    
-    // Se não tem o método setEncoding, provavelmente já é uma string ou valor simples
-    if (typeof lob.setEncoding !== 'function') {
-      return resolve(String(lob));
-    }
-    
-    // Caso seja um LOB válido, processa normalmente
-    let content = '';
-    lob.setEncoding('utf8');
-    lob.on('data', chunk => content += chunk);
-    lob.on('end', () => resolve(content));
-    lob.on('error', reject);
-  });
-}
-
-
-
+const { getConnection } = require('../conexaoMysql.js');
 router.post('/grupos', async (req, res) => {
   const connection = await getConnection();
-  const { nome, descricao, semestre, alunos } = req.body;
+  const { nome, descricao, semestre_id, disciplina_id, alunos } = req.body;
 
   try {
-    if (!nome || !semestre) {
+    if (!nome || !semestre_id) {
       return res.status(400).json({ 
         success: false, 
         message: 'Nome e semestre são obrigatórios.' 
@@ -48,40 +20,29 @@ router.post('/grupos', async (req, res) => {
       });
     }
 
-    const resultGrupo = await connection.execute(
-      `INSERT INTO Grupos (nome, descricao, semestre) 
-       VALUES (:1, :2, :3) 
-       RETURNING id INTO :4`,
-      [nome, descricao, semestre, { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }],
-      { autoCommit: false }
+    await connection.beginTransaction();
+
+    // Inserir grupo
+    const [resultGrupo] = await connection.execute(
+      `INSERT INTO Grupos (nome, descricao, semestre_id, disciplina_id) 
+       VALUES (?, ?, ?, ?)`,
+      [nome, descricao, semestre_id, disciplina_id]
     );
 
-    const grupoId = resultGrupo.outBinds[0][0];
-    await connection.commit();
+    const grupoId = resultGrupo.insertId;
 
-    // Chamar procedure para adicionar alunos
-    const alunosCSV = alunos.join(','); 
-
+    // Adicionar alunos usando procedure
+    const alunosCSV = alunos.join(',');
     await connection.execute(
-      `BEGIN
-         adicionar_alunos_grupo2(:grupoId, :alunosCSV);
-       END;`,
-      {
-        grupoId: grupoId,
-        alunosCSV: alunosCSV
-      },
-      { autoCommit: true }
+      `CALL adicionar_alunos_grupo2(?, ?)`,
+      [grupoId, alunosCSV]
     );
 
+    await connection.commit();
     res.status(201).json({ success: true, message: 'Grupo criado com sucesso!' });
 
   } catch (error) {
-    try {
-      await connection.rollback();
-    } catch (rollbackError) {
-      console.error('Erro ao realizar rollback:', rollbackError);
-    }
-
+    await connection.rollback();
     console.error('Erro ao criar grupo:', error);
     res.status(500).json({ 
       success: false, 
@@ -89,38 +50,37 @@ router.post('/grupos', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) {
-      try {
-        await connection.close();
-      } catch (closeError) {
-        console.error('Erro ao fechar conexão:', closeError);
-      }
-    }
+    await connection.end();
   }
 });
 
+// Listar grupos
 router.get('/grupos', async (req, res) => {
   const connection = await getConnection();
 
   try {
-    const result = await connection.execute(
-      `SELECT id, nome, descricao, semestre, 
-              TO_CHAR(data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-              TO_CHAR(data_atualizacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_atualizacao
-       FROM Grupos
-       ORDER BY data_criacao DESC`,
-      [],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    const [rows] = await connection.execute(
+      `SELECT g.id, g.nome, g.descricao, g.semestre_id, g.disciplina_id,
+              g.data_criacao, g.data_atualizacao,
+              s.periodo as semestre_periodo,
+              d.nome as disciplina_nome
+       FROM Grupos g
+       LEFT JOIN Semestres s ON g.semestre_id = s.id
+       LEFT JOIN Disciplinas d ON g.disciplina_id = d.id
+       ORDER BY g.data_criacao DESC`
     );
 
-    const grupos = await Promise.all(result.rows.map(async row => ({
-      id: row.ID,
-      nome: row.NOME,
-      descricao: row.DESCRICAO ? await lobToString(row.DESCRICAO) : null,
-      semestre: row.SEMESTRE,
-      data_criacao: row.DATA_CRIACAO,
-      data_atualizacao: row.DATA_ATUALIZACAO
-    })));
+    const grupos = rows.map(row => ({
+      id: row.id,
+      nome: row.nome,
+      descricao: row.descricao,
+      semestre_id: row.semestre_id,
+      semestre_periodo: row.semestre_periodo,
+      disciplina_id: row.disciplina_id,
+      disciplina_nome: row.disciplina_nome,
+      data_criacao: row.data_criacao,
+      data_atualizacao: row.data_atualizacao
+    }));
 
     res.json(grupos);
 
@@ -132,10 +92,11 @@ router.get('/grupos', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
 
+// Buscar grupo por ID
 router.get('/grupos/:id', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.id, 10);
@@ -145,28 +106,32 @@ router.get('/grupos/:id', async (req, res) => {
   }
 
   try {
-    const result = await connection.execute(
-      `SELECT id, nome, descricao, semestre, 
-              TO_CHAR(data_criacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_criacao,
-              TO_CHAR(data_atualizacao, 'YYYY-MM-DD"T"HH24:MI:SS') as data_atualizacao
-       FROM Grupos
-       WHERE id = :grupoId`,
-      [grupoId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    const [rows] = await connection.execute(
+      `SELECT g.id, g.nome, g.descricao, g.semestre_id, g.disciplina_id,
+              g.data_criacao, g.data_atualizacao,
+              s.periodo as semestre_periodo,
+              d.nome as disciplina_nome
+       FROM Grupos g
+       LEFT JOIN Semestres s ON g.semestre_id = s.id
+       LEFT JOIN Disciplinas d ON g.disciplina_id = d.id
+       WHERE g.id = ?`,
+      [grupoId]
     );
 
-    if (result.rows.length === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'Grupo não encontrado' });
     }
 
-    // Converter CLOB para string
     const grupo = {
-      id: result.rows[0].ID,
-      nome: result.rows[0].NOME,
-      descricao: result.rows[0].DESCRICAO ? await lobToString(result.rows[0].DESCRICAO) : null,
-      semestre: result.rows[0].SEMESTRE,
-      data_criacao: result.rows[0].DATA_CRIACAO,
-      data_atualizacao: result.rows[0].DATA_ATUALIZACAO
+      id: rows[0].id,
+      nome: rows[0].nome,
+      descricao: rows[0].descricao,
+      semestre_id: rows[0].semestre_id,
+      semestre_periodo: rows[0].semestre_periodo,
+      disciplina_id: rows[0].disciplina_id,
+      disciplina_nome: rows[0].disciplina_nome,
+      data_criacao: rows[0].data_criacao,
+      data_atualizacao: rows[0].data_atualizacao
     };
 
     res.json(grupo);
@@ -179,7 +144,7 @@ router.get('/grupos/:id', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
 
@@ -193,22 +158,21 @@ router.get('/grupos/:id/membros', async (req, res) => {
   }
 
   try {
-    const result = await connection.execute(
-      `SELECT u.id, u.nome, u.email, ug.papel, 
-              TO_CHAR(ug.data_entrada, 'YYYY-MM-DD"T"HH24:MI:SS') as data_entrada
+    const [rows] = await connection.execute(
+      `SELECT u.id, u.nome, u.email, ug.papel, ug.data_entrada
        FROM Usuario_Grupo ug
        JOIN Usuarios u ON ug.usuario_id = u.id
-       WHERE ug.grupo_id = :grupoId`,
-      [grupoId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+       WHERE ug.grupo_id = ?
+       ORDER BY u.nome`,
+      [grupoId]
     );
 
-    const membros = result.rows.map(row => ({
-      id: row.ID,
-      nome: row.NOME,
-      email: row.EMAIL,
-      papel: row.PAPEL,
-      data_entrada: row.DATA_ENTRADA
+    const membros = rows.map(row => ({
+      id: row.id,
+      nome: row.nome,
+      email: row.email,
+      papel: row.papel,
+      data_entrada: row.data_entrada
     }));
 
     res.json(membros);
@@ -221,7 +185,7 @@ router.get('/grupos/:id/membros', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
 
@@ -229,48 +193,51 @@ router.get('/grupos/:id/membros', async (req, res) => {
 router.put('/grupos/:id', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.id, 10);
-  const { nome, descricao, semestre, alunos } = req.body;
+  const { nome, descricao, semestre_id, disciplina_id, alunos } = req.body;
 
   if (isNaN(grupoId)) {
     return res.status(400).json({ message: 'ID de grupo inválido' });
   }
 
   try {
+    await connection.beginTransaction();
+
     // Verificar se o grupo existe
-    const verificacao = await connection.execute(
-      `SELECT COUNT(*) as count FROM Grupos WHERE id = :grupoId`,
-      [grupoId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    const [verificacao] = await connection.execute(
+      `SELECT COUNT(*) as count FROM Grupos WHERE id = ?`,
+      [grupoId]
     );
 
-    if (verificacao.rows[0].COUNT === 0) {
+    if (verificacao[0].count === 0) {
       return res.status(404).json({ message: 'Grupo não encontrado.' });
     }
 
-    const result = await connection.execute(
+    // Atualizar dados do grupo
+    const [result] = await connection.execute(
       `UPDATE Grupos
-       SET nome = :nome,
-           descricao = :descricao,
-           semestre = :semestre,
+       SET nome = ?,
+           descricao = ?,
+           semestre_id = ?,
+           disciplina_id = ?,
            data_atualizacao = CURRENT_TIMESTAMP
-       WHERE id = :grupoId`,
-      [nome, descricao, semestre, grupoId]
+       WHERE id = ?`,
+      [nome, descricao, semestre_id, disciplina_id, grupoId]
     );
+
+    // Atualizar membros se fornecidos
     if (Array.isArray(alunos)) {
       // Remover todos os membros anteriores
       await connection.execute(
-        `DELETE FROM Usuario_Grupo WHERE grupo_id = :grupoId`,
+        `DELETE FROM Usuario_Grupo WHERE grupo_id = ?`,
         [grupoId]
       );
 
+      // Adicionar novos membros
       for (const alunoId of alunos) {
         await connection.execute(
           `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel)
-           VALUES (:usuarioId, :grupoId, 'Membro')`,
-          {
-            usuarioId: alunoId,
-            grupoId: grupoId
-          }
+           VALUES (?, ?, 'Membro')`,
+          [alunoId, grupoId]
         );
       }
     }
@@ -278,13 +245,14 @@ router.put('/grupos/:id', async (req, res) => {
     await connection.commit();
 
     res.json({
-      success: result.rowsAffected > 0,
-      message: result.rowsAffected > 0
+      success: result.affectedRows > 0,
+      message: result.affectedRows > 0
         ? 'Grupo atualizado com sucesso!'
         : 'Erro ao atualizar grupo.'
     });
 
   } catch (error) {
+    await connection.rollback();
     console.error('Erro ao atualizar grupo:', error);
     res.status(500).json({ 
       success: false, 
@@ -292,7 +260,7 @@ router.put('/grupos/:id', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
 
@@ -307,23 +275,22 @@ router.post('/grupos/:id/membros', async (req, res) => {
   }
 
   try {
-    const verificacao = await connection.execute(
+    // Verificar se usuário já pertence ao grupo
+    const [verificacao] = await connection.execute(
       `SELECT COUNT(*) as count 
        FROM Usuario_Grupo 
-       WHERE grupo_id = :grupoId AND usuario_id = :usuario_id`,
-      [grupoId, usuario_id],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+       WHERE grupo_id = ? AND usuario_id = ?`,
+      [grupoId, usuario_id]
     );
 
-    if (verificacao.rows[0].COUNT > 0) {
+    if (verificacao[0].count > 0) {
       return res.status(400).json({ message: 'Usuário já pertence ao grupo.' });
     }
 
-    const result = await connection.execute(
+    const [result] = await connection.execute(
       `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel)
-       VALUES (:usuario_id, :grupoId, :papel)`,
-      [usuario_id, grupoId, papel || 'Membro'],
-      { autoCommit: true }
+       VALUES (?, ?, ?)`,
+      [usuario_id, grupoId, papel || 'Membro']
     );
 
     res.status(201).json({
@@ -339,40 +306,51 @@ router.post('/grupos/:id/membros', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
-router.get('/alunos/semestre/:semestre', async (req, res) => {
+
+// Buscar alunos por semestre (sem grupo)
+router.get('/alunos/semestre/:semestre_id', async (req, res) => {
   const connection = await getConnection();
-  const semestre = req.params.semestre;
+  const semestreId = parseInt(req.params.semestre_id, 10);
+
+  if (isNaN(semestreId)) {
+    return res.status(400).json({ message: 'ID de semestre inválido' });
+  }
 
   try {
-    const result = await connection.execute(
-      `SELECT u.id, u.nome, u.email 
-      FROM Usuarios u
-      WHERE u.semestre = :semestre 
-      AND u.tipo = 'Aluno'
-      AND u.ativo = 1
-      AND NOT EXISTS (
-          SELECT 1 
-          FROM Usuario_Grupo ug 
-          WHERE ug.usuario_id = u.id
-      )
-      ORDER BY u.nome`,
-      [semestre],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    const [rows] = await connection.execute(
+      `SELECT DISTINCT u.id, u.nome, u.email 
+       FROM Usuarios u
+       JOIN Usuario_Semestre us ON u.id = us.usuario_id
+       WHERE us.semestre_id = ? 
+       AND u.tipo = 'Aluno'
+       AND u.ativo = 1
+       AND NOT EXISTS (
+           SELECT 1 
+           FROM Usuario_Grupo ug 
+           JOIN Grupos g ON ug.grupo_id = g.id
+           WHERE ug.usuario_id = u.id 
+           AND g.semestre_id = ?
+       )
+       ORDER BY u.nome`,
+      [semestreId, semestreId]
     );
 
-    res.json(result.rows);
+    res.json(rows);
   } catch (error) {
     console.error('Erro ao buscar alunos por semestre:', error);
-    res.status(500).json({ message: 'Erro ao buscar alunos.', error: error.message });
+    res.status(500).json({ 
+      message: 'Erro ao buscar alunos.', 
+      error: error.message 
+    });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
 
-
+// Remover membro do grupo
 router.delete('/grupos/:grupoId/membros/:usuarioId', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.grupoId, 10);
@@ -383,16 +361,15 @@ router.delete('/grupos/:grupoId/membros/:usuarioId', async (req, res) => {
   }
 
   try {
-    const result = await connection.execute(
+    const [result] = await connection.execute(
       `DELETE FROM Usuario_Grupo
-       WHERE grupo_id = :grupoId AND usuario_id = :usuarioId`,
-      [grupoId, usuarioId],
-      { autoCommit: true }
+       WHERE grupo_id = ? AND usuario_id = ?`,
+      [grupoId, usuarioId]
     );
 
     res.json({
-      success: result.rowsAffected > 0,
-      message: result.rowsAffected > 0
+      success: result.affectedRows > 0,
+      message: result.affectedRows > 0
         ? 'Membro removido do grupo com sucesso!'
         : 'Membro não encontrado no grupo.'
     });
@@ -405,10 +382,11 @@ router.delete('/grupos/:grupoId/membros/:usuarioId', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
 
+// Excluir grupo
 router.delete('/grupos/:id', async (req, res) => {
   const connection = await getConnection();
   const grupoId = parseInt(req.params.id, 10);
@@ -418,40 +396,42 @@ router.delete('/grupos/:id', async (req, res) => {
   }
 
   try {
-    // Verifica se há algum projeto vinculado ao grupo
-    const vinculo = await connection.execute(
-      `SELECT COUNT(*) AS total FROM projetos WHERE grupo_id = :grupoId`,
-      [grupoId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    await connection.beginTransaction();
+
+    // Verificar se há projetos vinculados ao grupo
+    const [vinculo] = await connection.execute(
+      `SELECT COUNT(*) AS total FROM Projetos WHERE grupo_id = ?`,
+      [grupoId]
     );
-  
-    if (vinculo.rows[0].TOTAL > 0) {
+
+    if (vinculo[0].total > 0) {
       return res.status(400).json({
         success: false,
         message: 'Não é possível excluir o grupo, pois ele está vinculado a um projeto.'
       });
     }
-  
-    // Remove membros do grupo
+
+    // Remover membros do grupo
     await connection.execute(
-      `DELETE FROM Usuario_Grupo WHERE grupo_id = :grupoId`,
-      [grupoId],
-      { autoCommit: false }
+      `DELETE FROM Usuario_Grupo WHERE grupo_id = ?`,
+      [grupoId]
     );
-  
-    // Remove o grupo
-    const result = await connection.execute(
-      `DELETE FROM Grupos WHERE id = :grupoId`,
-      [grupoId],
-      { autoCommit: true }
+
+    // Remover o grupo
+    const [result] = await connection.execute(
+      `DELETE FROM Grupos WHERE id = ?`,
+      [grupoId]
     );
-  
-    if (result.rowsAffected === 0) {
+
+    if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Grupo não encontrado.' });
     }
-  
+
+    await connection.commit();
     res.json({ success: true, message: 'Grupo excluído com sucesso!' });
+
   } catch (error) {
+    await connection.rollback();
     console.error('Erro ao excluir grupo:', error);
     res.status(500).json({ 
       success: false, 
@@ -459,8 +439,61 @@ router.delete('/grupos/:id', async (req, res) => {
       error: error.message 
     });
   } finally {
-    if (connection) await connection.close();
+    await connection.end();
   }
 });
+
+// Listar semestres disponíveis
+router.get('/semestres', async (req, res) => {
+  const connection = await getConnection();
+
+  try {
+    const [rows] = await connection.execute(
+      `SELECT id, periodo, ano, descricao, data_inicio, data_fim, ativo
+       FROM Semestres
+       WHERE ativo = 1
+       ORDER BY periodo`
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Erro ao buscar semestres:', error);
+    res.status(500).json({ 
+      message: 'Erro ao buscar semestres.', 
+      error: error.message 
+    });
+  } finally {
+    await connection.end();
+  }
+});
+
+// Listar disciplinas disponíveis
+router.get('/disciplinas', async (req, res) => {
+  const connection = await getConnection();
+
+  try {
+    const [rows] = await connection.execute(
+      `SELECT id, nome, codigo, descricao, ativo
+       FROM Disciplinas
+       WHERE ativo = 1
+       ORDER BY nome`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Erro ao buscar disciplinas:', error);
+    res.status(500).json({ 
+      message: 'Erro ao buscar disciplinas.', 
+      error: error.message 
+    });
+  } finally {
+    if (connection) {
+      try { 
+        await connection.close(); 
+      } catch (closeErr) { 
+        console.warn('Aviso: Erro ao fechar conexão:', closeErr.message);
+      }
+    }
+  }
+})
 
 module.exports = router;

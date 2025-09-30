@@ -5,9 +5,13 @@ const form = document.querySelector('.signup-info');
 
 // Variável para controlar se os termos foram aceitos
 let termosAceitos = false;
+// Variáveis para controlar as etapas de validação
+let dadosUsuarioTemp = {};
+let etapaValidacao = false;
 
-// Função para processar o cadastro (extraída do event listener)
-async function processarCadastro() {
+// Função para processar o cadastro inicial (enviar email de validação)
+// Função para processar o cadastro inicial (enviar email de validação)
+async function processarCadastroInicial() {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
@@ -82,38 +86,47 @@ async function processarCadastro() {
         return false;
     }
 
+    // Validar se os termos foram aceitos
+    if (!termosAceitos) {
+        ativar('Você deve aceitar os termos de uso para continuar.', 'erro', '');
+        return false;
+    }
+
     // Se chegou até aqui, todas as validações passaram
     try {
-        // ===== DADOS COMENTADOS PARA ENVIO FUTURO =====
-        
-        // Dados básicos (já implementados)
-        const dadosBasicos = { nome, email, senha };
-        
-        // Dados adicionais para implementação futura
-        // const dadosCompletos = { 
-        //     nome, 
-        //     email, 
-        //     senha, 
-        //     perfil,
-        //     materias: perfil === 'aluno' ? materias : null,
-        //     chaveProfessor: perfil === 'professor' ? chaveProfessor : null
-        // };
+        // ===== PREPARAR DADOS COMPLETOS PARA O BACKEND =====
+        const dadosCompletos = { 
+            nome, 
+            email, 
+            senha,
+            tipo: perfil.charAt(0).toUpperCase() + perfil.slice(1), // 'aluno' → 'Aluno'
+            ra: perfil === 'aluno' ? (document.getElementById('ra')?.value || `RA${Date.now()}`) : null,
+            disciplinas: perfil === 'aluno' ? materias : [],
+            termos_aceitos: termosAceitos ? 1 : 0   // boolean → int para MySQL
+        };
 
-        // Por enquanto, enviando apenas dados básicos
-        const data = await cadastrarUsuario(dadosBasicos);
-        
-        // ===== IMPLEMENTAÇÃO FUTURA COM DADOS COMPLETOS =====
-        // const data = await cadastrarUsuario(dadosCompletos);
+        // ===== NOVA LÓGICA: INICIAR CADASTRO COM VALIDAÇÃO DE EMAIL =====
+        const response = await fetch('/cadastro', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dadosCompletos)
+        });
+
+        const data = await response.json();
         
         // ===== LOG PARA DEBUG (remover em produção) =====
-        console.log("=== DADOS CAPTURADOS PARA CADASTRO ===");
+        console.log("=== DADOS ENVIADOS PARA O BACKEND ===");
         console.log("Nome:", nome);
         console.log("Email:", email);
-        console.log("Perfil selecionado:", perfil);
+        console.log("Tipo:", dadosCompletos.tipo);
+        console.log("RA:", dadosCompletos.ra);
+        console.log("Termos aceitos:", dadosCompletos.termos_aceitos);
         
         if (perfil === 'aluno') {
-            console.log("Matérias selecionadas:", materias);
-            console.log("Quantidade de matérias:", materias.length);
+            console.log("Disciplinas selecionadas:", dadosCompletos.disciplinas);
+            console.log("Quantidade de disciplinas:", dadosCompletos.disciplinas.length);
         }
         
         if (perfil === 'professor') {
@@ -122,9 +135,19 @@ async function processarCadastro() {
         console.log("=====================================");
         
         if (data.success) {
-            ativar(data.message || "Cadastro realizado com sucesso!", "sucesso", "/index");
+            // Guardar dados temporariamente para possível reenvio de email
+            dadosUsuarioTemp = {
+                nome,
+                email,
+                tipo: dadosCompletos.tipo
+            };
+            
+            // Mostrar etapa de validação
+            mostrarEtapaValidacao();
+            
+            ativar(data.message || "E-mail de validação enviado! Verifique sua caixa de entrada.", "sucesso", "");
         } else {
-            ativar(data.message || "Erro ao cadastrar", "erro", "");
+            ativar(data.message || "Erro ao iniciar cadastro", "erro", "");
         }
         return true;
     } catch (error) {
@@ -134,13 +157,84 @@ async function processarCadastro() {
     }
 }
 
+// Função para mostrar a etapa de validação de email
+function mostrarEtapaValidacao() {
+    etapaValidacao = true;
+    
+    // Esconder formulário de cadastro
+    document.getElementById('formCadastro').style.display = 'none';
+    
+    // Mostrar formulário de validação
+    document.getElementById('formValidacaoEmail').style.display = 'flex';
+}
+
+// Função para validar o código/token
+async function validarCodigo() {
+    const codigo = document.getElementById('codigoValidacao').value.trim();
+    
+    if (!codigo || codigo.length < 8) {
+        ativar("Digite o código de 8 caracteres enviado ao seu e-mail.", "erro", "");
+        return;
+    }
+
+    try {
+        const response = await fetch('/validar-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ codigo })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            ativar("🎉 Cadastro concluído! Redirecionando para login...", "sucesso", "/index");
+        } else {
+            ativar(data.message || "Código inválido ou expirado", "erro", "");
+        }
+    } catch (error) {
+        console.error("Erro ao validar código:", error);
+        ativar("Erro ao conectar com o servidor.", "erro", "");
+    }
+}
+
+// Função para reenviar email de validação
+async function reenviarEmail() {
+    if (!dadosUsuarioTemp.email) {
+        ativar("Email não encontrado.", "erro", "");
+        return;
+    }
+
+    try {
+        const response = await fetch('/reenviar-validacao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: dadosUsuarioTemp.email })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            ativar("📧 Novo email de validação enviado!", "sucesso", "");
+        } else {
+            ativar(data.message || "Erro ao reenviar email", "erro", "");
+        }
+    } catch (error) {
+        console.error("Erro ao reenviar email:", error);
+        ativar("Erro ao conectar com o servidor.", "erro", "");
+    }
+}
+
 // Event listener para o submit do formulário (agora só processa se termos foram aceitos)
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
     
-    // Se os termos foram aceitos, processa o cadastro
+    // Se os termos foram aceitos, processa o cadastro inicial
     if (termosAceitos) {
-        await processarCadastro();
+        await processarCadastroInicial();
         termosAceitos = false; // Reset para próxima tentativa
     }
 });
@@ -185,6 +279,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const aceitarTermos = document.getElementById('aceitarTermos');
     const modalBody = document.getElementById('modalBody');
     const scrollIndicator = document.getElementById('scrollIndicator');
+
+    // ===== NOVOS ELEMENTOS PARA VALIDAÇÃO DE EMAIL =====
+    const btnValidarCodigo = document.getElementById('btnValidarCodigo');
+    const btnReenviarEmail = document.getElementById('btnReenviarEmail');
+
+    // Event listeners para os novos botões
+    if (btnValidarCodigo) {
+        btnValidarCodigo.addEventListener('click', validarCodigo);
+    }
+
+    if (btnReenviarEmail) {
+        btnReenviarEmail.addEventListener('click', reenviarEmail);
+    }
 
     // Abrir modal ao clicar em cadastrar
     cadastrarBtn.addEventListener('click', async function(e) {
@@ -311,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== FUNÇÃO COMENTADA PARA VALIDAÇÃO DE CHAVE NO BACKEND =====
 // async function validarChaveProfessor(chave) {
 //     try {
-//         const response = await fetch('/api/validar-chave-professor', {
+//         const response = await fetch('/validar-chave-professor', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',

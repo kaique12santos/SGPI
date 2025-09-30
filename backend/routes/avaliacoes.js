@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getConnection, oracledb } = require('../connectOracle.js');
+const { getConnection } = require('../conexaoMysql.js');
 
 router.post('/api/avaliacoes', async (req, res) => {
   const { entrega_id, professor_id, nota, comentario } = req.body;
@@ -14,9 +14,8 @@ router.post('/api/avaliacoes', async (req, res) => {
   try {
     await connection.execute(
       `INSERT INTO Avaliacoes (entrega_id, professor_id, nota, comentario)
-       VALUES (:entrega_id, :professor_id, :nota, :comentario)`,
-      { entrega_id, professor_id, nota, comentario },
-      { autoCommit: true }
+       VALUES (?, ?, ?, ?)`,
+      [entrega_id, professor_id, nota, comentario]
     );
 
     res.json({ success: true, message: 'Avaliação enviada com sucesso!' });
