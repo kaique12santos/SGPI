@@ -11,7 +11,7 @@ const emailService = new EmailValidationService();
 
 // 🚀 CADASTRO (envio do email de validação)
 router.post("/cadastro", async (req, res) => {
-  const { nome, email, senha, tipo, ra, disciplinas, termos_aceitos } = req.body;
+  const { nome, email, senha, tipo, ra, disciplinas, termos_aceitos,chaveProfessor } = req.body;
 
   try {
     if (!nome || !email || !senha || !tipo) {
@@ -26,13 +26,45 @@ router.post("/cadastro", async (req, res) => {
       return res.status(400).json({ success: false, message: "O campo termos_aceitos deve ser 0 ou 1." });
     }
 
+    if ((tipo === 'professor' || tipo === 'professor_orientador') && !chaveProfessor) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Chave de professor é obrigatória para este tipo de usuário." 
+      });
+    }
+
+    let chaveValidada = null;
+    if (chaveProfessor) {
+      // Valida a chave internamente
+      const connection = await getConnection();
+      try {
+        const chaveResult = await connection.execute(
+          `SELECT chave_id, usos, limite_uso,tipo_usuario FROM PalavrasChave 
+           WHERE chave = ? AND usos < limite_uso`,
+          [chaveProfessor]
+        );
+
+        if (!chaveResult.rows || chaveResult.rows.length === 0) {
+          return res.status(400).json({
+            success: false,
+            message: "Chave inválida ou já totalmente utilizada."
+          });
+        }
+
+        chaveValidada = chaveResult.rows[0];
+      } finally {
+        await connection.close();
+      }
+    }
+
+     //---------------------------
     const connection = await getConnection();
     try {
       const check = await connection.execute(
         "SELECT COUNT(1) AS cnt FROM Usuarios WHERE UPPER(email) = UPPER(?)",
         [email]
       );
-
+     
       if (check.rows && check.rows[0] && check.rows[0].cnt > 0) {
         return res.status(409).json({ success: false, message: "Este e-mail já está cadastrado." });
       }
@@ -45,23 +77,91 @@ router.post("/cadastro", async (req, res) => {
       nome,
       email,
       senha,
-      tipo,
+      tipo: chaveValidada ? chaveValidada.tipo_usuario : tipo,
       ra,
       disciplinas,
-      termos_aceitos
+      termos_aceitos,
+      chaveProfessor: chaveValidada ? chaveValidada.chave_id : null
     };
-
+    
+   
     const token = await emailService.sendValidationEmail(email, tokenData);
 
     return res.status(200).json({
       success: true,
       message: "Email de validação enviado. Confirme para concluir seu cadastro.",
-      previewToken: token // só para debug, remove em produção
+      
     });
+    
 
   } catch (error) {
     console.error("Erro no pré-cadastro:", error);
     res.status(500).json({ success: false, message: "Erro interno no servidor." });
+  }
+});
+
+// Adicione esta rota no seu arquivo de rotas (ex: routes/auth.js ou routes/palavraChave.js)
+router.post('/validar-chave-professor', async (req, res) => {
+  const { chaveProfessor } = req.body;
+
+  if (!chaveProfessor) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Chave do professor é obrigatória.' 
+    });
+  }
+
+  try {
+    const connection = await getConnection();
+    
+    try {
+      // Busca a chave no banco
+      const result = await connection.execute(
+        `SELECT chave_id, chave, tipo_usuario, usos, limite_uso, gerado_por
+         FROM PalavrasChave 
+         WHERE chave = ? AND usos < limite_uso`,
+        [chaveProfessor]
+      );
+
+      if (!result.rows || result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Chave inválida ou já foi totalmente utilizada.'
+        });
+      }
+
+      const chaveData = result.rows[0];
+
+      // Verifica se é do tipo correto (Professor ou Professor_Orientador)
+      if (!['Professor', 'Professor_Orientador'].includes(chaveData.tipo_usuario)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Esta chave não é válida para professores.'
+        });
+      }
+
+      // Retorna sucesso com dados da chave
+      return res.status(200).json({
+        success: true,
+        message: 'Chave válida!',
+        data: {
+          chaveId: chaveData.chave_id,
+          tipo: chaveData.tipo_usuario,
+          usosRestantes: chaveData.limite_uso - chaveData.usos,
+          geradoPor: chaveData.gerado_por
+        }
+      });
+
+    } finally {
+      await connection.close();
+    }
+
+  } catch (error) {
+    console.error('Erro ao validar chave do professor:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor ao validar chave.'
+    });
   }
 });
 
@@ -70,14 +170,16 @@ router.post("/cadastro", async (req, res) => {
 router.post('/validar-token', async (req, res) => {
   try {
     const { token, codigo } = req.body;
+    
     if (!token && !codigo) {
       return res.status(400).json({ success: false, message: 'Token ou código é obrigatório' });
     }
 
     const result = await emailService.validateToken(token || codigo);
+    console.log("DEBUG userData recebido no validateToken:", result.userData);
     if (!result.success) return res.status(400).json(result);
 
-    const { nome, email, senha, tipo, ra, disciplinas, termos_aceitos } = result.userData;
+    const { nome, email, senha, tipo, ra, disciplinas, termos_aceitos, chaveProfessor } = result.userData;
 
     const hashedPassword = await bcrypt.hash(senha, 10);
 
@@ -90,6 +192,17 @@ router.post('/validar-token', async (req, res) => {
       );
       const usuarioId = insertResult.rows.insertId;
 
+      // Consumo da chave 
+      if (result.userData.chaveProfessor) {
+        console.log("DEBUG chaveProfessor recebido no token:", result.userData.chaveProfessor);
+        await connection.execute(
+          `UPDATE PalavrasChave 
+          SET usos = usos + 1, usuario_destino_id = ?
+          WHERE chave_id = ?`,
+          [usuarioId, result.userData.chaveProfessor]
+        );
+
+      }
       if (tipo === "Aluno") {
         await connection.execute("INSERT INTO Alunos (usuario_id, RA) VALUES (?, ?)", [usuarioId, ra || `RA${usuarioId}`]);
 

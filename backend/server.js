@@ -11,26 +11,45 @@ const fs = require('fs').promises;
 app.use(
   helmet({
     contentSecurityPolicy: {
+      useDefaults: true,
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://cdn.userway.org", "'unsafe-inline'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.userway.org",
+          "https://*.userway.org"
+        ],
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
           "https://cdn.userway.org",
           "https://*.userway.org",
           "https://fonts.googleapis.com"
-          
         ],
-        connectSrc: ["'self'", "https://api.userway.org"],
-        imgSrc: ["'self'", "data:", "https://cdn.userway.org", "https://*.userway.org","https://static.vecteezy.com"],
+        connectSrc: [
+          "'self'",
+          "https://api.userway.org",
+          "https://*.userway.org"
+        ],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https://cdn.userway.org",
+          "https://*.userway.org",
+          "https://static.vecteezy.com"
+        ],
         fontSrc: [
           "'self'",
           "https://cdn.userway.org",
           "https://*.userway.org",
           "https://fonts.gstatic.com"
         ],
-        frameSrc: ["'self'", "https://cdn.userway.org", "https://*.userway.org"],
+        frameSrc: [
+          "'self'",
+          "https://cdn.userway.org",
+          "https://*.userway.org"
+        ],
       },
     },
   })
@@ -41,7 +60,6 @@ app.use(
 const auth = require('./routes/auth.js')
 const redefinirSenha = require('./routes/redefinirSenha.js');
 const palavraChaveRoutes = require('./routes/palavraChave');
-// const professor = require('./routes/professor.js')
 const professorOrientador = require('./routes/professorOrientador.js');
 const atualizarPerfil = require('./routes/atualizarPerfil.js');
 const grupos = require('./routes/grupos.js');

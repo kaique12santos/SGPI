@@ -10,7 +10,6 @@ let dadosUsuarioTemp = {};
 let etapaValidacao = false;
 
 // Função para processar o cadastro inicial (enviar email de validação)
-// Função para processar o cadastro inicial (enviar email de validação)
 async function processarCadastroInicial() {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
@@ -54,20 +53,18 @@ async function processarCadastroInicial() {
     //     return false;
     // }
 
-    // VALIDAÇÃO DA PALAVRA-CHAVE NO BACKEND (exemplo de implementação futura)
-    // if (perfil === 'professor') {
-    //     try {
-    //         const validacaoChave = await validarChaveProfessor(chaveProfessor);
-    //         if (!validacaoChave.success) {
-    //             ativar("Palavra-chave inválida. Verifique com a coordenação.", "erro", "");
-    //             return false;
-    //         }
-    //     } catch (error) {
-    //         console.error("Erro ao validar chave do professor:", error);
-    //         ativar("Erro ao validar palavra-chave. Tente novamente.", "erro", "");
-    //         return false;
-    //     }
-    // }
+    if (perfil === 'professor' && chaveProfessor) {
+        try {
+            const validacao = await validarChaveProfessor(chaveProfessor);
+            if (!validacao.success) {
+                ativar(validacao.message || "Palavra‑chave inválida!", "erro", "");
+                return false;
+            }
+        } catch {
+            ativar("Erro ao validar palavra‑chave.", "erro", "");
+            return false;
+        }
+    }
 
     // ===== FIM DAS VALIDAÇÕES COMENTADAS =====
 
@@ -102,7 +99,9 @@ async function processarCadastroInicial() {
             tipo: perfil.charAt(0).toUpperCase() + perfil.slice(1), // 'aluno' → 'Aluno'
             ra: perfil === 'aluno' ? (document.getElementById('ra')?.value || `RA${Date.now()}`) : null,
             disciplinas: perfil === 'aluno' ? materias : [],
-            termos_aceitos: termosAceitos ? 1 : 0   // boolean → int para MySQL
+            termos_aceitos: termosAceitos ? 1 : 0,   // boolean → int para MySQL
+            tipo: perfil.charAt(0).toUpperCase() + perfil.slice(1),
+            chaveProfessor: perfil === 'professor' ? chaveProfessor : null
         };
 
         // ===== NOVA LÓGICA: INICIAR CADASTRO COM VALIDAÇÃO DE EMAIL =====
@@ -415,21 +414,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ===== FUNÇÃO COMENTADA PARA VALIDAÇÃO DE CHAVE NO BACKEND =====
-// async function validarChaveProfessor(chave) {
-//     try {
-//         const response = await fetch('/validar-chave-professor', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ chaveProfessor: chave })
-//         });
-//         
-//         const data = await response.json();
-//         return data;
-//     } catch (error) {
-//         console.error('Erro ao validar chave do professor:', error);
-//         throw error;
-//     }
-// }
+
+async function validarChaveProfessor(chave) {
+    try {
+        const response = await fetch('/validar-chave-professor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ chaveProfessor: chave })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Erro ao validar chave');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Erro ao validar chave do professor:', error);
+        throw error;
+    }
+}
