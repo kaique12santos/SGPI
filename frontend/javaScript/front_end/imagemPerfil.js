@@ -7,11 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   let fotoUrl = './imagens/avatar-default.png';
   try {
     // agora usando fetchComAuth
-    const resp = await fetchComAuth(`/perfil/usuario/${userId}`);
+    const userId = localStorage.getItem('usuarioId');
+    const resp = await fetchComAuth(`/perfil/${userId}`)
     if (resp.ok) {
       const data = await resp.json();
-      const userData = data.data ?? data;
-      fotoUrl = userData.foto || fotoUrl;
+      const userData = data.usuario ?? data;
+      fotoUrl = `/perfil/${userId}/foto`;
     }
   } catch (e) {
     console.warn('Erro ao buscar imagem de perfil:', e);

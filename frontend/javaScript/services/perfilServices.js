@@ -1,7 +1,9 @@
-export async function obterPerfil(userId) {
-    return await fetchComAuth(`/perfil/usuario/${userId}`, "GET");
+export async function obterPerfil() {
+    const id = localStorage.getItem('usuarioId');
+    return await fetchComAuth(`/perfil/${id}`, { method: "GET" });
+
 }
-  
-export async function atualizarPerfilService(userId, formData) {
-    return await fetchFormDataComAuth(`/perfil/atualizar-perfil/${userId}`, formData, "PUT");
+export async function atualizarPerfilService(formData) {
+    const id = localStorage.getItem('usuarioId');
+    return await fetchFormDataComAuth(`/perfil/${id}`, formData, "PUT");
 }

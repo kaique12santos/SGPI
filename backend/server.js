@@ -57,6 +57,7 @@ app.use(
 
 
 // Importar as rotas
+const authPerfil = require('./middlewares/authPerfil.js');
 const auth = require('./routes/auth.js')
 const redefinirSenha = require('./routes/redefinirSenha.js');
 const palavraChaveRoutes = require('./routes/palavraChave');

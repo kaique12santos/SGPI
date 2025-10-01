@@ -203,52 +203,5 @@
 
 <script src="./javaScript/utils/fetchHelper.js"></script>
 <script type="module" src="./javaScript/front_end/Cadastro.js"></script>
-<script>
-// Script termos (igual ao seu) + ajuste para exibir validação de email
-document.addEventListener('DOMContentLoaded', function() {
-    const cadastrarBtn = document.getElementById('cadastrarBtn');
-    const termosModal = document.getElementById('termosModal');
-    const closeModal = document.getElementById('closeModal');
-    const cancelarTermos = document.getElementById('cancelarTermos');
-    const aceitarTermos = document.getElementById('aceitarTermos');
-    const modalBody = document.getElementById('modalBody');
-    const scrollIndicator = document.getElementById('scrollIndicator');
-
-    cadastrarBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        termosModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    });
-
-    function fecharModal() {
-        termosModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        modalBody.scrollTop = 0;
-        aceitarTermos.disabled = true;
-        scrollIndicator.style.display = 'block';
-    }
-
-    closeModal.addEventListener('click', fecharModal);
-    cancelarTermos.addEventListener('click', fecharModal);
-
-    termosModal.addEventListener('click', function(e) {
-        if (e.target === termosModal) { fecharModal(); }
-    });
-
-    modalBody.addEventListener('scroll', function() {
-        if (modalBody.scrollTop + modalBody.clientHeight >= modalBody.scrollHeight - 10) {
-            aceitarTermos.disabled = false;
-            scrollIndicator.style.display = 'none';
-        }
-    });
-
-    // Quando aceitar termos -> mostrar validação de email
-    aceitarTermos.addEventListener('click', function() {
-        fecharModal();
-        document.getElementById("formCadastro").style.display = "none";
-        document.getElementById("formValidacaoEmail").style.display = "flex";
-    });
-});
-</script>
 </body>
 </html>

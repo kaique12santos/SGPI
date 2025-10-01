@@ -144,22 +144,22 @@
 // });
 
 // module.exports = router;
-
+const multer = require("multer");
+const upload = multer();
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const { getConnection } = require('../conexaoMysql.js');
 
 /**
- * GET /perfil
- * Busca dados do perfil do usuário logado
+ * GET /perfil/:id
+ * Busca dados do perfil do usuário
  */
-router.get('/perfil', async (req, res) => {
-  const usuarioId = req.user?.id;
+router.get('/:id', async (req, res) => {
+  const usuarioId = Number(req.params.id);
 
-  if (!usuarioId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
+  if (!usuarioId)
+    return res.status(400).json({ success: false, message: 'ID inválido.' });
 
   let connection;
   try {
@@ -169,7 +169,6 @@ router.get('/perfil', async (req, res) => {
       SELECT 
         u.id AS usuario_id,
         u.nome AS usuario_nome,
-        u.email AS usuario_email,
         u.tipo AS usuario_tipo,
         u.ultimo_acesso AS usuario_ultimo_acesso,
         u.data_criacao AS usuario_data_criacao,
@@ -179,17 +178,15 @@ router.get('/perfil', async (req, res) => {
       LEFT JOIN Alunos a ON u.id = a.usuario_id
       WHERE u.id = ?
     `;
-    //select funcional
 
-    const [rows] = await connection.execute(sqlPerfil, [usuarioId]);
-    
-    if (rows.length === 0) {
+    const result = await connection.execute(sqlPerfil, [usuarioId]);
+    const rows = result.rows;
+
+    if (!rows || rows.length === 0)
       return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
-    }
 
     const usuario = rows[0];
-    // Remove dados sensíveis
-    delete usuario.senha;
+    delete usuario.senha; // segurança
 
     return res.json({ success: true, usuario });
 
@@ -202,109 +199,78 @@ router.get('/perfil', async (req, res) => {
 });
 
 /**
- * PUT /perfil
- * Atualiza dados do perfil do usuário logado
+ * PUT /perfil/:id
+ * Atualiza nome, senha (se enviada) e foto
  */
-router.put('/perfil', async (req, res) => {
-  const usuarioId = req.user?.id;
-  const { nome, email, senhaAtual, novaSenha } = req.body;
+router.put('/:id', upload.single("foto"), async (req, res) => {
+  const usuarioId = Number(req.params.id);
+  const { nome, senha } = req.body;
 
   if (!usuarioId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
+    return res.status(400).json({ success: false, message: 'ID inválido.' });
   }
 
-  if (!nome?.trim() || !email?.trim()) {
-    return res.status(400).json({ success: false, message: 'Nome e email são obrigatórios.' });
+  if (!nome?.trim()) {
+    return res.status(400).json({ success: false, message: 'Nome é obrigatório.' });
   }
 
   let connection;
   try {
     connection = await getConnection();
 
-    // Verificar se o usuário existe e buscar senha atual
-    const sqlUsuario = `
-      SELECT id, nome, email, senha FROM Usuarios WHERE id = ?
-    `;
+    // Buscar usuário
+    const sqlUsuario = `SELECT id FROM Usuarios WHERE id = ?`;
+    const resultUser = await connection.execute(sqlUsuario, [usuarioId]);
+    const usuarioRows = resultUser.rows;
 
-    const [usuarioRows] = await connection.execute(sqlUsuario, [usuarioId]);
-    
     if (usuarioRows.length === 0) {
       return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
     }
 
-    const usuarioAtual = usuarioRows[0];
-
-    // Verificar se o email já está em uso por outro usuário
-    if (email.trim() !== usuarioAtual.email) {
-      const sqlVerificarEmail = `
-        SELECT id FROM Usuarios WHERE email = ? AND id != ?
-      `;
-
-      const [emailRows] = await connection.execute(sqlVerificarEmail, [email.trim(), usuarioId]);
-      
-      if (emailRows.length > 0) {
-        return res.status(400).json({ success: false, message: 'Este email já está em uso por outro usuário.' });
+    let senhaHash = null;
+    if (senha?.trim()) {
+      if (senha.length < 6) {
+        return res.status(400).json({ success: false, message: 'Senha deve ter pelo menos 6 caracteres.' });
       }
+      if (senha.length > 12) {
+        return res.status(400).json({ success: false, message: 'Senha deve ter no máximo 12 caracteres.' });
+      }
+      senhaHash = await bcrypt.hash(senha, 10);
     }
 
-    let novaSenhaHash = null;
-
-    // Se foi fornecida uma nova senha, validar a senha atual
-    if (novaSenha?.trim()) {
-      if (!senhaAtual?.trim()) {
-        return res.status(400).json({ success: false, message: 'Senha atual é obrigatória para alterar a senha.' });
-      }
-
-      const senhaValida = await bcrypt.compare(senhaAtual, usuarioAtual.senha);
-      if (!senhaValida) {
-        return res.status(400).json({ success: false, message: 'Senha atual incorreta.' });
-      }
-
-      if (novaSenha.length < 6) {
-        return res.status(400).json({ success: false, message: 'Nova senha deve ter pelo menos 6 caracteres.' });
-      }
-
-      novaSenhaHash = await bcrypt.hash(novaSenha, 10);
-    }
-
-    // Atualizar dados do usuário
-    let sqlUpdate, params;
-
-    if (novaSenhaHash) {
-      sqlUpdate = `
-        UPDATE Usuarios 
-        SET nome = ?, email = ?, senha = ?
-        WHERE id = ?
-      `;
-      params = [nome.trim(), email.trim(), novaSenhaHash, usuarioId];
+    // Atualizar nome e, se enviada, senha
+    if (senhaHash) {
+      await connection.execute(
+        `UPDATE Usuarios SET nome = ?, senha = ? WHERE id = ?`,
+        [nome.trim(), senhaHash, usuarioId]
+      );
     } else {
-      sqlUpdate = `
-        UPDATE Usuarios 
-        SET nome = ?, email = ?
-        WHERE id = ?
-      `;
-      params = [nome.trim(), email.trim(), usuarioId];
+      await connection.execute(
+        `UPDATE Usuarios SET nome = ? WHERE id = ?`,
+        [nome.trim(), usuarioId]
+      );
     }
 
-    await connection.execute(sqlUpdate, params);
+    // Se vier foto, atualiza
+    if (req.file) {
+      const fotoBuffer = req.file.buffer;
+      await connection.execute(
+        `UPDATE Usuarios SET foto = ? WHERE id = ?`,
+        [fotoBuffer, usuarioId]
+      );
+    }
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: 'Perfil atualizado com sucesso.',
       usuario: {
         id: usuarioId,
-        nome: nome.trim(),
-        email: email.trim()
+        nome: nome.trim()
       }
     });
 
   } catch (err) {
     console.error('Erro ao atualizar perfil:', err);
-    
-    if (err.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ success: false, message: 'Este email já está em uso.' });
-    }
-    
     return res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
   } finally {
     if (connection) await connection.release();
@@ -312,86 +278,28 @@ router.put('/perfil', async (req, res) => {
 });
 
 /**
- * POST /perfil/foto
- * Atualiza foto do perfil do usuário
+ * GET /perfil/:id/foto
+ * Retorna a foto do usuário
  */
-router.post('/perfil/foto', async (req, res) => {
-  const usuarioId = req.user?.id;
-  const { foto } = req.body; // Base64 ou buffer
+router.get('/:id/foto', async (req, res) => {
+  const usuarioId = Number(req.params.id);
 
-  if (!usuarioId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
-
-  if (!foto) {
-    return res.status(400).json({ success: false, message: 'Foto é obrigatória.' });
-  }
+  if (!usuarioId)
+    return res.status(400).json({ success: false, message: 'ID inválido.' });
 
   let connection;
   try {
     connection = await getConnection();
+    const result = await connection.execute(`SELECT foto FROM Usuarios WHERE id = ?`, [usuarioId]);
+    const rows = result.rows;
 
-    // Converter base64 para buffer se necessário
-    let fotoBuffer;
-    if (typeof foto === 'string' && foto.startsWith('data:image/')) {
-      const base64Data = foto.split(',')[1];
-      fotoBuffer = Buffer.from(base64Data, 'base64');
-    } else {
-      fotoBuffer = foto;
-    }
-
-    const sqlUpdateFoto = `
-      UPDATE Usuarios 
-      SET foto = ?
-      WHERE id = ?
-    `;
-
-    await connection.execute(sqlUpdateFoto, [fotoBuffer, usuarioId]);
-
-    return res.json({ success: true, message: 'Foto atualizada com sucesso.' });
-
-  } catch (err) {
-    console.error('Erro ao atualizar foto do perfil:', err);
-    return res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
-  } finally {
-    if (connection) await connection.release();
-  }
-});
-
-/**
- * GET /perfil/foto
- * Busca foto do perfil do usuário
- */
-router.get('/perfil/foto', async (req, res) => {
-  const usuarioId = req.user?.id;
-
-  if (!usuarioId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
-
-  let connection;
-  try {
-    connection = await getConnection();
-
-    const sqlFoto = `
-      SELECT foto FROM Usuarios WHERE id = ?
-    `;
-
-    const [rows] = await connection.execute(sqlFoto, [usuarioId]);
-    
-    if (rows.length === 0 || !rows[0].foto) {
+    if (!rows || rows.length === 0 || !rows[0].foto)
       return res.status(404).json({ success: false, message: 'Foto não encontrada.' });
-    }
 
     const foto = rows[0].foto;
-    
-    // Definir tipo de conteúdo baseado nos primeiros bytes
-    let contentType = 'image/jpeg'; // padrão
-    if (foto[0] === 0x89 && foto[1] === 0x50) {
-      contentType = 'image/png';
-    } else if (foto[0] === 0xFF && foto[1] === 0xD8) {
-      contentType = 'image/jpeg';
-    }
+
+    let contentType = 'image/jpeg';
+    if (foto[0] === 0x89 && foto[1] === 0x50) contentType = 'image/png';
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Length', foto.length);
@@ -406,28 +314,19 @@ router.get('/perfil/foto', async (req, res) => {
 });
 
 /**
- * DELETE /perfil/foto
- * Remove foto do perfil do usuário
+ * DELETE /perfil/:id/foto
+ * Remove a foto do usuário
  */
-router.delete('/perfil/foto', async (req, res) => {
-  const usuarioId = req.user?.id;
+router.delete('/:id/foto', async (req, res) => {
+  const usuarioId = Number(req.params.id);
 
-  if (!usuarioId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
+  if (!usuarioId)
+    return res.status(400).json({ success: false, message: 'ID inválido.' });
 
   let connection;
   try {
     connection = await getConnection();
-
-    const sqlRemoverFoto = `
-      UPDATE Usuarios 
-      SET foto = NULL
-      WHERE id = ?
-    `;
-
-    await connection.execute(sqlRemoverFoto, [usuarioId]);
-
+    await connection.execute(`UPDATE Usuarios SET foto = NULL WHERE id = ?`, [usuarioId]);
     return res.json({ success: true, message: 'Foto removida com sucesso.' });
 
   } catch (err) {

@@ -8,31 +8,30 @@ let userFoto = null;
 async function carregarPerfil() {
   try {
     userId = parseInt(localStorage.getItem("usuarioId"));
-
     if (!userId) {
       ativar("Usuário não autenticado.", "erro", "/TelaPrincipal");
       return;
     }
 
-    const response = await obterPerfil(userId);
+    const resp = await obterPerfil();
 
-    if (response.ok) {
-      const userData = await response.json();
+    if (resp.ok) {
+      const data = await resp.json();
+      const userData = data.usuario;
 
-      document.getElementById("nome").value = userData.nome;
+      document.getElementById("nome").value = userData.usuario_nome;
 
-      if (userData.foto) {
-        document.getElementById("preview-foto").src = userData.foto;
-        const headerProfilePic = document.querySelector(".profile-pic img");
-        if (headerProfilePic) {
-          headerProfilePic.src = userData.foto;
-        }
+      // Foto: buscar rota de foto
+      document.getElementById("preview-foto").src = `/perfil/${userId}/foto`;
+      const headerProfilePic = document.querySelector(".profile-pic img");
+      if (headerProfilePic) {
+        headerProfilePic.src = `/perfil/${userId}/foto`;
       }
 
-      userNome = userData.nome;
-      userFoto = userData.foto;
+      userNome = userData.usuario_nome;
+      userFoto = `/perfil/${userId}/foto`;
     } else {
-      const errorData = await response.json();
+      const errorData = await resp.json();  // ✅ corrigido aqui
       ativar(errorData.message || "Erro ao carregar dados do usuário", "erro", "");
     }
   } catch (error) {
@@ -92,7 +91,7 @@ async function atualizarPerfil(event) {
   if (fotoInput.files.length > 0) formData.append("foto", fotoInput.files[0]);
 
   try {
-    const response = await atualizarPerfilService(userId, formData);
+    const response = await atualizarPerfilService(formData);
     const data = await response.json();
 
     if (data.success) {

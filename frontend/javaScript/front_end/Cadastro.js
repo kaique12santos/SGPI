@@ -141,10 +141,11 @@ async function processarCadastroInicial() {
                 tipo: dadosCompletos.tipo
             };
             
-            // Mostrar etapa de validação
-            mostrarEtapaValidacao();
-            
-            ativar(data.message || "E-mail de validação enviado! Verifique sua caixa de entrada.", "sucesso", "");
+          // Só mostrar etapa de validação se TODAS passaram
+            if (etapaValidacao) {
+                mostrarEtapaValidacao();
+                ativar(data.message || "E-mail de validação enviado! Verifique sua caixa de entrada.", "sucesso", "");
+            }
         } else {
             ativar(data.message || "Erro ao iniciar cadastro", "erro", "");
         }
@@ -407,6 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
     aceitarTermos.addEventListener('click', function() {
         fecharModal();
         termosAceitos = true; // Marca que os termos foram aceitos
+        etapaValidacao = true;
         
         // Dispara o evento de submit do formulário
         const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
