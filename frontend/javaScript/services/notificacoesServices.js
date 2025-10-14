@@ -1,3 +1,5 @@
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
+
 export async function listarNotificacoes(usuarioId) {
     return await fetchJsonComAuth(`/notificacoes?usuario_id=${usuarioId}`, null, 'GET');
 }

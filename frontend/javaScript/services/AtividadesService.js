@@ -1,5 +1,6 @@
 
-// Lista todas as atividades (retorna JSON)
+import { fetchComAuth,fetchJsonComAuth, } from "../utils/fetchHelper.js";
+
 export async function listarAtividades(usuarioId, baseEndpoint) {
     const res = await fetchComAuth(`${baseEndpoint}/atividades?professor_id=${usuarioId}`);
     return res.json(); // garante JSON

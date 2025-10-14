@@ -176,6 +176,10 @@ select, input {
     background-color: #e74c3c;
     color: white;
 }
+.badge-adm {
+    background-color: #000000;
+    color: white;
+}
 
 .badge-active {
     background-color: #2ecc71;

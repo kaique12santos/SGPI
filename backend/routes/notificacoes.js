@@ -23,7 +23,7 @@ router.get('/notificacoes', async (req, res) => {
 
     // Listar últimas 20 notificações
     const resultRows = await connection.execute(
-      `SELECT id, titulo, mensagem, tipo, lida, data_criacao, data_leitura
+      `SELECT id, titulo, mensagem, lida, data_criacao, data_leitura
        FROM Notificacoes
        WHERE usuario_id = ?
        ORDER BY data_criacao DESC

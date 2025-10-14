@@ -18,32 +18,37 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "https://cdn.userway.org",
-          "https://*.userway.org"
+          "https://*.userway.org",
+          "https://cdn.jsdelivr.net" 
         ],
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
           "https://cdn.userway.org",
           "https://*.userway.org",
-          "https://fonts.googleapis.com"
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com",
         ],
         connectSrc: [
           "'self'",
           "https://api.userway.org",
-          "https://*.userway.org"
+          "https://*.userway.org",
+          "https://cdn.jsdelivr.net"  
         ],
         imgSrc: [
           "'self'",
           "data:",
           "https://cdn.userway.org",
           "https://*.userway.org",
-          "https://static.vecteezy.com"
+          "https://static.vecteezy.com",
+          "https://cdn.jsdelivr.net"
         ],
         fontSrc: [
           "'self'",
           "https://cdn.userway.org",
           "https://*.userway.org",
-          "https://fonts.gstatic.com"
+          "https://fonts.gstatic.com",
+          "https://cdnjs.cloudflare.com"
         ],
         frameSrc: [
           "'self'",
@@ -74,6 +79,10 @@ const notas = require('./routes/alunoNotas.js')
 const reconsideracoes = require('./routes/professorReconsideracoes.js')
 const ListaProjetos = require('./routes/CoordenadorProjetos.js')
 const coordenadorRelatorios= require('./routes/CoordenadorRelatorios.js')
+const perfilAcademico = require('./routes/perfilAcademico.js')
+const perfilDashboard = require( './routes/perfilDashboard.js'); 
+const professoresDiciplinas = require('./routes/professoresDiciplinas.js')
+const semestreRoutes = require('./routes/semestres.js');
 
 
 //importar as rotas de tratamento de erros
@@ -105,6 +114,8 @@ app.use('/',auth)
 app.use('/professor', professorOrientador);
 app.use('/professor_orientador', professorOrientador);
 app.use('/perfil', atualizarPerfil);
+app.use('/perfilAcademico',perfilAcademico);
+app.use('/dashboard', perfilDashboard);
 app.use('/',grupos);
 app.use('/', notificacoes);
 app.use('/',usuarios);
@@ -118,6 +129,9 @@ app.use('/',reconsideracoes);
 app.use('/coordenador',ListaProjetos);
 app.use('/coordenador',coordenadorRelatorios);
 app.use('/api', palavraChaveRoutes);
+app.use('/',professoresDiciplinas)
+app.use('/semestres', semestreRoutes);
+
 // ROTA DINÂMICA PARA SERVIR OUTRAS PÁGINAS HTML DA PASTA 'views'
 // Ex: /avaliar vai servir frontend/views/avaliar.html
 // Ex: /TelaPrincipal vai servir frontend/views/TelaPrincipal.html

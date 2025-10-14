@@ -1,4 +1,4 @@
-//import { fetchJsonComAuth } from "../utils/fetchHelper.js";
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
 function normalizarGrupo(g) {
   if (!g) return null;

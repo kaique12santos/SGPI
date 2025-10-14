@@ -1,3 +1,5 @@
+// efeitoMenu.js
+
 function toggleMenu(button) {
     let menu = button.nextElementSibling;
     let isOpen = menu.classList.contains("show");
@@ -5,7 +7,7 @@ function toggleMenu(button) {
     document.querySelectorAll(".menu-content").forEach(m => m.classList.remove("show"));
     document.querySelectorAll(".dropbutton").forEach(b => {
         b.setAttribute("aria-expanded", "false");
-        b.blur(); 
+        b.blur();
     });
 
     if (!isOpen) {
@@ -14,15 +16,21 @@ function toggleMenu(button) {
     }
 }
 
-window.onclick = function(event) {
-    
-    if (!event.target.closest('.dropbutton')) {
-        document.querySelectorAll(".menu-content").forEach(m => m.classList.remove("show"));
-        document.querySelectorAll(".dropbutton").forEach(b => {
-            b.setAttribute("aria-expanded", "false");
-            b.blur();
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggleButton = document.getElementById('menuToggleButton');
+    if (menuToggleButton) {
+        menuToggleButton.addEventListener('click', function() {
+            toggleMenu(this);
         });
     }
-};
 
-
+    window.onclick = function(event) {
+        if (!event.target.closest('.dropbutton')) {
+            document.querySelectorAll(".menu-content").forEach(m => m.classList.remove("show"));
+            document.querySelectorAll(".dropbutton").forEach(b => {
+                b.setAttribute("aria-expanded", "false");
+                b.blur();
+            });
+        }
+    };
+});

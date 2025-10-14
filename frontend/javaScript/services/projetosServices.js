@@ -1,3 +1,5 @@
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
+
 export async function obterGruposPorSemestre(semestre = '') {
     // Retorna o JSON cru do backend (ex: { success, grupos })
    return await fetchJsonComAuth(`/api/grupos?semestre=${semestre}`, null, "GET");

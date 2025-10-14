@@ -1,3 +1,4 @@
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
 export async function listarAtividadesAluno(alunoId) {
     if (!alunoId) throw new Error('ID do aluno não informado');

@@ -1,5 +1,4 @@
-// Serviço responsável por chamadas ao backend relacionadas à listagem de grupos (Coordenador)
-// Depende das funções globais definidas em fetchHelper.js (fetchJsonComAuth)
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
 export async function listarGruposPorSemestre(semestre) {
     if (!semestre) throw new Error('Semestre não informado');

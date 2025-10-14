@@ -1,4 +1,4 @@
-
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
 // Buscar entregas recebidas pelo professor
 export async function obterEntregasRecebidas(professorId) {

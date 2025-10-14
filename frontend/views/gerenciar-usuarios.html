@@ -48,7 +48,7 @@
                 </div>
             </nav>
         <div class="menu-dropdown"> <!--Div feita para o menu-->
-            <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
+            <button class="dropbutton" aria-expanded="false" id="menuToggleButton">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
                 </svg>
@@ -155,6 +155,7 @@
                         <option value="Professor">Professor</option>
                         <option value="Professor_Orientador">Professor Orientador</option>
                         <option value="Coordenador">Coordenador</option>
+                        <option value="Administrador">Administrador</option>
                     </select>
                 </div>
                 <div class="modal-actions">
@@ -195,12 +196,12 @@
             </div>
         </div>
     </footer>
-    <script src="./javaScript/utils/fetchHelper.js"></script>
+    
     <script defer src="/javaScript/utils/efeitoMenu.js"></script>
     
     <script src="/javaScript/front_end/GerarMenu.js"></script>
-    <script src="/javaScript/front_end/imagemPerfil.js"></script>
-    <script type="module" src="/javaScript/front_end/usuarios.js" defer></script>
+    <script type="module" src="/javaScript/front_end/imagemPerfil.js"></script>
+    <script defer type="module" src="/javaScript/front_end/usuarios.js" ></script>
     <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
 
 </body>

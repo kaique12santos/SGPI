@@ -1,3 +1,5 @@
+import { fetchComAuth } from "../utils/fetchHelper.js";
+
 document.addEventListener('DOMContentLoaded', async () => {
   const profileImages = document.querySelectorAll('.profile-image');
   const userId = localStorage.getItem('usuarioId');

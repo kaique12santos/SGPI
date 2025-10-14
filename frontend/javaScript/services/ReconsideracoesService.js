@@ -1,3 +1,5 @@
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
+
 export async function obterReconsideracoes(professorId) {
     return await fetchJsonComAuth(
       `/api/professor/reconsideracoes?professor_id=${professorId}`,

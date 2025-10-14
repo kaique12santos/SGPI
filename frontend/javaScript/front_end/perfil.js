@@ -112,9 +112,23 @@ async function atualizarPerfil(event) {
   }
 }
 
+
 document.addEventListener("DOMContentLoaded", function () {
+  
   carregarPerfil();
   previewImagem();
   const botaoSalvar = document.querySelector(".salvar-btn");
   if (botaoSalvar) botaoSalvar.addEventListener("click", atualizarPerfil);
+
+  document.querySelectorAll('.perfil-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const section = btn.dataset.section;
+        
+        document.querySelectorAll('.perfil-nav-item').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.perfil-section').forEach(s => s.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(`section-${section}`).classList.add('active');
+    });
+  });
 });

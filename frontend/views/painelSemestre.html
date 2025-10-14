@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Semestres</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/painelSemestre.css">
+    <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/footer-estrutura.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+    <link rel="stylesheet" href="/css/alerts.css">
+    
+</head>
+<body>
+    <header>
+            <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+                <!-- Div da esquerda com logos e SGPI -->
+                <div class="header-left">
+                    <img src="/imagens/logo_cps.png" alt="logo do centro paula souza" class="logo-image">
+                    
+                    <h1>SGPI</h1>
+                </div>
+                
+                <!-- Div da direita com mensagem de usuário e perfil -->
+                <div class="header-right">
+                    
+                    <img src="/imagens/logo_fatec_br.png" alt="logo da fatec Zona Leste" class="logo-image">
+                    <div class="perfil-container">
+                        <div id="user-profile-pic" class="profile-pic " >
+                            <a href="/TelaPrincipal" >
+                            <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+                            </a>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </header>
+
+    <div class="container"> <!--Div container para facilitar configurações globais-->
+        <div class="wrapper">
+            <nav class="menu-desktop">
+                <div class="menu-desktop-nav" id="menu-desktop">
+                    <!-- Links gerados pelo JavaScript -->
+                </div>
+            </nav>
+        <div class="menu-dropdown"> <!--Div feita para o menu-->
+            <button class="dropbutton" aria-expanded="false" id="menuToggleButton">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                </svg>
+            </button>
+            <div id="menu-itens" class="menu-content">
+                <a href=""></a>
+                <a href=""></a>
+                <a href=""></a>
+                <a href=""></a>
+            </div>
+        </div>
+        
+        </div>
+        <div class="page-name-usuario">
+            <h2>Controle de Semestres</h2>
+        </div>
+
+        <div class="semestre-painel-container">
+          <!-- Card: Semestre Atual -->
+          <div class="semestre-card semestre-atual">
+            <div class="semestre-card-header">
+              <h3>Semestre Atual</h3>
+              <span class="badge badge-success">Ativo</span>
+            </div>
+            <div class="semestre-card-body">
+              <div class="semestre-info">
+                <p class="semestre-periodo" id="semestre-atual-periodo">Carregando...</p>
+                <p class="semestre-ano" id="semestre-atual-ano">----</p>
+              </div>
+              <div class="semestre-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Projetos Ativos</span>
+                  <span class="stat-value" id="semestre-atual-projetos">0</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Disciplinas Ofertas</span>
+                  <span class="stat-value" id="semestre-atual-ofertas">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Card: Criar Próximo Semestre -->
+          <div class="semestre-card semestre-criar">
+            <div class="semestre-card-header">
+              <h3>Criar Próximo Semestre</h3>
+            </div>
+            <div class="semestre-card-body">
+              <p class="semestre-descricao">
+                Crie o próximo semestre automaticamente ou defina manualmente o período e ano.
+              </p>
+        
+              <div class="semestre-form">
+                <div class="form-toggle">
+                  <label class="toggle-label">
+                    <input type="checkbox" id="modo-manual-toggle">
+                    <span class="toggle-text">Modo Manual</span>
+                  </label>
+                </div>
+        
+                <div class="form-manual" id="form-manual-fields" style="display: none;">
+                  <div class="form-group">
+                    <label for="periodo-input">Período</label>
+                    <select id="periodo-input" class="form-control">
+                      <option value="1">1º Semestre</option>
+                      <option value="2">2º Semestre</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ano-input">Ano</label>
+                    <input type="number" id="ano-input" class="form-control" min="2020" max="2050" placeholder="2025">
+                  </div>
+                </div>
+        
+                <div class="form-ativar-opcao">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="ativar-automatico">
+                    <span>Ativar automaticamente após criar</span>
+                  </label>
+                  <p class="help-text">Se marcado, este semestre será ativado e o atual será desativado automaticamente.</p>
+                </div>
+        
+                <button class="btn btn-primary btn-criar-semestre" id="btn-criar-semestre">
+                  <span class="btn-icon">+</span>
+                  Criar Próximo Semestre
+                </button>
+        
+                <p class="info-text">
+                  <small>💡 O semestre será criado como <strong>inativo</strong>. Use o botão "Ativar" no histórico para torná-lo o semestre atual.</small>
+                </p>
+        
+                <div class="semestre-preview" id="semestre-preview" style="display: none;">
+                  <p class="preview-label">Será criado:</p>
+                  <p class="preview-value" id="preview-value">2º Semestre de 2025</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Card: Histórico de Semestres -->
+          <div class="semestre-card semestre-historico">
+            <div class="semestre-card-header">
+              <h3>Histórico de Semestres</h3>
+              <button class="btn-icon-refresh" id="btn-refresh-historico" title="Atualizar">
+                ↻
+              </button>
+            </div>
+            <div class="semestre-card-body">
+              <div class="semestre-lista" id="semestre-lista">
+                <div class="loading-skeleton">
+                  <div class="skeleton-item"></div>
+                  <div class="skeleton-item"></div>
+                  <div class="skeleton-item"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- Modal de Confirmação Customizado (Opcional - melhor que alert nativo) -->
+          <div class="modal-overlay" id="modal-confirmar" style="display: none;">
+            <div class="modal-confirmar">
+              <div class="modal-header">
+                <span class="modal-icon">⚠️</span>
+                <h3 id="modal-titulo">Confirmação</h3>
+              </div>
+              <div class="modal-body">
+                <p id="modal-mensagem"></p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn-modal btn-cancelar" id="modal-btn-cancelar">Cancelar</button>
+                <button class="btn-modal btn-confirmar" id="modal-btn-confirmar">Confirmar</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+    </div>
+    <footer class="sgpi-footer">
+        <div class="footer-container">
+            <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
+            <span class="footer-text">Desenvolvido para o curso de DSM - FATEC Zona Leste</span>
+            
+            <div class="footer-links">
+                <span class="footer-separator">|</span>
+                <a href="/manual">Manual do Usuário</a>
+                <span class="footer-separator">|</span>
+                <a href="/termos_uso">Termos de Uso</a>
+                <span class="footer-separator">|</span>
+                <a href="/politica-privacidade">Política de Privacidade</a>
+                <span class="footer-separator">|</span>
+                <a href="./sobre">Sobre</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script defer src="/javaScript/utils/efeitoMenu.js"></script>
+    
+    <script src="/javaScript/front_end/GerarMenu.js"></script>
+    <script type="module" src="/javaScript/front_end/imagemPerfil.js"></script>
+    <script defer type="module" src="/javaScript/front_end/painelSemestre.js" ></script>
+    <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
+
+</body>
+</html>

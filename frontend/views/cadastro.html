@@ -50,22 +50,45 @@
             <div class="signup-form" id="materiasBox">
                 <label>Matérias</label>
                 <div class="materias-list">
-                    <label><input type="checkbox" name="materias" value="DD101"> Design Digital</label>
-                    <label><input type="checkbox" name="materias" value="DW101"> Desenvolvimento Web I</label>
-                    <label><input type="checkbox" name="materias" value="DW102"> Desenvolvimento Web II</label>
-                    <label><input type="checkbox" name="materias" value="DW103"> Desenvolvimento Web III</label>
-                    <label><input type="checkbox" name="materias" value="ES101"> Engenharia de Software I</label>
-                    <label><input type="checkbox" name="materias" value="ES102"> Engenharia de Software II</label>
-                    <label><input type="checkbox" name="materias" value="BD101"> Banco de Dados Relacional</label>
-                    <label><input type="checkbox" name="materias" value="BD102"> Banco de Dados Não Relacional</label>
-                    <label><input type="checkbox" name="materias" value="IHC101"> Interação Humano Computador</label>
-                    <label><input type="checkbox" name="materias" value="GP101"> Gestão Ágil de Projetos de Software</label>
-                    <label><input type="checkbox" name="materias" value="LDW101"> Laboratório de Desenvolvimento Web</label>
-                    <label><input type="checkbox" name="materias" value="UX101"> Experiência do Usuário</label>
-                    <label><input type="checkbox" name="materias" value="PM201"> Programação para Dispositivos Móveis II</label>
-                    <label><input type="checkbox" name="materias" value="LDM101"> Laboratório de Desenvolvimento Mobile</label>
-                    <label><input type="checkbox" name="materias" value="QT101"> Qualidade e Testes de Software</label>
-                    <label><input type="checkbox" name="materias" value="LDM201"> Laboratório de Desenvolvimento Multiplataforma</label>
+                    <fieldset>
+                        <legend>1º Semestre</legend>
+                        <label><input type="checkbox" name="materias" value="DD101"> Design Digital</label>
+                        <label><input type="checkbox" name="materias" value="DW101"> Desenvolvimento Web I</label>
+                        <label><input type="checkbox" name="materias" value="ES101"> Engenharia de Software I</label>
+                    </fieldset>
+            
+                    <fieldset>
+                        <legend>2º Semestre</legend>
+                        <label><input type="checkbox" name="materias" value="DW102"> Desenvolvimento Web II</label>
+                        <label><input type="checkbox" name="materias" value="ES102"> Engenharia de Software II</label>
+                        <label><input type="checkbox" name="materias" value="BD101"> Banco de Dados Relacional</label>
+                    </fieldset>
+            
+                    <fieldset>
+                        <legend>3º Semestre</legend>
+                        <label><input type="checkbox" name="materias" value="DW103"> Desenvolvimento Web III</label>
+                        <label><input type="checkbox" name="materias" value="BD102"> Banco de Dados Não Relacional</label>
+                        <label><input type="checkbox" name="materias" value="IHC101"> Interação Humano Computador</label>
+                        <label><input type="checkbox" name="materias" value="GP101"> Gestão Ágil de Projetos de Software</label>
+                    </fieldset>
+            
+                    <fieldset>
+                        <legend>4º Semestre</legend>
+                        <label><input type="checkbox" name="materias" value="LDW101"> Laboratório de Desenvolvimento Web</label>
+                        <label><input type="checkbox" name="materias" value="UX101"> Experiência do Usuário</label>
+                    </fieldset>
+        
+                    <fieldset>
+                        <legend>5º Semestre</legend>
+                        <label><input type="checkbox" name="materias" value="LDM101"> Laboratório de Desenvolvimento Mobile</label>
+                        <label><input type="checkbox" name="materias" value="PM201"> Programação para Dispositivos Móveis II</label>
+                    </fieldset>
+            
+                    <fieldset>
+                        <legend>6º Semestre</legend>
+                        <label><input type="checkbox" name="materias" value="QT101"> Qualidade e Testes de Software</label>
+                        <label><input type="checkbox" name="materias" value="LDM201"> Laboratório de Desenvolvimento Multiplataforma</label>
+                    </fieldset>
                 </div>
             </div>
 
@@ -193,6 +216,17 @@
         </div>
         <div class="modal-footer">
             <div class="scroll-indicator" id="scrollIndicator">Role até o final para aceitar os termos</div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="aceiteTermos" name="aceiteTermos" required>
+                <label for="aceiteTermos">Li e aceito os <a href="/termos-de-uso" target="_blank">Termos de Uso</a>.</label>
+                <div id="erroTermos" class="error-message"></div>
+            </div>
+    
+            <div class="checkbox-group">
+                <input type="checkbox" id="aceitePolitica" name="aceitePolitica" required>
+                <label for="aceitePolitica">Li e aceito a <a href="/politica-privacidade" target="_blank">Política de Privacidade</a>.</label>
+                <div id="erroPolitica" class="error-message"></div>
+            </div>
             <div class="modal-actions">
                 <button class="btn-cancelar" id="cancelarTermos">Cancelar</button>
                 <button class="btn-aceitar" id="aceitarTermos" disabled>Aceitar e Cadastrar</button>
@@ -201,7 +235,7 @@
     </div>
 </div>
 
-<script src="./javaScript/utils/fetchHelper.js"></script>
+
 <script type="module" src="./javaScript/front_end/Cadastro.js"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@ const emailService = new EmailValidationService();
 
 // 🚀 CADASTRO (envio do email de validação)
 router.post("/cadastro", async (req, res) => {
-  const { nome, email, senha, tipo, ra, disciplinas, termos_aceitos,chaveProfessor } = req.body;
+  const { nome, email, senha, tipo, disciplinas, termos_aceitos,politica_privacidade,chaveProfessor } = req.body;
 
   try {
     if (!nome || !email || !senha || !tipo) {
@@ -22,8 +22,8 @@ router.post("/cadastro", async (req, res) => {
       return res.status(400).json({ success: false, message: "Senha deve ter pelo menos 6 caracteres." });
     }
 
-    if (![0,1,true,false].includes(termos_aceitos)) {
-      return res.status(400).json({ success: false, message: "O campo termos_aceitos deve ser 0 ou 1." });
+    if (![0,1,true,false].includes(termos_aceitos) && ![0,1,true,false].includes(politica_privacidade)) {
+      return res.status(400).json({ success: false, message: "Os campos termos_aceitos e politica_privacidade devem ser 0 ou 1." });
     }
 
     if ((tipo === 'professor' || tipo === 'professor_orientador') && !chaveProfessor) {
@@ -78,9 +78,10 @@ router.post("/cadastro", async (req, res) => {
       email,
       senha,
       tipo: chaveValidada ? chaveValidada.tipo_usuario : tipo,
-      ra,
+      
       disciplinas,
       termos_aceitos,
+      politica_privacidade,
       chaveProfessor: chaveValidada ? chaveValidada.chave_id : null
     };
     
@@ -124,9 +125,8 @@ router.post('/validar-chave-professor', async (req, res) => {
       );
 
       if (!result.rows || result.rows.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'Chave inválida ou já foi totalmente utilizada.'
+        return res.status(200).json({
+          success: false
         });
       }
 
@@ -179,7 +179,7 @@ router.post('/validar-token', async (req, res) => {
     console.log("DEBUG userData recebido no validateToken:", result.userData);
     if (!result.success) return res.status(400).json(result);
 
-    const { nome, email, senha, tipo, ra, disciplinas, termos_aceitos, chaveProfessor } = result.userData;
+    const { nome, email, senha, tipo, disciplinas, termos_aceitos,politica_privacidade, chaveProfessor } = result.userData;
 
     const hashedPassword = await bcrypt.hash(senha, 10);
 
@@ -187,8 +187,8 @@ router.post('/validar-token', async (req, res) => {
     try {
       // Inserir usuário de verdade só agora
       const insertResult = await connection.execute(
-        "INSERT INTO Usuarios (nome, email, senha, tipo, ativo, termos_aceitos) VALUES (?, ?, ?, ?, 1, ?)",
-        [nome, email, hashedPassword, tipo, termos_aceitos ? 1 : 0]
+        "INSERT INTO Usuarios (nome, email, senha, tipo, ativo, termos_aceitos,politica_privacidade) VALUES (?, ?, ?, ?, 1, ?,?)",
+        [nome, email, hashedPassword, tipo, termos_aceitos ? 1 : 0,politica_privacidade ? 1 : 0]
       );
       const usuarioId = insertResult.rows.insertId;
 
@@ -203,32 +203,80 @@ router.post('/validar-token', async (req, res) => {
         );
 
       }
-      if (tipo === "Aluno") {
-        await connection.execute("INSERT INTO Alunos (usuario_id, RA) VALUES (?, ?)", [usuarioId, ra || `RA${usuarioId}`]);
+      // if (tipo === "Aluno") {
+      //   await connection.execute("INSERT INTO Alunos (usuario_id) VALUES (?)", [usuarioId]);
 
+      //   if (Array.isArray(disciplinas) && disciplinas.length > 0) {
+      //     const resultDisciplinas = await connection.execute(
+      //       `SELECT id FROM Disciplinas WHERE codigo IN (${disciplinas.map(() => "?").join(",")})`,
+      //       disciplinas
+      //     );
+      //     const disciplinaIds = resultDisciplinas.rows.map(d => d.id);
+
+      //     if (disciplinaIds.length > 0) {
+      //       const resultSemestres = await connection.execute(
+      //         `SELECT DISTINCT semestre_id FROM Disciplinas_Ofertas WHERE disciplina_id IN (${disciplinaIds.map(() => "?").join(",")})`,
+      //         disciplinaIds
+      //       );
+
+
+      //       for (const oferta of ofertasResult) {
+      //         await connection.execute(
+      //           `INSERT INTO Aluno_Oferta (aluno_id, oferta_id, status)
+      //            VALUES (?, ?, 'Matriculado')`,
+      //           [usuarioId, oferta.oferta_id]
+      //         );
+      //       }
+      //       console.log(`✅ ${ofertasResult.length} disciplinas vinculadas ao aluno ID ${usuarioId}`);
+      //     }
+          
+      //   }
+      // }
+
+      if (tipo === "Aluno") {
+        // 1️⃣ Cadastra o aluno na tabela Alunos
+        await connection.execute("INSERT INTO Alunos (usuario_id) VALUES (?)", [usuarioId]);
+      
+        // 2️⃣ Se o aluno escolheu disciplinas no front
         if (Array.isArray(disciplinas) && disciplinas.length > 0) {
+          // Busca os IDs das disciplinas selecionadas
           const resultDisciplinas = await connection.execute(
-            `SELECT id FROM Disciplinas WHERE codigo IN (${disciplinas.map(() => "?").join(",")})`,
+            `SELECT id, codigo FROM Disciplinas WHERE codigo IN (${disciplinas.map(() => "?").join(",")})`,
             disciplinas
           );
           const disciplinaIds = resultDisciplinas.rows.map(d => d.id);
-
+      
           if (disciplinaIds.length > 0) {
-            const resultSemestres = await connection.execute(
-              `SELECT DISTINCT semestre_id FROM Disciplinas_Ofertas WHERE disciplina_id IN (${disciplinaIds.map(() => "?").join(",")})`,
+            // Busca as ofertas correspondentes a essas disciplinas
+            const ofertasResult = await connection.execute(
+              `SELECT id AS oferta_id, disciplina_id, semestre_id 
+               FROM Disciplinas_Ofertas 
+               WHERE disciplina_id IN (${disciplinaIds.map(() => "?").join(",")})`,
               disciplinaIds
             );
-            for (const row of resultSemestres.rows) {
-              if (row.semestre_id) {
+            
+            const ofertas = ofertasResult.rows; // ✅ CORREÇÃO AQUI!
+            console.log("DEBUG ofertasResult:", ofertasResult.rows);
+
+      
+            if (ofertas.length > 0) {
+              // Faz o vínculo do aluno com as ofertas encontradas
+              for (const oferta of ofertas) {
                 await connection.execute(
-                  `INSERT IGNORE INTO Usuario_Semestre (usuario_id, semestre_id, papel) VALUES (?, ?, 'Aluno')`,
-                  [usuarioId, row.semestre_id]
+                  `INSERT INTO Aluno_Oferta (aluno_id, oferta_id, status)
+                   VALUES (?, ?, 'Matriculado')`,
+                  [usuarioId, oferta.oferta_id]
                 );
               }
+              console.log(`✅ ${ofertas.length} disciplinas vinculadas ao aluno ID ${usuarioId}`);
+            } else {
+              console.warn("⚠️ Nenhuma oferta encontrada para as disciplinas:", disciplinaIds);
             }
           }
         }
       }
+      
+      
 
       res.json({
         success: true,
@@ -304,6 +352,12 @@ router.post('/login', async (req, res, next) => {
 
       const passwordMatch = await bcrypt.compare(String(password), user.senha);
       if (!passwordMatch) return genericFail();
+      await connection.execute(
+        `UPDATE Usuarios 
+         SET ultimo_acesso = NOW() 
+         WHERE id = ?`,
+        [user.id]
+      );
 
       // Definir papel para frontend
       let roleFrontend = 'aluno';

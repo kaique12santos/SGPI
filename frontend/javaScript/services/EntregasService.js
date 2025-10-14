@@ -1,4 +1,4 @@
-
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
 // Buscar detalhes da atividade pelo aluno
 export async function obterDetalhesAtividade(atividadeId, alunoId) {

@@ -83,7 +83,7 @@ function getItensMenu() {
     {texto: 'Sair', id:'logout-button'}
     ],
     professor_orientador: [
-    { texto: 'Artefatos entregues', link: '/artefatosEntregues' },
+    { texto: 'Avaliar Entregas', link: '/artefatosEntregues' },
     { texto: 'Criar Projetos', link: '/projetos' },
     { texto: 'Gerenciar grupo', link: '/criar-grupos' },
     { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes' },
@@ -94,18 +94,25 @@ function getItensMenu() {
     coordenador: [
     { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios' },
     { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador' },
-    { texto: 'Entregas dos Grupos', link: '/listaProjetos'},
+    { texto: 'Monitoramento Geral', link: '/listaProjetos'},
     { texto: 'Controle de Chaves', link: '/palavraChave'},
     {texto: 'Meu Perfil', link: '/perfil'},
     {texto: 'Sair', id:'logout-button'}
     ],
     professor: [
-    { texto: 'Artefatos entregues', link: '/artefatosEntregues' },
+    { texto: 'Avaliar Entregas', link: '/artefatosEntregues' },
     { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes' },
-    { texto: 'Criar Artefato', link: '/criar-atividade' },
+    { texto: 'Criar Atividade', link: '/criar-atividade' },
     {texto: 'Meu Perfil', link: '/perfil'},
     {texto: 'Sair', id:'logout-button'}
+    ],
+    administrador: [
+        { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios' },
+        { texto: 'Controle de Semestres', link: '/painelSemestre' },
+        {texto: 'Meu Perfil', link: '/perfil'},
+        {texto: 'Sair', id:'logout-button'}
     ]
+
     };
 }
 

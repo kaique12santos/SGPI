@@ -54,21 +54,12 @@ class EmailValidationService {
                 attempts: 0
             });
            
-            const validationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/validar-email?token=${token}`;
 
             const emailTemplate = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #2c3e50;">Validação de Email - SGPI</h2>
                     <p>Olá <strong>${userData.nome}</strong>,</p>
-                    <p>Para completar seu cadastro, você precisa validar seu email clicando no link abaixo:</p>
-
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${validationLink}" 
-                           style="background-color: #3498db; color: white; padding: 12px 30px; 
-                                  text-decoration: none; border-radius: 5px; display: inline-block;">
-                            Validar Email
-                        </a>
-                    </div>
+                    <p>Para completar seu cadastro, você precisa validar seu email utilizando o codigo abaixo:</p>
 
                     <p>Ou use o código de validação: 
                         <strong style="font-size: 18px; color: #e74c3c;">

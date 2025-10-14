@@ -1,161 +1,124 @@
 import { ativar } from "../utils/alerts.js";
-import { cadastrarUsuario } from "../services/CadastroService.js";
+import { cadastrarUsuario, 
+    validarTokenCadastro, 
+    reenviarTokenCadastro,
+    validarChaveProfessor } from "../services/CadastroService.js";
 
 const form = document.querySelector('.signup-info'); 
 
 // Variável para controlar se os termos foram aceitos
 let termosAceitos = false;
+let politicaPrivacidade= false;
 // Variáveis para controlar as etapas de validação
 let dadosUsuarioTemp = {};
 let etapaValidacao = false;
 
 // Função para processar o cadastro inicial (enviar email de validação)
 async function processarCadastroInicial() {
-    const nome = document.getElementById('nome').value;
-    const email = document.getElementById('email').value;
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
     const senha = document.getElementById('senha').value;
     const confirmarSenha = document.getElementById('confirmar-senha').value;
-
+  
     const perfil = document.querySelector('input[name="perfil"]:checked')?.value;
-    const materias = perfil === 'aluno' 
-        ? Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value) 
-        : [];
+    const materias = perfil === 'aluno'
+      ? Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value)
+      : [];
     const chaveProfessor = perfil === 'professor' ? document.getElementById('chaveProfessor').value : "";
-
+  
     document.getElementById('passwordError').textContent = '';
     document.getElementById('emailError').textContent = '';
-
+  
     const minLength = 6;
     const maxLength = 12;
-
-    // Validações básicas
+  
+    // ======= VALIDAÇÕES BÁSICAS =======
     if (!nome || !email || !senha || !confirmarSenha || !perfil) {
-        ativar('Por favor, preencha todos os campos.','erro','');
-        return false;
+      ativar('Por favor, preencha todos os campos.', 'erro', '');
+      return false;
     }
-
+  
     if (!email.endsWith("@fatec.sp.gov.br")) {
-        document.getElementById('emailError').textContent = 'E-mail Institucional Inválido';
-        return false;
+      document.getElementById('emailError').textContent = 'E-mail Institucional Inválido';
+      return false;
     }
-
-    // ===== VALIDAÇÕES COMENTADAS PARA IMPLEMENTAÇÃO FUTURA =====
-    
-    // VALIDAÇÃO DE MATÉRIAS PARA ALUNO
-    // if (perfil === 'aluno' && materias.length === 0) {
-    //     ativar("Selecione pelo menos uma matéria.", "erro", "");
-    //     return false;
-    // }
-
-    // VALIDAÇÃO DE PALAVRA-CHAVE PARA PROFESSOR
-    // if (perfil === 'professor' && !chaveProfessor) {
-    //     ativar("Insira a palavra-chave fornecida pelo coordenador.", "erro", "");
-    //     return false;
-    // }
-
+  
+    if (perfil === 'aluno' && materias.length === 0) {
+      ativar("Selecione pelo menos uma matéria.", "erro", "");
+      return false;
+    }
+  
     if (perfil === 'professor' && chaveProfessor) {
         try {
-            const validacao = await validarChaveProfessor(chaveProfessor);
-            if (!validacao.success) {
-                ativar(validacao.message || "Palavra‑chave inválida!", "erro", "");
-                return false;
-            }
-        } catch {
-            ativar("Erro ao validar palavra‑chave.", "erro", "");
+          const validacao = await validarChaveProfessor(chaveProfessor);
+          if (!validacao.success) {
+            ativar(validacao.message || "Palavra-chave inválida!", "erro", "");
             return false;
+          }
+        } catch {
+          ativar("Erro ao validar palavra-chave.", "erro", "");
+          return false;
         }
     }
-
-    // ===== FIM DAS VALIDAÇÕES COMENTADAS =====
-
+      
+  
     if (senha.length < minLength) {
-        document.getElementById('passwordError').textContent = `A senha deve ter pelo menos ${minLength} caracteres.`;
-        return false;
+      document.getElementById('passwordError').textContent = `A senha deve ter pelo menos ${minLength} caracteres.`;
+      return false;
     }
-
+  
     if (senha.length > maxLength) {
-        document.getElementById('passwordError').textContent = `A senha deve ter no máximo ${maxLength} caracteres.`;
-        return false;
+      document.getElementById('passwordError').textContent = `A senha deve ter no máximo ${maxLength} caracteres.`;
+      return false;
     }
-
+  
     if (senha !== confirmarSenha) {
-        document.getElementById('passwordError').textContent = 'As senhas não coincidem.';
-        return false;
+      document.getElementById('passwordError').textContent = 'As senhas não coincidem.';
+      return false;
     }
-
-    // Validar se os termos foram aceitos
-    if (!termosAceitos) {
-        ativar('Você deve aceitar os termos de uso para continuar.', 'erro', '');
-        return false;
+  
+    // ======= VERIFICA ACEITE DOS TERMOS =======
+    if (!termosAceitos || !politicaPrivacidade) {
+      ativar('Você deve aceitar os Termos de Uso e a Política de Privacidade para continuar.', 'erro', '');
+      return false;
     }
-
-    // Se chegou até aqui, todas as validações passaram
+  
+    // ======= MONTAR DADOS PARA O BACKEND =======
+    const dadosCompletos = {
+      nome,
+      email,
+      senha,
+      tipo: perfil.charAt(0).toUpperCase() + perfil.slice(1), // Ex: "Aluno", "Professor"
+      disciplinas: perfil === 'aluno' ? materias : [],
+      termos_aceitos: termosAceitos ? 1 : 0,
+      politica_privacidade: politicaPrivacidade ? 1 : 0,
+      chaveProfessor: perfil === 'professor' ? chaveProfessor : null
+    };
+  
     try {
-        // ===== PREPARAR DADOS COMPLETOS PARA O BACKEND =====
-        const dadosCompletos = { 
-            nome, 
-            email, 
-            senha,
-            tipo: perfil.charAt(0).toUpperCase() + perfil.slice(1), // 'aluno' → 'Aluno'
-            ra: perfil === 'aluno' ? (document.getElementById('ra')?.value || `RA${Date.now()}`) : null,
-            disciplinas: perfil === 'aluno' ? materias : [],
-            termos_aceitos: termosAceitos ? 1 : 0,   // boolean → int para MySQL
-            tipo: perfil.charAt(0).toUpperCase() + perfil.slice(1),
-            chaveProfessor: perfil === 'professor' ? chaveProfessor : null
-        };
-
-        // ===== NOVA LÓGICA: INICIAR CADASTRO COM VALIDAÇÃO DE EMAIL =====
-        const response = await fetch('/cadastro', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dadosCompletos)
-        });
-
-        const data = await response.json();
-        
-        // ===== LOG PARA DEBUG (remover em produção) =====
-        console.log("=== DADOS ENVIADOS PARA O BACKEND ===");
-        console.log("Nome:", nome);
-        console.log("Email:", email);
-        console.log("Tipo:", dadosCompletos.tipo);
-        console.log("RA:", dadosCompletos.ra);
-        console.log("Termos aceitos:", dadosCompletos.termos_aceitos);
-        
-        if (perfil === 'aluno') {
-            console.log("Disciplinas selecionadas:", dadosCompletos.disciplinas);
-            console.log("Quantidade de disciplinas:", dadosCompletos.disciplinas.length);
+      console.log("📤 Enviando dados para o backend:", dadosCompletos);
+      const data = await cadastrarUsuario(dadosCompletos);
+  
+      console.log("📥 Resposta do backend:", data);
+  
+      if (data.success) {
+        dadosUsuarioTemp = { nome, email, tipo: dadosCompletos.tipo };
+  
+        if (etapaValidacao) {
+          mostrarEtapaValidacao();
+          ativar(data.message || "E-mail de validação enviado! Verifique sua caixa de entrada.", "sucesso", "");
         }
-        
-        if (perfil === 'professor') {
-            console.log("Palavra-chave informada:", chaveProfessor ? "***" + chaveProfessor.slice(-3) : "não informada");
-        }
-        console.log("=====================================");
-        
-        if (data.success) {
-            // Guardar dados temporariamente para possível reenvio de email
-            dadosUsuarioTemp = {
-                nome,
-                email,
-                tipo: dadosCompletos.tipo
-            };
-            
-          // Só mostrar etapa de validação se TODAS passaram
-            if (etapaValidacao) {
-                mostrarEtapaValidacao();
-                ativar(data.message || "E-mail de validação enviado! Verifique sua caixa de entrada.", "sucesso", "");
-            }
-        } else {
-            ativar(data.message || "Erro ao iniciar cadastro", "erro", "");
-        }
-        return true;
+      } else {
+        ativar(data.message || "Erro ao iniciar cadastro.", "erro", "");
+      }
+  
+      return true;
     } catch (error) {
-        console.error("Erro na requisição:", error);
-        ativar("Erro ao conectar com o servidor.", "erro", "");
-        return false;
+      console.error("❌ Erro na requisição de cadastro:", error);
+      ativar("Erro ao conectar com o servidor.", "erro", "");
+      return false;
     }
-}
+  }
 
 // Função para mostrar a etapa de validação de email
 function mostrarEtapaValidacao() {
@@ -178,18 +141,10 @@ async function validarCodigo() {
     }
 
     try {
-        const response = await fetch('/validar-token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ codigo })
-        });
-
-        const data = await response.json();
+        const data = await validarTokenCadastro(codigo);
 
         if (data.success) {
-            ativar("🎉 Cadastro concluído! Redirecionando para login...", "sucesso", "/index");
+            ativar("Cadastro concluído!...", "sucesso", "/index");
         } else {
             ativar(data.message || "Código inválido ou expirado", "erro", "");
         }
@@ -207,15 +162,8 @@ async function reenviarEmail() {
     }
 
     try {
-        const response = await fetch('/reenviar-validacao', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email: dadosUsuarioTemp.email })
-        });
+        const data = await reenviarTokenCadastro(dadosUsuarioTemp.email);
 
-        const data = await response.json();
 
         if (data.success) {
             ativar("📧 Novo email de validação enviado!", "sucesso", "");
@@ -258,17 +206,17 @@ document.getElementById('perfilProfessor').addEventListener('change', () => {
     console.log("Campo de chave exibido, campo de matérias oculto");
 });
 
-// ===== LISTENERS PARA DEBUG DAS MATÉRIAS (comentados para implementação futura) =====
-// document.addEventListener('DOMContentLoaded', function() {
-//     const checkboxesMaterias = document.querySelectorAll('input[name="materias"]');
-//     
-//     checkboxesMaterias.forEach(checkbox => {
-//         checkbox.addEventListener('change', function() {
-//             const materiasSelecionadas = Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value);
-//             console.log("Matérias selecionadas:", materiasSelecionadas);
-//         });
-//     });
-// });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxesMaterias = document.querySelectorAll('input[name="materias"]');
+   
+    checkboxesMaterias.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const materiasSelecionadas = Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value);
+            console.log("Matérias selecionadas:", materiasSelecionadas);
+        });
+    });
+});
 
 // ===== CONTROLE DO MODAL DE TERMOS =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -276,37 +224,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const termosModal = document.getElementById('termosModal');
     const closeModal = document.getElementById('closeModal');
     const cancelarTermos = document.getElementById('cancelarTermos');
-    const aceitarTermos = document.getElementById('aceitarTermos');
+    const aceitarTermosBtn = document.getElementById('aceitarTermos');
     const modalBody = document.getElementById('modalBody');
     const scrollIndicator = document.getElementById('scrollIndicator');
+    const chkTermos = document.getElementById('aceiteTermos');
+    const chkPolitica = document.getElementById('aceitePolitica');
+    const erroTermos = document.getElementById('erroTermos');
+    const erroPolitica = document.getElementById('erroPolitica');
+
+    // Estado inicial
+    chkTermos.disabled = true;
+    chkPolitica.disabled = true;
+    aceitarTermosBtn.disabled = true;
+    scrollIndicator.style.display = 'block';
 
     // ===== NOVOS ELEMENTOS PARA VALIDAÇÃO DE EMAIL =====
     const btnValidarCodigo = document.getElementById('btnValidarCodigo');
     const btnReenviarEmail = document.getElementById('btnReenviarEmail');
 
-    // Event listeners para os novos botões
-    if (btnValidarCodigo) {
-        btnValidarCodigo.addEventListener('click', validarCodigo);
-    }
-
-    if (btnReenviarEmail) {
-        btnReenviarEmail.addEventListener('click', reenviarEmail);
-    }
+    if (btnValidarCodigo) btnValidarCodigo.addEventListener('click', validarCodigo);
+    if (btnReenviarEmail) btnReenviarEmail.addEventListener('click', reenviarEmail);
 
     // Abrir modal ao clicar em cadastrar
     cadastrarBtn.addEventListener('click', async function(e) {
         e.preventDefault();
         
-        // Primeiro valida os campos antes de abrir o modal
         const validacao = await validarCampos();
-        if (!validacao) {
-            return; // Se validação falhou, não abre o modal
-        }
-        
-        // Se validação passou, abre o modal
+        if (!validacao) return;
+
         termosModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     });
+   
 
     // Função para validar campos antes de abrir o modal
     async function validarCampos() {
@@ -315,8 +264,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const senha = document.getElementById('senha').value;
         const confirmarSenha = document.getElementById('confirmar-senha').value;
         const perfil = document.querySelector('input[name="perfil"]:checked')?.value;
-        const materias = perfil === 'aluno' 
-            ? Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value) 
+        const materias = perfil === 'aluno'
+            ? Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value)
             : [];
         const chaveProfessor = perfil === 'professor' ? document.getElementById('chaveProfessor').value : "";
 
@@ -326,7 +275,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const minLength = 6;
         const maxLength = 12;
 
-        // Validações básicas
         if (!nome || !email || !senha || !confirmarSenha || !perfil) {
             ativar('Por favor, preencha todos os campos.','erro','');
             return false;
@@ -337,21 +285,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        // ===== VALIDAÇÕES COMENTADAS PARA IMPLEMENTAÇÃO FUTURA =====
-        
-        // VALIDAÇÃO DE MATÉRIAS PARA ALUNO (antes de abrir modal)
-        // if (perfil === 'aluno' && materias.length === 0) {
-        //     ativar("Selecione pelo menos uma matéria.", "erro", "");
-        //     return false;
-        // }
-
-        // VALIDAÇÃO DE PALAVRA-CHAVE PARA PROFESSOR (antes de abrir modal)
-        // if (perfil === 'professor' && !chaveProfessor) {
-        //     ativar("Insira a palavra-chave fornecida pelo coordenador.", "erro", "");
-        //     return false;
-        // }
-
-        // ===== FIM DAS VALIDAÇÕES COMENTADAS =====
+        if (perfil === 'aluno' && materias.length === 0) {
+            ativar("Selecione pelo menos uma matéria.", "erro", "");
+            return false;
+        }
 
         if (senha.length < minLength) {
             document.getElementById('passwordError').textContent = `A senha deve ter pelo menos ${minLength} caracteres.`;
@@ -371,71 +308,70 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // Fechar modal
+    // Fechar modal e resetar estado
     function fecharModal() {
         termosModal.style.display = 'none';
         document.body.style.overflow = 'auto';
-        // Reset do scroll e botão
         modalBody.scrollTop = 0;
-        aceitarTermos.disabled = true;
+        chkTermos.checked = false;
+        chkPolitica.checked = false;
+        chkTermos.disabled = true;
+        chkPolitica.disabled = true;
+        aceitarTermosBtn.disabled = true;
         scrollIndicator.style.display = 'block';
+        erroTermos.textContent = '';
+        erroPolitica.textContent = '';
     }
 
     closeModal.addEventListener('click', fecharModal);
     cancelarTermos.addEventListener('click', fecharModal);
-
-    // Fechar modal clicando fora
-    termosModal.addEventListener('click', function(e) {
-        if (e.target === termosModal) {
-            fecharModal();
-        }
-    });
+    termosModal.addEventListener('click', e => { if (e.target === termosModal) fecharModal(); });
 
     // Detectar scroll até o final
     modalBody.addEventListener('scroll', function() {
         const scrollTop = modalBody.scrollTop;
         const scrollHeight = modalBody.scrollHeight;
         const clientHeight = modalBody.clientHeight;
-        
-        // Se chegou ao final (com margem de 10px)
+
         if (scrollTop + clientHeight >= scrollHeight - 10) {
-            aceitarTermos.disabled = false;
+            chkTermos.disabled = false;
+            chkPolitica.disabled = false;
             scrollIndicator.style.display = 'none';
         }
     });
 
+    // Validação dos checkboxes
+    function validarCheckboxes() {
+        const termosOk = chkTermos.checked;
+        const politicaOk = chkPolitica.checked;
+
+        erroTermos.textContent = termosOk ? '' : 'Você deve aceitar os Termos de Uso.';
+        erroPolitica.textContent = politicaOk ? '' : 'Você deve aceitar a Política de Privacidade.';
+
+        aceitarTermosBtn.disabled = !(termosOk && politicaOk);
+    }
+
+    chkTermos.addEventListener('change', validarCheckboxes);
+    chkPolitica.addEventListener('change', validarCheckboxes);
+
     // Aceitar termos e prosseguir com cadastro
-    aceitarTermos.addEventListener('click', function() {
-        fecharModal();
-        termosAceitos = true; // Marca que os termos foram aceitos
+    aceitarTermosBtn.addEventListener('click', function() {
+        const termosOk = chkTermos.checked;
+        const politicaOk = chkPolitica.checked;
+
+        if (!termosOk || !politicaOk) {
+            validarCheckboxes();
+            return;
+        }
+
+        termosAceitos = true;
+        politicaPrivacidade = true;
         etapaValidacao = true;
-        
-        // Dispara o evento de submit do formulário
+
+        fecharModal();
+
         const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
         form.dispatchEvent(submitEvent);
     });
 });
 
-
-async function validarChaveProfessor(chave) {
-    try {
-        const response = await fetch('/validar-chave-professor', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ chaveProfessor: chave })
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.message || 'Erro ao validar chave');
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Erro ao validar chave do professor:', error);
-        throw error;
-    }
-}

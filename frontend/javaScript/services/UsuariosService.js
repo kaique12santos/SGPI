@@ -1,3 +1,4 @@
+import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 export async function obterUsuarios() {
   return await fetchJsonComAuth('/usuarios', null, 'GET');
 }

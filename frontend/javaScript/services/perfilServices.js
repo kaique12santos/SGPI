@@ -1,3 +1,4 @@
+import { fetchComAuth,fetchFormDataComAuth } from "../utils/fetchHelper.js";
 export async function obterPerfil() {
     const id = localStorage.getItem('usuarioId');
     return await fetchComAuth(`/perfil/${id}`, { method: "GET" });

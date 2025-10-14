@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/footer-estrutura.css">
     <link rel="stylesheet" href="css/main.css">
-    
     <link rel="stylesheet" href="css/perfil.css">
     <link rel="stylesheet" href="css/alerts.css">
 </head>
@@ -16,14 +15,11 @@
   <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
     <!-- Div da esquerda com logos e SGPI -->
     <div class="header-left">
-        <img src="/imagens/logo_cps.png" alt="logo do centro paula souza" class="logo-image">
-        
+        <img src="/imagens/logo_cps.png" alt="logo do centro paula souza" class="logo-image"> 
         <h1>SGPI</h1>
     </div>
-    
     <!-- Div da direita com mensagem de usuário e perfil -->
     <div class="header-right">
-        
         <img src="/imagens/logo_fatec_br.png" alt="logo da fatec Zona Leste" class="logo-image">
         <div class="perfil-container">
             <div id="user-profile-pic" class="profile-pic " >
@@ -43,9 +39,9 @@
         <div class="menu-desktop-nav" id="menu-desktop">
             <!-- Links gerados pelo JavaScript -->
         </div>
-    </nav>
+      </nav>
         <div class="menu-dropdown"> <!--Div feita para o menu, não sei ainda como fazer, favor não modificar-->
-            <button onclick="toggleMenu(this)" class="dropbutton" aria-expanded="false">
+            <button class="dropbutton" aria-expanded="false" id="menuToggleButton">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
                 </svg>
@@ -60,35 +56,192 @@
         
         </div>
         
-    <div class="perfil-container_perfil">
-        <h2>Meu Perfil</h2>
-        <div class="profile-preview">
-          <img id="preview-foto" class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Foto de Perfil">
-        </div>
-    
-        <form id="form-perfil">
-          <div class="form-group">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required>
-          </div>
-    
-          <div class="form-group">
-            <label for="senha">Nova Senha:</label>
-            <input type="password" id="senha" name="senha">
-          </div>
-          <div class="form-group">
-            <label for="confirmar-senha">Digite a senha novamente</label>
-            <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required>
-            <span id="passwordError"></span> 
-        </div>
-    
-          <div class="form-group">
-            <label for="fotoPerfil">Foto de Perfil:</label>
-            <input type="file" id="fotoPerfil" accept="image/*">
-          </div>
-    
-          <button type="button" class="salvar-btn">Salvar Alterações</button>
-        </form>
+        <div class="perfil-layout">
+          <!-- Sidebar de Navegação -->
+          <aside class="perfil-sidebar">
+              <nav class="perfil-nav">
+                  <button class="perfil-nav-item active" id="btn-meus-dados" data-section="meus-dados">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z"/>
+                      </svg>
+                      <span>Meus Dados</span>
+                  </button>
+                  
+                  <button class="perfil-nav-item" id="btn-minhas-disciplinas" data-section="minhas-disciplinas">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783"/>
+                      </svg>
+                      <span>Minhas Disciplinas</span>
+                  </button>
+                  
+                  
+                  <button class="perfil-nav-item" id="btn-meus-grupos" data-section="meus-grupos">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                      </svg>
+                      <span>Meus Grupos</span>
+                  </button>
+                  
+                  <button class="perfil-nav-item" id="btn-meus-projetos" data-section="meus-projetos">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1z"/>
+                      </svg>
+                      <span>Meus Projetos</span>
+                  </button>
+                  
+                  <button id="btn-disciplinas-disponiveis" class="perfil-nav-item" data-section="disciplinas-disponiveis">
+                    <i class="fas fa-book"></i> Disciplinas Disponíveis
+                  </button>
+                  
+              </nav>
+          </aside>
+      
+          <!-- Área de Conteúdo Dinâmico -->
+          <main class="perfil-content">
+              
+              <!-- SEÇÃO: Meus Dados -->
+              <section class="perfil-section active" id="section-meus-dados">
+                  <div class="perfil-section-header">
+                      <h2>Meus Dados</h2>
+                      <p class="perfil-section-subtitle">Gerencie suas informações pessoais e de acesso</p>
+                  </div>
+                  
+                  <div class="profile-preview">
+                      <img id="preview-foto" class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Foto de Perfil">
+                  </div>
+              
+                  <form id="form-perfil">
+                      <div class="form-group">
+                          <label for="nome">Nome:</label>
+                          <input type="text" id="nome" name="nome" required>
+                      </div>
+              
+                      <div class="form-group">
+                          <label for="senha">Nova Senha:</label>
+                          <input type="password" id="senha" name="senha">
+                      </div>
+                      
+                      <div class="form-group">
+                          <label for="confirmar-senha">Digite a senha novamente</label>
+                          <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required>
+                          <span id="passwordError"></span> 
+                      </div>
+              
+                      <div class="form-group">
+                          <label for="fotoPerfil">Foto de Perfil:</label>
+                          <input type="file" id="fotoPerfil" accept="image/*">
+                      </div>
+              
+                      <button type="button" class="salvar-btn">Salvar Alterações</button>
+                  </form>
+              </section>
+      
+              <!-- SEÇÃO: Minhas Disciplinas -->
+              <section class="perfil-section" id="section-minhas-disciplinas">
+                  <div class="perfil-section-header">
+                      <h2>Minhas Disciplinas</h2>
+                      <p class="perfil-section-subtitle">Visualize as disciplinas em que você está matriculado</p>
+                  </div>
+                  
+                  <div class="disciplinas-container">
+                      <!-- Conteúdo será carregado dinamicamente via JavaScript -->
+                      <div class="loading-placeholder">
+                          <p>Carregando disciplinas...</p>
+                      </div>
+                  </div>
+              </section>
+
+              
+      
+              <!-- SEÇÃO: Meus Grupos -->
+              <section class="perfil-section" id="section-meus-grupos">
+                  <div class="perfil-section-header">
+                      <h2>Meus Grupos</h2>
+                      <p class="perfil-section-subtitle">Grupos dos quais você participa</p>
+                  </div>
+                  
+                  <div class="grupos-container">
+                      <!-- Conteúdo será carregado dinamicamente via JavaScript -->
+                      <div class="loading-placeholder">
+                          <p>Carregando grupos...</p>
+                      </div>
+                  </div>
+              </section>
+      
+              <!-- SEÇÃO: Meus Projetos -->
+              <section class="perfil-section" id="section-meus-projetos">
+                  <div class="perfil-section-header">
+                      <h2>Meus Projetos</h2>
+                      <p class="perfil-section-subtitle">Projetos vinculados aos seus grupos</p>
+                  </div>
+                  <div class="projetos-filtro-container">
+                    <label for="filtro-semestre"><b>Filtrar por semestre:</b></label>
+                    <select id="projetos-filtro-semestre">
+                        <option value="">Todos os semestres</option>
+                        <option value="1">1º semestre</option>
+                        <option value="2">2º semestre</option>
+                        <option value="3">3º semestre</option>
+                        <option value="4">4º semestre</option>
+                        <option value="5">5º semestre</option>
+                        <option value="6">6º semestre</option>
+                    </select>
+                    <button id="btn-filtrar-semestre">Filtrar</button>       
+                    <button id="btn-limpar-filtro-semestre" class="limpar-btn">Limpar filtro</button>
+                </div>
+                    <!-- 🔽 Conteúdo dinâmico aqui -->
+                <div class="projetos-container">
+                    <div class="lista-projetos">
+                    <!-- Projetos carregados via JS -->
+                    </div>
+                </div>
+                  
+              </section>
+              <!-- Cada seção de dashboard deve ter uma div .dashboard-container vazia -->
+                <section class="perfil-section" id="section-dashboard-admin">
+                    <div class="perfil-section-header">
+                    <h2>Painel Administrativo</h2>
+                    <p class="perfil-section-subtitle">Logs e estatísticas do sistema</p>
+                    </div>
+                    <div class="dashboard-container"></div>
+                </section>
+                
+                <section class="perfil-section" id="section-dashboard-coordenador">
+                    <div class="perfil-section-header">
+                    <h2>Indicadores do Semestre</h2>
+                    <p class="perfil-section-subtitle">Dados globais do curso</p>
+                    </div>
+                    <div class="dashboard-container"></div>
+                </section>
+                
+                <section class="perfil-section" id="section-dashboard-professor">
+                    <div class="perfil-section-header">
+                    <h2>Estatísticas do Semestre</h2>
+                    <p class="perfil-section-subtitle">Resumo de suas atividades</p>
+                    </div>
+                    <div class="dashboard-container"></div>
+                </section>
+                
+                <section class="perfil-section" id="section-dashboard-orientador">
+                    <div class="perfil-section-header">
+                    <h2>Painel de Orientações</h2>
+                    <p class="perfil-section-subtitle">Resumo dos projetos orientados</p>
+                    </div>
+                    <div class="dashboard-container"></div>
+                </section>
+                <!-- 🔹 Seção: Disciplinas Disponíveis para Professores -->
+                <section id="section-disciplinas-disponiveis" class="perfil-section professores" style="display: none;">
+                    <h2>Selecionar Disciplinas</h2>
+                    <p>Escolha as disciplinas que você irá lecionar. As opções desaparecerão para outros professores após serem escolhidas.</p>
+                    
+                    <div class="disciplinas-disponiveis-container"></div>
+                
+                    <div class="botoes-acoes">
+                    <button id="confirmar-disciplinas-btn" class="btn-principal">Confirmar Seleção</button>
+                    </div>
+                </section>
+  
+      
+          </main>
       </div>
     </div>
     <footer class="sgpi-footer">
@@ -108,13 +261,17 @@
           </div>
       </div>
     </footer>
-    <script src="./javaScript/utils/fetchHelper.js"></script>
+   
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="./javaScript/utils/efeitoMenu.js"></script>
-    
+    <script defer src="./javaScript/utils/perfilNavigation.js"></script>
+    <script defer type="module" src="./javaScript/front_end/perfilAcademico.js"></script>
+    <script defer type="module" src="./javaScript/front_end/perfilDashboards.js"></script>
     <script defer src="./javaScript/front_end/GerarMenu.js"></script>
     <script type="module" src="./javaScript/front_end/perfil.js"></script>
     <script src="./javaScript/front_end/deslogar.js"></script>
-    <script src="./javaScript/front_end/imagemPerfil.js"></script>
+    <script type="module" src="./javaScript/front_end/imagemPerfil.js"></script>
     <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
+
 </body>
 </html>

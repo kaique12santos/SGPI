@@ -180,3 +180,19 @@ body{
     color: #000;
 }
 
+fieldset {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+legend {
+    padding: 0 10px;
+    color: #333;
+}
+
+.materias-list label {
+    display: block; /* Para cada checkbox ficar em uma linha */
+    margin-bottom: 5px;
+}
