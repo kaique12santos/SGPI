@@ -92,6 +92,11 @@
                   <button id="btn-disciplinas-disponiveis" class="perfil-nav-item" data-section="disciplinas-disponiveis">
                     <i class="fas fa-book"></i> Disciplinas Disponíveis
                   </button>
+
+                  <button class="perfil-nav-item" id="btn-gerenciar-disciplinas" data-section="gerenciar-disciplinas">
+                    <i class="fas fa-edit"></i>
+                    <span>Gerenciar Disciplinas</span>
+                  </button>
                   
               </nav>
           </aside>
@@ -229,7 +234,7 @@
                     <div class="dashboard-container"></div>
                 </section>
                 <!-- 🔹 Seção: Disciplinas Disponíveis para Professores -->
-                <section id="section-disciplinas-disponiveis" class="perfil-section professores" style="display: none;">
+                <section id="section-disciplinas-disponiveis" class="perfil-section" style="display: none;">
                     <h2>Selecionar Disciplinas</h2>
                     <p>Escolha as disciplinas que você irá lecionar. As opções desaparecerão para outros professores após serem escolhidas.</p>
                     
@@ -240,7 +245,16 @@
                     </div>
                 </section>
   
-      
+                <section id="section-gerenciar-disciplinas" class="perfil-section" style="display: none;">
+                    <h2>Gerenciar Disciplinas</h2>
+                    <p>Selecione abaixo as disciplinas nas quais deseja permanecer matriculado.</p>
+                    <div class="disciplinas-gerenciar-container"></div>
+                  
+                    <div class="botoes-acoes">
+                      <button id="btn-salvar-alteracoes" class="btn-principal">Salvar Alterações</button>
+                    </div>
+                </section>
+                  
           </main>
       </div>
     </div>

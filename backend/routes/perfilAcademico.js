@@ -127,5 +127,102 @@ router.get('/projetos/:id', async (req, res) => {
     safeRelease(conn);
   }
 });
+// rota para update das diciplinas dos alunos
+router.put('/disciplinas/:id', async (req, res) => {
+  const alunoId = Number(req.params.id);
+  const { disciplinas } = req.body;
+  if (!alunoId || !Array.isArray(disciplinas))
+    return res.status(400).json({ success: false, message: "Dados inválidos." });
+
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // Remove disciplinas antigas
+    await conn.execute(`DELETE FROM Aluno_Oferta WHERE aluno_id = ?`, [alunoId]);
+
+    if (disciplinas.length > 0) {
+      const ofertas = await conn.execute(
+        `SELECT id FROM Disciplinas_Ofertas WHERE disciplina_id IN (${disciplinas.map(() => "?").join(",")})`,
+        disciplinas
+      );
+      const ofertasIds = ofertas.rows.map(o => o.id);
+
+      for (const ofertaId of ofertasIds) {
+        await conn.execute(
+          `INSERT INTO Aluno_Oferta (aluno_id, oferta_id, status) VALUES (?, ?, 'Matriculado')`,
+          [alunoId, ofertaId]
+        );
+      }
+    }
+
+    res.json({ success: true, message: "Disciplinas atualizadas com sucesso!" });
+  } catch (err) {
+    console.error("Erro ao atualizar disciplinas:", err);
+    res.status(500).json({ success: false, message: "Erro interno no servidor" });
+  } finally {
+    safeRelease(conn);
+  }
+});
+
+// rota para listar disciplinas disponíveis para o aluno
+router.get('/disciplinas-disponiveis/:id', async (req, res) => {
+  const alunoId = Number(req.params.id);
+  if (!alunoId)
+    return res.status(400).json({ success: false, message: "ID do aluno inválido." });
+
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // Busca disciplinas já matriculadas (Aluno_Oferta → Disciplinas_Ofertas → Disciplinas)
+    const matriculadasResult = await conn.execute(
+      `SELECT do.disciplina_id
+         FROM Aluno_Oferta ao
+         JOIN Disciplinas_Ofertas do ON ao.oferta_id = do.id
+        WHERE ao.aluno_id = ?`,
+      [alunoId]
+    );
+    const matriculadasIds = matriculadasResult.rows.map(r => r.disciplina_id);
+
+    // Busca todas as disciplinas disponíveis (grade completa)
+    const todasResult = await conn.execute(
+      `SELECT d.id, d.nome, d.codigo, do.semestre_id
+         FROM Disciplinas d
+         JOIN Disciplinas_Ofertas do ON d.id = do.disciplina_id
+        ORDER BY do.semestre_id, d.nome`
+    );
+
+    if (!todasResult.rows || todasResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Nenhuma disciplina disponível encontrada."
+      });
+    }
+
+    // Marca as disciplinas que o aluno já está matriculado
+    const disciplinas = todasResult.rows.map(d => ({
+      id: d.id,
+      nome: d.nome,
+      codigo: d.codigo,
+      semestre_id: d.semestre_id,
+      matriculado: matriculadasIds.includes(d.id)
+    }));
+
+    res.json({
+      success: true,
+      disciplinas
+    });
+
+  } catch (err) {
+    console.error("Erro ao buscar disciplinas disponíveis do aluno:", err);
+    res.status(500).json({
+      success: false,
+      message: "Erro interno do servidor ao buscar disciplinas."
+    });
+  } finally {
+    safeRelease(conn);
+  }
+});
 
 module.exports = router;

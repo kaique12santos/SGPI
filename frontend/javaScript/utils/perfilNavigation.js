@@ -8,6 +8,7 @@ const perfilTabsByRole = {
       { id: "btn-minhas-disciplinas", text: "Minhas Disciplinas", section: "minhas-disciplinas" },
       { id: "btn-meus-grupos", text: "Meus Grupos", section: "meus-grupos" },
       { id: "btn-meus-projetos", text: "Meus Projetos", section: "meus-projetos" },
+      { id: "btn-gerenciar-disciplinas", text: "Gerenciar Diciplinas", section: "gerenciar-disciplinas" },
     ],
   
     professor: [
