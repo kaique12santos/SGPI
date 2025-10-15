@@ -130,41 +130,98 @@ router.get('/projetos/:id', async (req, res) => {
 // rota para update das diciplinas dos alunos
 router.put('/disciplinas/:id', async (req, res) => {
   const alunoId = Number(req.params.id);
-  const { disciplinas } = req.body;
-  if (!alunoId || !Array.isArray(disciplinas))
+  const { disciplinas: disciplinasBody } = req.body;
+  
+  console.log("--------------- INÍCIO DA REQUISIÇÃO PUT ---------------");
+  console.log("Aluno ID:", alunoId);
+  console.log("Disciplinas recebidas no Body (disciplinasBody):", disciplinasBody);
+
+  if (!alunoId || !Array.isArray(disciplinasBody)) {
+    console.log("Erro: Dados inválidos (alunoId ou disciplinasBody).");
     return res.status(400).json({ success: false, message: "Dados inválidos." });
+  }
 
   let conn;
   try {
     conn = await getConnection();
+    await conn.query('START TRANSACTION');
+    console.log("Transação iniciada.");
 
-    // Remove disciplinas antigas
-    await conn.execute(`DELETE FROM Aluno_Oferta WHERE aluno_id = ?`, [alunoId]);
+    // Obter as ofertas IDs que o aluno *já está* matriculado
+    const matriculasAtuaisQueryResult = await conn.execute(
+      `SELECT ao.oferta_id, do.disciplina_id
+       FROM Aluno_Oferta ao
+       JOIN Disciplinas_Ofertas do ON ao.oferta_id = do.id
+       WHERE ao.aluno_id = ?`,
+      [alunoId]
+    );
+    const matriculasAtuaisMap = new Map(matriculasAtuaisQueryResult.rows.map(row => [row.disciplina_id, row.oferta_id]));
+    
+    console.log("Matrículas atuais do aluno (disciplina_id -> oferta_id):", Array.from(matriculasAtuaisMap.entries()));
 
-    if (disciplinas.length > 0) {
-      const ofertas = await conn.execute(
-        `SELECT id FROM Disciplinas_Ofertas WHERE disciplina_id IN (${disciplinas.map(() => "?").join(",")})`,
-        disciplinas
+    // Obter as ofertas IDs correspondentes às disciplinas enviadas no body
+    let ofertasNovasQueryResult = { rows: [] };
+    if (disciplinasBody.length > 0) {
+      const placeholders = disciplinasBody.map(() => "?").join(",");
+      ofertasNovasQueryResult = await conn.execute(
+        `SELECT id, disciplina_id FROM Disciplinas_Ofertas WHERE disciplina_id IN (${placeholders})`,
+        disciplinasBody
       );
-      const ofertasIds = ofertas.rows.map(o => o.id);
+    }
+    const disciplinasNovasSet = new Set(disciplinasBody);
+    
+    console.log("Ofertas novas do Body (id, disciplina_id):", ofertasNovasQueryResult.rows);
+    console.log("Disciplinas novas do Body (Set):", Array.from(disciplinasNovasSet));
 
-      for (const ofertaId of ofertasIds) {
-        await conn.execute(
-          `INSERT INTO Aluno_Oferta (aluno_id, oferta_id, status) VALUES (?, ?, 'Matriculado')`,
-          [alunoId, ofertaId]
-        );
+    // --- Lógica de INSERÇÃO (Adicionar novas matrículas) ---
+    console.log("--- Iniciando lógica de INSERÇÃO ---");
+    for (const disciplinaId of disciplinasBody) {
+      if (!matriculasAtuaisMap.has(disciplinaId)) {
+        const ofertaParaInserir = ofertasNovasQueryResult.rows.find(o => o.disciplina_id === disciplinaId);
+        if (ofertaParaInserir) {
+          console.log(`INSERT: aluno ${alunoId} na oferta ${ofertaParaInserir.id} (disciplina ${disciplinaId})`);
+          await conn.execute(
+            `INSERT INTO Aluno_Oferta (aluno_id, oferta_id, status, data_matricula) VALUES (?, ?, 'Matriculado', CURRENT_TIMESTAMP)`,
+            [alunoId, ofertaParaInserir.id]
+          );
+        } else {
+          console.warn(`AVISO: Disciplina ${disciplinaId} no body não possui oferta correspondente.`);
+        }
+      } else {
+        console.log(`SKIP INSERT: aluno ${alunoId} já matriculado na disciplina ${disciplinaId}`);
       }
     }
 
+    // --- Lógica de DELEÇÃO (Remover matrículas que não estão mais no body) ---
+    console.log("--- Iniciando lógica de DELEÇÃO ---");
+    for (const [disciplinaIdAntiga, ofertaIdAntiga] of matriculasAtuaisMap.entries()) {
+      if (!disciplinasNovasSet.has(disciplinaIdAntiga)) {
+        console.log(`DELETE: aluno ${alunoId} da oferta ${ofertaIdAntiga} (disciplina ${disciplinaIdAntiga})`);
+        await conn.execute(
+          `DELETE FROM Aluno_Oferta WHERE aluno_id = ? AND oferta_id = ?`,
+          [alunoId, ofertaIdAntiga]
+        );
+      } else {
+        console.log(`SKIP DELETE: disciplina ${disciplinaIdAntiga} ainda marcada.`);
+      }
+    }
+
+    await conn.query('COMMIT');
+    console.log("Transação confirmada.");
     res.json({ success: true, message: "Disciplinas atualizadas com sucesso!" });
+
   } catch (err) {
     console.error("Erro ao atualizar disciplinas:", err);
+    if (conn) {
+      await conn.query('ROLLBACK');
+      console.log("Transação revertida.");
+    }
     res.status(500).json({ success: false, message: "Erro interno no servidor" });
   } finally {
     safeRelease(conn);
+    console.log("--------------- FIM DA REQUISIÇÃO PUT ---------------");
   }
 });
-
 // rota para listar disciplinas disponíveis para o aluno
 router.get('/disciplinas-disponiveis/:id', async (req, res) => {
   const alunoId = Number(req.params.id);

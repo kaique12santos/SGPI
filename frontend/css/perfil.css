@@ -30,7 +30,7 @@
 }
 
 .btn-sim {
-  background: var(--cor-principal);
+  background: red;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -618,6 +618,7 @@
 }
 
 .disciplina-item {
+  
   display: flex;
   align-items: center;
   gap: 10px;
@@ -629,6 +630,7 @@
 }
 
 .disciplina-item:hover {
+  border-left: 4px solid #970000;
   background-color: #fff7f7;
   border-color: #970000;
 }
@@ -649,8 +651,10 @@
 }
 
 .disciplina-item.orientacao {
-  border-left: 4px solid #970000;
   background-color: #fff5f5;
+}
+.disciplina-item.orientacao:hover {
+  border-left: 4px solid #970000;
 }
 
 .disciplinas-vazio {
@@ -659,7 +663,21 @@
   text-align: center;
   padding: 10px 0;
 }
+/* para o utils da descricaoLista */
+.card-desc-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
 
+.card-desc-list li {
+  margin: 6px 0;
+  line-height: 1.45;
+}
+
+.card-desc--multiline {
+  white-space: pre-line; 
+}
+/* fim dos ajustes */
 /* Botão confirmar */
 #confirmar-disciplinas-btn {
   display: block;
