@@ -209,7 +209,12 @@ async function handleCriarSemestre() {
     }
   }
 
-  const ativarAuto = document.getElementById('ativar-automatico')?.checked;
+  const checkboxAtivar = document.getElementById('ativar-automatico');
+  const ativarAuto = checkboxAtivar?.checked;
+  
+  console.log('[Frontend] Checkbox ativar-automatico:', checkboxAtivar);
+  console.log('[Frontend] Checkbox checked:', checkboxAtivar?.checked);
+  console.log('[Frontend] ativarAuto final:', ativarAuto);
   
   let tituloConfirm = 'Criar Próximo Semestre';
   let mensagemConfirm;
@@ -239,7 +244,6 @@ async function handleCriarSemestre() {
 
   try {
     let response;
-    let semestreIdCriado;
 
     if (modoManual) {
       const periodoInput = document.getElementById('periodo-input');
@@ -254,17 +258,23 @@ async function handleCriarSemestre() {
 
     const data = await response.json();
 
-    console.log('[Frontend] Resposta de criar semestre:', data);
+    console.log('[Frontend] Resposta completa de criar semestre:', data);
 
     if (data.success) {
-      semestreIdCriado = data.semestre_id;
+      const semestreIdCriado = data.semestre_id;
 
-      console.log('[Frontend] ID criado:', semestreIdCriado, 'Ativar auto:', ativarAuto);
+      console.log('[Frontend] ==================');
+      console.log('[Frontend] ID criado:', semestreIdCriado);
+      console.log('[Frontend] Tipo do ID:', typeof semestreIdCriado);
+      console.log('[Frontend] Ativar auto:', ativarAuto);
+      console.log('[Frontend] Condição (ativarAuto && semestreIdCriado):', (ativarAuto && semestreIdCriado));
+      console.log('[Frontend] ==================');
 
       if (ativarAuto && semestreIdCriado) {
+        console.log('[Frontend] ✅ ENTRANDO no bloco de ativação automática');
         btnCriar.innerHTML = '<span class="btn-icon">⏳</span>Ativando...';
         
-        const ativarResponse = await fetch(`/api/semestres/ativar/${semestreIdCriado}`, {
+        const ativarResponse = await fetch(`/semestres/ativar/${semestreIdCriado}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -281,6 +291,8 @@ async function handleCriarSemestre() {
           ativar(`Semestre criado, mas erro ao ativar: ${ativarData.message}`,'info','')
         }
       } else {
+        console.log('[Frontend] ❌ NÃO ENTROU no bloco de ativação automática');
+        console.log('[Frontend] Motivo: ativarAuto =', ativarAuto, ', semestreIdCriado =', semestreIdCriado);
         ativar(data.message || 'Semestre criado com sucesso!','sucesso','')
       }
       
@@ -291,7 +303,7 @@ async function handleCriarSemestre() {
       atualizarPreview();
 
       const toggleManual = document.getElementById('modo-manual-toggle');
-      const checkboxAtivar = document.getElementById('ativar-automatico');
+      const checkboxAtivarReset = document.getElementById('ativar-automatico');
       
       if (toggleManual) {
         toggleManual.checked = false;
@@ -299,12 +311,12 @@ async function handleCriarSemestre() {
         toggleCamposManual(false);
       }
       
-      if (checkboxAtivar) checkboxAtivar.checked = false;
+      if (checkboxAtivarReset) checkboxAtivarReset.checked = false;
     } else {
       ativar(data.message || 'Erro ao criar semestre.','erro','')
     }
   } catch (error) {
-    console.error('Erro ao criar semestre:', error);
+    console.error('[Frontend] Erro ao criar semestre:', error);
     ativar('Erro ao conectar com o servidor.','erro','')
   } finally {
     if (btnCriar) {
@@ -313,6 +325,7 @@ async function handleCriarSemestre() {
     }
   }
 }
+
 
 function mostrarModalConfirmar(titulo, mensagem) {
   return new Promise((resolve) => {

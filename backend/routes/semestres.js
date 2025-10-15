@@ -129,7 +129,7 @@ router.post('/criar-proximo', async (req, res) => {
       [novoPeriodo, novoAno]
     );
 
-    const semestreId = resInsert.insertId || resInsert[0]?.insertId;
+    const semestreId = resInsert?.rows?.insertId ?? resInsert?.insertId ?? resInsert?.[0]?.insertId;
 
     console.log('[/criar-proximo] Semestre criado com sucesso (inativo):', { 
       id: semestreId, 
@@ -324,5 +324,6 @@ router.delete('/deletar/:id', async (req, res) => {
     safeRelease(conn);
   }
 });
+
 
 module.exports = router;
