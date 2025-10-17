@@ -4,7 +4,7 @@
     flex-wrap: wrap;
     padding: 10px;
     background-color: #ffff;
-    
+
 }
 
 .button-link{
@@ -12,7 +12,8 @@
     flex-direction: column;
     align-items: center;
     width: 300px;
-    background-color: #dedcdc;
+    background-color: 
+#dedcdc;
     border: none;
     justify-content: space-around;
     margin: 2%;
@@ -33,7 +34,8 @@
 
 .link-icon{
     background-color: transparent;
-    color: #696969;
+    color: 
+#696969;
     height: 100%;
     width: 100%;
 }
@@ -41,7 +43,8 @@
     width: 20%;
 }
 .button-link:hover{
-    background-color: #c2c2c2;
+    background-color: 
+#c2c2c2;
 }
 
 .logout-btn {
@@ -49,7 +52,8 @@
     align-items: center;
     gap: 5px;
     padding: 8px 12px;
-    background-color: #f44336;
+    background-color: 
+#f44336;
     color: white;
     border: none;
     border-radius: 4px;
@@ -59,7 +63,8 @@
 }
 
 .logout-btn:hover {
-    background-color: #d32f2f;
+    background-color: 
+#d32f2f;
 }
 
 .logout-btn svg {

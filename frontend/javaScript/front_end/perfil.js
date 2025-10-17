@@ -1,5 +1,6 @@
 import { ativar } from "../utils/alerts.js";
 import { obterPerfil, atualizarPerfilService } from "../services/perfilServices.js";
+import { confirmarAcao } from "../utils/confirmDialog.js";
 
 let userId = null;
 let userNome = null;
@@ -31,7 +32,7 @@ async function carregarPerfil() {
       userNome = userData.usuario_nome;
       userFoto = `/perfil/${userId}/foto`;
     } else {
-      const errorData = await resp.json();  // ✅ corrigido aqui
+      const errorData = await resp.json(); 
       ativar(errorData.message || "Erro ao carregar dados do usuário", "erro", "");
     }
   } catch (error) {
@@ -85,6 +86,15 @@ async function atualizarPerfil(event) {
     }
   }
 
+  const confirmar = await confirmarAcao(
+    "Confirmar alteração?",
+    "Deseja realmente salvar as alterações no perfil?",
+    "Confirmar",
+    "Cancelar"
+  );
+  if (!confirmar) return;
+
+  
   const formData = new FormData();
   formData.append("nome", nome);
   if (senha) formData.append("senha", senha);
@@ -95,7 +105,7 @@ async function atualizarPerfil(event) {
     const data = await response.json();
 
     if (data.success) {
-      ativar(data.message, "sucesso", "/TelaPrincipal");
+      ativar(data.message, "sucesso", "/perfil");
 
       if (fotoInput.files.length > 0) {
         const headerProfilePic = document.querySelector(".profile-pic img");
@@ -110,6 +120,8 @@ async function atualizarPerfil(event) {
     console.error("Erro na requisição:", error);
     ativar("Erro ao conectar com o servidor.", "erro", "");
   }
+
+
 }
 
 
@@ -117,6 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
   carregarPerfil();
   previewImagem();
+  
   const botaoSalvar = document.querySelector(".salvar-btn");
   if (botaoSalvar) botaoSalvar.addEventListener("click", atualizarPerfil);
 

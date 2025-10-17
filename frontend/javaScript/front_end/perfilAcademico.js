@@ -1,5 +1,4 @@
-// perfilAcademico.js (patch focado)
-// Usa services/ and utils externos para manter padrão do projeto
+import { obterPerfil } from "../services/perfilServices.js";
 import { iniciarObserverDescricoes } from '../utils/descricaoLista.js';
 import { ativar } from "../utils/alerts.js";
 import { getMinhasDisciplinas, getMeusGrupos, getMeusProjetos } from "../services/perfilAcademicoServices.js";
@@ -79,6 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const orientacao = disciplinasResp.filter(d => d.disciplina_nome?.startsWith("Orientação de Projetos"));
       const regulares = disciplinasResp.filter(d => !d.disciplina_nome?.startsWith("Orientação de Projetos"));
+     
+     
+   
 
       let html = "";
 
@@ -152,6 +154,27 @@ document.addEventListener("DOMContentLoaded", () => {
       ativar("Selecione pelo menos uma disciplina.", "erro", "");
       return;
     }
+
+    const resp = await obterPerfil();
+    if (resp.ok) {
+      const dataProfessores = await resp.json();
+      const userData = dataProfessores.usuario;
+      const nomeProfessor = userData.usuario_nome;
+      
+      
+      const confirmar = await confirmarAcao(
+        `${nomeProfessor} Tem Certeza que Deseja se Vincular a Essas Diciplinas?`,
+        `As Diciplinas Selecionadas Serão Vinculadas a Sua Grade`,
+        "Confirmar",
+        "Cancelar"
+      )
+      if (!confirmar) return;
+
+    } else {
+      const errorData = await resp.json();  // ✅ corrigido aqui
+      ativar(errorData.message || "Erro ao carregar dados do usuário", "erro", "");
+    }
+    
 
     try {
       const resposta = await vincularDisciplinasProfessor(userId, selecionadas);
