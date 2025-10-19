@@ -45,10 +45,12 @@ router.post('/recuperar-senha', async (req, res) => {
     connection = await getConnection();
 
     // Verifica se o usuário existe
-    const [users] = await connection.execute(
+    const result = await connection.execute( 
       `SELECT id, nome FROM Usuarios WHERE email = ? AND ativo = 1 LIMIT 1`,
       [email]
     );
+
+    const users = result.rows; 
 
     if (users.length === 0) {
       console.log(`❌ Email não encontrado: ${email}`);
@@ -130,19 +132,19 @@ router.post('/redefinir-senha', async (req, res) => {
     connection = await getConnection();
 
     // Busca token e dados do usuário
-    const [rows] = await connection.execute(
+    const result = await connection.execute(
       `SELECT rs.usuario_id, rs.data_expiracao, u.email, u.nome 
        FROM Recuperacao_Senha rs
        JOIN Usuarios u ON rs.usuario_id = u.id
        WHERE rs.token = ? LIMIT 1`,
       [token]
     );
-
-    if (rows.length === 0) {
+    const tokens = result.rows; 
+    if (tokens.length === 0) {
       return res.status(404).json({ success: false, message: 'Token inválido ou expirado.' });
     }
 
-    const tokenInfo = rows[0];
+    const tokenInfo = tokens[0];
     const agora = new Date();
     const dataExpiracao = new Date(tokenInfo.data_expiracao);
 
@@ -158,7 +160,7 @@ router.post('/redefinir-senha', async (req, res) => {
 
     // Atualiza senha
     await connection.execute(
-      `UPDATE Usuarios SET senha = ?, data_atualizacao = CURRENT_TIMESTAMP WHERE id = ?`,
+      `UPDATE Usuarios SET senha = ? WHERE id = ?`,
       [hashedSenha, tokenInfo.usuario_id]
     );
 
