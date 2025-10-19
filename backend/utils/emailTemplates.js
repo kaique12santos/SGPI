@@ -132,5 +132,40 @@ module.exports = {
           </div>
         </div>
       `
-    })
+    }),
+
+    validacaoEmail: (nomeUsuario, token) => ({
+      subject: `🔐 Validação de Email - SGPI`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #2563eb; margin: 0;">🔐 Validação de Email</h2>
+            <p style="color: #6b7280; margin: 5px 0;">Sistema de Gestão de Projetos Integradores</p>
+          </div>
+          
+          <div style="background: white; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="color: #374151; margin-bottom: 15px;">Olá <strong>${nomeUsuario}</strong>,</p>
+            <p style="color: #374151; margin-bottom: 20px;">Para completar seu cadastro, utilize o código de validação abaixo:</p>
+            
+            <div style="text-align: center; margin: 25px 0; background: #f3f4f6; padding: 20px; border-radius: 6px;">
+              <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Código de Validação:</p>
+              <p style="font-size: 32px; font-weight: bold; color: #e74c3c; letter-spacing: 4px; margin: 0;">
+                ${token}
+              </p>
+            </div>
+          </div>
+          
+          <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              ⚠️ <strong>Este código expira em 15 minutos.</strong>
+            </p>
+          </div>
+          
+          <div style="text-align: center; color: #6b7280; font-size: 12px;">
+            <p>Se você não solicitou este cadastro, ignore este email.</p>
+            <p>Este é um e-mail automático, por favor não responda.</p>
+          </div>
+        </div>
+      `
+    }),
   };

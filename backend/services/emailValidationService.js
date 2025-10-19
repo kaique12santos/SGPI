@@ -1,12 +1,13 @@
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const emailTemplates = require("../utils/emailTemplates.js");
 
 class EmailValidationService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             port: parseInt(process.env.EMAIL_PORT),
-            secure: false, // true para 465, false para 587
+            secure: false,
             auth: {
                 user: process.env.EMAIL_FROM,
                 pass: process.env.EMAIL_PASSWORD,
@@ -18,25 +19,21 @@ class EmailValidationService {
             debug: true 
         });
 
-        // ✅ inicializa o tokenStore
         this.tokenStore = new Map();
     }
 
-    // Gerar token de validação
     generateValidationToken(length = 8) {
         return crypto.randomBytes(Math.ceil(length / 2))
                      .toString("hex")
                      .slice(0, length)
-                     .toUpperCase();   // Ficará tipo "A1B2C3D4"
+                     .toUpperCase();
     }
 
-    // Validar domínio @fatec (mantendo a validação existente)
     validateFatecDomain(email) {
         return email.toLowerCase().endsWith('@fatec.sp.gov.br') || 
                email.toLowerCase().endsWith('@fatec.edu.br');
     }
 
-    // Enviar email de validação
     async sendValidationEmail(email, userData) {
         try {
             if (!this.validateFatecDomain(email)) {
@@ -46,39 +43,20 @@ class EmailValidationService {
             const token = this.generateValidationToken();
             const expiresAt = Date.now() + (15 * 60 * 1000); 
 
-            // ✅ salva token em memória
             this.tokenStore.set(token, {
                 email,
                 userData,
                 expiresAt,
                 attempts: 0
             });
-           
 
-            const emailTemplate = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #2c3e50;">Validação de Email - SGPI</h2>
-                    <p>Olá <strong>${userData.nome}</strong>,</p>
-                    <p>Para completar seu cadastro, você precisa validar seu email utilizando o codigo abaixo:</p>
-
-                    <p>Ou use o código de validação: 
-                        <strong style="font-size: 18px; color: #e74c3c;">
-                            ${token.substring(0, 8).toUpperCase()}
-                        </strong>
-                    </p>
-
-                    <p style="color: #7f8c8d; font-size: 12px;">
-                        Este link expira em 15 minutos.<br>
-                        Se você não solicitou este cadastro, ignore este email.
-                    </p>
-                </div>
-            `;
+            const emailContent = emailTemplates.validacaoEmail(userData.nome, token);
 
             await this.transporter.sendMail({
                 from: process.env.EMAIL_FROM,
                 to: email,
-                subject: 'Validação de Email - SGPI',
-                html: emailTemplate
+                subject: emailContent.subject,
+                html: emailContent.html
             });
 
             return {
@@ -93,7 +71,6 @@ class EmailValidationService {
         }
     }
 
-    // Validar token
     async validateToken(token) {
         try {
             const tokenData = this.tokenStore.get(token);
@@ -128,7 +105,6 @@ class EmailValidationService {
         }
     }
 
-    // Reenviar email de validação
     async resendValidationEmail(email) {
         for (let [token, data] of this.tokenStore.entries()) {
             if (data.email === email) {
