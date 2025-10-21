@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./css/signup.css">
     <link rel="stylesheet" href="./css/alerts.css">
     <link rel="stylesheet" href="./css/modal_termos.css">
+    <link rel="stylesheet" href="./css/visibilidade.css">
     <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
 </head>
 
@@ -97,15 +98,62 @@
                 <input type="text" id="chaveProfessor" name="chaveProfessor" class="signup-input" placeholder="Digite a chave fornecida pelo coordenador">
             </div>
 
+            <!-- Campo de Senha no Cadastro -->
             <div class="signup-form">
                 <label for="senha">Senha</label>
-                <input type="password" id="senha" name="senha" placeholder="Digite aqui" class="signup-input" required autocomplete="new-password">
+                <div class="password-field-wrapper"> <!-- Wrapper para o campo de senha -->
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        name="senha" 
+                        placeholder="Digite aqui" 
+                        class="signup-input password-toggle-input"
+                        required 
+                        autocomplete="new-password"
+                    >
+                    <span class="password-toggle-icon"> <!-- Ícone para o campo de senha -->
+                        <!-- Ícone de olho aberto (visível por padrão) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <!-- Ícone de olho fechado (oculto por padrão) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </span>
+                </div>
+                <!-- <span id="passwordError"></span> --> <!-- Você pode ter um span de erro aqui se quiser -->
             </div>
-
+                
+            <!-- Campo de Confirmação de Senha no Cadastro -->
             <div class="signup-form">
                 <label for="confirmar-senha">Digite a senha novamente</label>
-                <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Digite aqui" class="signup-input" required autocomplete="new-password">
-                <span id="passwordError"></span>
+                <div class="password-field-wrapper"> <!-- Wrapper para o campo de confirmação de senha -->
+                    <input 
+                        type="password" 
+                        id="confirmar-senha" 
+                        name="confirmar-senha" 
+                        placeholder="Digite aqui" 
+                        class="signup-input password-toggle-input"
+                        required 
+                        autocomplete="new-password"
+                    >
+                    <span class="password-toggle-icon"> <!-- Ícone para o campo de confirmação de senha -->
+                        <!-- Ícone de olho aberto (visível por padrão) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <!-- Ícone de olho fechado (oculto por padrão) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </span>
+                </div>
+                <span id="passwordError"></span> 
             </div>
 
             <div class="signup-actions">
@@ -139,13 +187,14 @@
     </div>
 </div>
 
-<!-- Modal de Termos de Uso (mantido) -->
+<!-- Modal de Termos de Uso e Política de Privacidade -->
 <div id="termosModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Termos de Uso - SGPI</h2>
+            <h2>Termos de Uso e Política de Privacidade - SGPI</h2>
             <button class="modal-close" id="closeModal">&times;</button>
         </div>
+
         <div class="modal-body" id="modalBody">
             <div class="termos-content">
                 <h3>1. ACEITAÇÃO DOS TERMOS</h3>
@@ -212,21 +261,69 @@
                 <p>13.2. Eventuais disputas serão resolvidas no foro da comarca da instituição.</p>
 
                 <p class="data-atualizacao"><strong>Última atualização:</strong> Setembro de 2024</p>
+
+                <div class="politica-content">
+                    <h2>Política de Privacidade - SGPI</h2>
+                    <p><strong>Última atualização:</strong> 16 de outubro de 2025</p>
+    
+                    <p>Esta Política explica como o Sistema de Gestão de Projetos Integradores (SGPI) coleta, usa, protege e descarta os dados de coordenadores, professores, orientadores e alunos, conforme a Lei Geral de Proteção de Dados (LGPD).</p>
+    
+                    <h3>1. Dados Coletados</h3>
+                    <ul>
+                        <li><strong>Coordenadores, Professores e Orientadores:</strong> nome, e-mail institucional, cargo, foto (opcional), registros de log e identificação de acesso.</li>
+                        <li><strong>Alunos:</strong> nome, e-mail institucional, turma, notas, documentos enviados, foto (opcional) e registros de acesso.</li>
+                        <li><strong>Dados técnicos:</strong> endereço IP, data/hora, tipo de dispositivo e registros de auditoria.</li>
+                    </ul>
+    
+                    <h3>2. Finalidades</h3>
+                    <p>Os dados são utilizados para gestão acadêmica, comunicação institucional, acompanhamento de projetos, segurança e melhoria do sistema.</p>
+    
+                    <h3>3. Base Legal</h3>
+                    <p>Os dados são tratados com base na execução de contrato educacional, obrigação legal, legítimo interesse e consentimento para funcionalidades opcionais.</p>
+    
+                    <h3>4. Segurança e Armazenamento</h3>
+                    <p>Os dados ficam em servidores da instituição e são protegidos com criptografia, controle de acesso e backups regulares.</p>
+    
+                    <h3>5. Compartilhamento</h3>
+                    <p>O SGPI compartilha dados apenas quando necessário e nunca com fins comerciais. Todo compartilhamento é feito de forma segura e registrada.</p>
+    
+                    <h3>6. Retenção e Descarte</h3>
+                    <p>Os dados são mantidos durante o vínculo acadêmico e excluídos ou anonimizados após o prazo legal.</p>
+    
+                    <h3>7. Contato</h3>
+                    <p>Para dúvidas ou solicitações sobre seus dados pessoais, acesse: 
+                        <a href="https://fateczl.cps.sp.gov.br" target="_blank">https://fateczl.cps.sp.gov.br</a>
+                    </p>
+    
+                    <p class="data-atualizacao"><strong>Versão 1.0 — 16/10/2025</strong></p>
+                </div>
             </div>
-        </div>
+            </div>
+
+           
+
+        <!-- Rodapé do modal com os checkboxes e botões -->
         <div class="modal-footer">
             <div class="scroll-indicator" id="scrollIndicator">Role até o final para aceitar os termos</div>
+
             <div class="checkbox-group">
                 <input type="checkbox" id="aceiteTermos" name="aceiteTermos" required>
-                <label for="aceiteTermos">Li e aceito os <a href="/termos-de-uso" target="_blank">Termos de Uso</a>.</label>
+                <label for="aceiteTermos">
+                    Li e aceito os 
+                    <a href="./uploads/termos_e_politica/termos_de_uso.pdf" target="_blank">Termos de Uso</a>.
+                </label>
                 <div id="erroTermos" class="error-message"></div>
             </div>
-    
+
             <div class="checkbox-group">
                 <input type="checkbox" id="aceitePolitica" name="aceitePolitica" required>
-                <label for="aceitePolitica">Li e aceito a <a href="/politica-privacidade" target="_blank">Política de Privacidade</a>.</label>
+                <label for="aceitePolitica">
+                    Li e aceito a 
+                    <a href="./uploads/termos_e_politica/Politica_Privacidade_SGPI_Completa.pdf" target="_blank">Política de Privacidade</a>.
+                </label>
                 <div id="erroPolitica" class="error-message"></div>
             </div>
+
             <div class="modal-actions">
                 <button class="btn-cancelar" id="cancelarTermos">Cancelar</button>
                 <button class="btn-aceitar" id="aceitarTermos" disabled>Aceitar e Cadastrar</button>
@@ -236,6 +333,8 @@
 </div>
 
 
+
 <script type="module" src="./javaScript/front_end/Cadastro.js"></script>
+<script src="./javaScript/utils/visibilidade_senhas.js"></script>
 </body>
 </html>

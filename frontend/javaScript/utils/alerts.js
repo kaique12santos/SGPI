@@ -1,4 +1,22 @@
-function ativar(msg, tipo = 'info', redirectUrl = null) {
+const activeMessages = new Set();
+const MESSAGE_SPACING = 10;
+const DEFAULT_TIMEOUT_DURATION = 7000; // Novo tempo de exibição padrão: 7 segundos
+
+function closeMessage(messageElement, redirectUrl = null) {
+    // Inicia a animação de saída (slideout)
+    messageElement.style.animation = 'slideout 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+
+    messageElement.addEventListener('animationend', () => {
+        messageElement.remove();
+        activeMessages.delete(messageElement); // Remove do conjunto de mensagens ativas
+        repositionMessages(); // Reposiciona as mensagens restantes
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    }, { once: true });
+}
+
+function ativar(msg, tipo = 'info', redirectUrl = null, duration = DEFAULT_TIMEOUT_DURATION) {
     const message = document.createElement("div");
     message.classList.add("message");
     let icone = '';
@@ -18,27 +36,79 @@ function ativar(msg, tipo = 'info', redirectUrl = null) {
     switch (tipo) {
         case 'erro': 
             icone = icones.erro;
-            message.style.backgroundColor = 'rgba(244, 63, 94, 0.6)';
+            message.style.backgroundColor = 'rgba(244, 63, 94, 0.9)';
             break;
         case 'sucesso': 
-            icone=icones.sucesso
-            message.style.backgroundColor = 'rgba(0, 255, 0, 0.6)'; 
+            icone = icones.sucesso;
+            message.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
             break;
         case 'info': 
         default:       
-            icone=icones.info
-            message.style.backgroundColor = 'rgba(14, 165, 233, 0.6)'; 
+            icone = icones.info;
+            message.style.backgroundColor = 'rgba(14, 165, 233, 0.9)';
+    }
+
+    // Cria o botão de fechar
+    const closeBtn = document.createElement('button');
+    closeBtn.classList.add('message-close-btn');
+    closeBtn.innerHTML = '&times;'; // Caractere 'x' para fechar
+
+    // Adiciona o conteúdo e o botão de fechar
+    message.innerHTML = `${icone} <span class="text_color">${msg}</span>`; // Adicionei um span para envolver a msg e manter o layout flex intacto
+    message.appendChild(closeBtn); // Adiciona o botão de fechar ao final da mensagem
+    
+    document.body.appendChild(message);
+    activeMessages.add(message);
+
+    let currentTop = 20;
+    
+    const sortedMessages = Array.from(activeMessages).sort((a, b) => {
+        const topA = parseFloat(a.style.top) || 0;
+        const topB = parseFloat(b.style.top) || 0;
+        return topA - topB;
+    });
+
+    for (const activeMsg of sortedMessages) {
+        if (activeMsg === message) continue; 
+        
+        const msgHeight = activeMsg.offsetHeight;
+        if (msgHeight > 0) {
+             currentTop = Math.max(currentTop, parseFloat(activeMsg.style.top) + msgHeight + MESSAGE_SPACING);
+        }
     }
     
-    message.innerHTML = `${icone} ${msg}`;
-    
-   
-    document.body.appendChild(message);
-    setTimeout(() => {
-        message.style.display = "none";
-        if (redirectUrl) { 
-            window.location.href = redirectUrl;
-        }
-    }, 3000); 
+    message.style.top = `${currentTop}px`;
+
+    // Configura o setTimeout para fechar automaticamente
+    const timeoutId = setTimeout(() => {
+        closeMessage(message, redirectUrl);
+    }, duration); // Usa a duração passada ou o DEFAULT_TIMEOUT_DURATION
+
+    // Adiciona um listener de clique ao botão "X"
+    closeBtn.addEventListener('click', () => {
+        clearTimeout(timeoutId); // Limpa o setTimeout automático
+        closeMessage(message, redirectUrl); // Fecha a mensagem manualmente
+    });
 }
+
+function repositionMessages() {
+    let currentTop = 20;
+    
+    const sortedMessages = Array.from(activeMessages).sort((a, b) => {
+        const topA = parseFloat(a.style.top) || 0;
+        const topB = parseFloat(b.style.top) || 0;
+        return topA - topB;
+    });
+
+    for (const activeMsg of sortedMessages) {
+        activeMsg.style.top = `${currentTop}px`;
+        currentTop += activeMsg.offsetHeight + MESSAGE_SPACING;
+    }
+}
+
 export { ativar };
+
+// Exemplo de uso:
+// ativar('Este é um alerta de sucesso!', 'sucesso', null, 10000); // 10 segundos
+// ativar('Uma mensagem de erro importante!', 'erro'); // Usará a duração padrão (7s)
+// ativar('Informação para o usuário.', 'info', '/pagina-inicial'); // Redireciona após fechar

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+/* Container que envolve o input e o ícone */
+.password-field-wrapper {
+  position: relative; /* Essencial para o posicionamento absoluto do ícone */
+  width: 100%; /* Garante que o wrapper ocupe o espaço disponível */
+  display: flex; /* Para flexibilidade se precisar */
+  align-items: center; /* Para alinhar verticalmente o input e o ícone se o input não for 100% da altura do wrapper */
+}
+
+/* O input real dentro do wrapper */
+.password-field-wrapper .password-toggle-input {
+  width: 100%; /* O input deve ocupar a largura total do seu wrapper */
+  padding-right: 40px; /* Espaço para o ícone */
+  /* Outros estilos padrão do seu input (border, padding-left, border-radius, etc.) */
+  padding: 10px 40px 10px 10px; /* Exemplo de padding */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Inclui padding e border na largura total */
+}
+
+/* O ícone de alternância */
+.password-toggle-icon {
+  position: absolute;
+  right: 10px; /* Ajuste a distância da borda direita */
+  top: 50%; /* Centraliza verticalmente */
+  transform: translateY(-50%); /* Ajuste fino para o centro vertical */
+  cursor: pointer;
+  color: #888; /* Cor do ícone */
+  display: flex; /* Para centralizar o SVG dentro do span */
+  align-items: center;
+  justify-content: center;
+  z-index: 10; /* Garante que o ícone fique acima do input, se necessário */
+}
+
+.password-toggle-icon svg {
+  width: 20px; /* Tamanho do ícone */
+  height: 20px;
+  display: block; /* Remove espaço extra que alguns SVGs podem ter */
+}
+
+/* Classe para esconder um dos ícones */
+.password-toggle-icon .hidden {
+  display: none;
+}
+    </style>
+</head>
+<body>
+    
+
+    <div class="login-form">
+        Senha
+        <div class="password-field-wrapper"> <!-- Classe genérica -->
+            <input type="password" id="loginPassword" name="password" placeholder="Digite aqui" class="login-input password-toggle-input" required autocomplete="current-password">
+            <span class="password-toggle-icon"> <!-- Classe genérica -->
+                <!-- Seus SVGs ou ícones aqui -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+            </span>
+        </div>
+        <span id="passwordError"></span>  
+    </div>
+      <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Encontra todos os elementos que têm a classe 'password-toggle-icon'
+  const toggleIcons = document.querySelectorAll('.password-toggle-icon');
+
+  toggleIcons.forEach(toggleIcon => {
+    // Para cada ícone, precisamos encontrar o input de senha correspondente
+    // Ele será o input com a classe 'password-toggle-input' dentro do mesmo 'password-field-wrapper'
+    const passwordWrapper = toggleIcon.closest('.password-field-wrapper');
+    const passwordInput = passwordWrapper ? passwordWrapper.querySelector('.password-toggle-input') : null;
+
+    const eyeOpenIcon = toggleIcon.querySelector('.feather-eye');
+    const eyeOffIcon = toggleIcon.querySelector('.feather-eye-off');
+
+    // Se encontramos o input e os ícones, configuramos o listener
+    if (passwordInput && eyeOpenIcon && eyeOffIcon) {
+      // Configura atributos de acessibilidade iniciais
+      toggleIcon.setAttribute('role', 'button');
+      toggleIcon.setAttribute('aria-label', 'Mostrar senha');
+      // Usar o ID do input para aria-controls (se o input tiver ID)
+      if (passwordInput.id) {
+          toggleIcon.setAttribute('aria-controls', passwordInput.id);
+      }
+      toggleIcon.setAttribute('aria-pressed', 'false');
+
+      toggleIcon.addEventListener('click', function() {
+        // Alterna o tipo do input
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+
+        // Alterna a visibilidade dos ícones
+        eyeOpenIcon.classList.toggle('hidden');
+        eyeOffIcon.classList.toggle('hidden');
+
+        // Atualiza atributos de acessibilidade
+        toggleIcon.setAttribute('aria-label', type === 'password' ? 'Mostrar senha' : 'Ocultar senha');
+        toggleIcon.setAttribute('aria-pressed', type === 'text' ? 'true' : 'false');
+
+        // Opcional: foca no input após a alternância
+        passwordInput.focus();
+      });
+    }
+  });
+});
+
+      </script>
+</body>
+</html>

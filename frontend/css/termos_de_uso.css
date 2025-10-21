@@ -1,4 +1,8 @@
-/* Estilos para a página de Termos de Uso */
+/* ===============================
+   PADRÃO VISUAL - TERMOS E POLÍTICA SGPI
+   =============================== */
+
+/* Container principal */
 .termos-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -7,6 +11,7 @@
     min-height: calc(100vh - 200px);
 }
 
+/* Cabeçalho */
 .termos-header {
     text-align: center;
     margin-bottom: 40px;
@@ -28,14 +33,18 @@
     margin: 0;
 }
 
+/* Conteúdo */
 .termos-content-page {
     line-height: 1.8;
     color: #333;
     font-size: 1rem;
     width: 70%;
+    margin: 0 auto;
 }
 
-.termo-section {
+/* Seções */
+.termo-section,
+.politica-section {
     margin-bottom: 35px;
     padding: 25px;
     background-color: #f9f9f9;
@@ -43,7 +52,9 @@
     border-left: 4px solid #970000;
 }
 
-.termo-section h2 {
+/* Títulos de seções */
+.termo-section h2,
+.politica-section h2 {
     color: #970000;
     font-size: 1.3rem;
     margin-bottom: 20px;
@@ -52,23 +63,44 @@
     padding-bottom: 10px;
 }
 
-.termo-section p {
+/* Texto de parágrafos */
+.termo-section p,
+.politica-section p {
     margin-bottom: 15px;
     text-align: justify;
     text-indent: 20px;
 }
 
-.termo-section ul {
+/* Listas */
+.termo-section ul,
+.politica-section ul {
     margin: 15px 0;
     padding-left: 30px;
 }
 
-.termo-section li {
+.termo-section li,
+.politica-section li {
     margin-bottom: 10px;
     list-style-type: disc;
 }
 
-.data-atualizacao-page {
+/* Bloco da Política dentro do modal */
+.politica-content {
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 3px solid #970000;
+}
+
+.politica-content h2 {
+    color: #004080;
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Caixa de data de atualização */
+.data-atualizacao-page,
+.data-atualizacao {
     margin-top: 40px;
     padding: 20px;
     background-color: #e9ecef;
@@ -77,13 +109,29 @@
     border: 1px solid #ddd;
 }
 
-.data-atualizacao-page p {
+.data-atualizacao-page p,
+.data-atualizacao p {
     margin: 0;
     font-style: italic;
     color: #666;
     font-size: 0.95rem;
 }
 
+/* Rodapé */
+.termos-footer {
+    background-color: #970000;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+}
+
+.footer-content p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+/* Botão de voltar */
 .voltar-container {
     text-align: center;
     margin: 40px 0;
@@ -110,55 +158,51 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.termos-footer {
-    background-color: #970000;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 50px;
-}
-
-.footer-content p {
-    margin: 5px 0;
-    font-size: 0.9rem;
-}
-
-/* Responsividade */
+/* ===============================
+   RESPONSIVIDADE
+   =============================== */
 @media (max-width: 768px) {
     .termos-container {
         padding: 15px;
     }
-    
+
     .termos-header h1 {
         font-size: 2rem;
     }
-    
+
     .subtitle {
         font-size: 1rem;
     }
-    
-    .termo-section {
+
+    .termo-section,
+    .politica-section {
         padding: 20px 15px;
         margin-bottom: 25px;
     }
-    
-    .termo-section h2 {
+
+    .termo-section h2,
+    .politica-section h2 {
         font-size: 1.2rem;
     }
-    
-    .termo-section p {
+
+    .termo-section p,
+    .politica-section p {
         text-indent: 10px;
     }
-    
+
     .voltar-container {
         padding: 15px;
     }
-    
+
     .btn-voltar {
         display: block;
         margin: 10px auto;
         width: 200px;
         text-align: center;
+    }
+
+    .termos-content-page {
+        width: 100%;
     }
 }
 
@@ -166,19 +210,21 @@
     .termos-header {
         padding: 20px 0;
     }
-    
+
     .termos-header h1 {
         font-size: 1.8rem;
     }
-    
-    .termo-section {
+
+    .termo-section,
+    .politica-section {
         padding: 15px 10px;
     }
-    
-    .termo-section h2 {
+
+    .termo-section h2,
+    .politica-section h2 {
         font-size: 1.1rem;
     }
-    
+
     .termos-content-page {
         font-size: 0.95rem;
     }

@@ -3,20 +3,49 @@
   font-weight: bold;
   padding: 19px 60px;
   position: fixed;
-  top: 20px;
+  /* top será definido pelo JavaScript */
   right: 105px;
-  /* background-color será definida pelo JavaScript */
-  border-radius: 8px; /* Aumentei um pouco para ficar mais moderno */
+  background-color: #333; /* Cor padrão, será sobrescrita pelo JS */
+  border-radius: 8px;
   color: #fff;
   animation: slidein 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   
-  /* Adicionado para o layout flexbox com ícones */
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 300px;
   max-width: 500px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000; /* Garante que as mensagens fiquem acima */
+  transition: top 0.3s ease-out, opacity 0.2s ease-out; /* Transição para top e opacidade */
+}
+.text_color{
+  color: #fff;
+}
+
+/* Garante que o ícone SVG não encolha */
+.message svg {
+  flex-shrink: 0;
+}
+
+/* Seu CSS existente para .message e suas animações... */
+
+/* Estilo para o botão de fechar */
+.message-close-btn {
+  background: none;
+  border: none;
+  color: #fff; /* Cor do X */
+  font-size: 1.2em; /* Tamanho do X */
+  cursor: pointer;
+  margin-left: auto; /* Empurra o botão para a direita */
+  padding: 0;
+  line-height: 1; /* Alinha o X verticalmente */
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.message-close-btn:hover {
+  opacity: 1;
 }
 
 /* Garante que o ícone SVG não encolha */
@@ -35,7 +64,17 @@
   }
 }
 
-/* Barra de progresso na parte inferior */
+@keyframes slideout {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(1000px);
+    opacity: 0;
+  }
+}
+
 .message::before {
   content: "";
   position: absolute;
@@ -44,8 +83,16 @@
   width: 0;
   height: 5px;
   background-color: rgba(0, 0, 0, 0.5);
-  animation: time 3s forwards;
-  border-radius: 0 0 8px 8px; /* Acompanha o border-radius do container */
+  /* A duração da animação da barra de progresso agora precisa ser dinâmica
+     ou removida, pois o tempo de exibição será variável.
+     Por enquanto, vou deixar 5s como um placeholder ou você pode remover.
+     Se você quiser uma barra de progresso que reflita o novo timeout,
+     terá que gerenciá-la com JS. Por simplicidade, vou considerar que a barra
+     pode ser removida ou ter uma duração fixa longa (ex: 10s)
+     ou simplesmente para de animar se o usuário interagir.
+  */
+  animation: time 5s forwards; /* Aumentado para 5s, mas você pode remover */
+  border-radius: 0 0 8px 8px;
 }
 
 @keyframes time {

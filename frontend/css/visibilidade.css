@@ -1,0 +1,37 @@
+/* Container que envolve o input e o ícone */
+.password-field-wrapper {
+    position: relative; /* Essencial para o posicionamento absoluto do ícone */
+    width: 100%; /* Garante que o wrapper ocupe o espaço disponível */
+    display: flex; /* Para flexibilidade se precisar */
+    align-items: center; /* Para alinhar verticalmente o input e o ícone se o input não for 100% da altura do wrapper */
+  }
+  
+  /* O input real dentro do wrapper */
+  .password-field-wrapper .password-toggle-input {
+    width: 100%; /* O input deve ocupar a largura total do seu wrapper */
+  }
+  
+  /* O ícone de alternância */
+  .password-toggle-icon {
+    position: absolute;
+    right: 10px; /* Ajuste a distância da borda direita */
+    top: 50%; /* Centraliza verticalmente */
+    transform: translateY(-50%); /* Ajuste fino para o centro vertical */
+    cursor: pointer;
+    color: #888; /* Cor do ícone */
+    display: flex; /* Para centralizar o SVG dentro do span */
+    align-items: center;
+    justify-content: center;
+    z-index: 10; /* Garante que o ícone fique acima do input, se necessário */
+  }
+  
+  .password-toggle-icon svg {
+    width: 20px; /* Tamanho do ícone */
+    height: 20px;
+    display: block; /* Remove espaço extra que alguns SVGs podem ter */
+  }
+  
+  /* Classe para esconder um dos ícones */
+  .password-toggle-icon .hidden {
+    display: none;
+  }
