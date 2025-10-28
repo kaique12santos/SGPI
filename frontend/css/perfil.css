@@ -199,11 +199,9 @@
 }
 
 .perfil-section.active {
-  display: block;
+  display: block !important;
 }
-.perfil-section.activee {
-  display: block;
-}
+
 
 @keyframes fadeIn {
   from {
@@ -617,6 +615,90 @@
   gap: 10px;
 }
 
+.botoes-acoes{
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  
+  gap: 1rem; 
+}
+.disciplina-item.ocupada {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.disciplina-item.ocupada {
+  background-color: #fce4ec;
+  opacity: 0.7;
+}
+
+.badge-vinculada {
+  background-color: #4caf50;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  margin-left: 8px;
+}
+
+.badge-ocupada {
+  background-color: #f44336;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  margin-left: 8px;
+}
+
+#desvincular-disciplinas-btn, #btn-toggle-gerenciamento-aluno {
+  display: block;
+  margin: 20px auto 0 auto;
+  padding: 10px 20px;
+  font-size: 15px;
+  border-radius: 6px;
+  background-color: #c74017;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#desvincular-disciplinas-btn:hover, #btn-toggle-gerenciamento-aluno:hover {
+  background-color: #ff5722;
+  transform: translateY(-2px);
+}
+
+#desvincular-disciplinas-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.disciplina-item.desabilitada {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.disciplina-item.vinculada {
+  background-color: #e8f5e9;
+  border-left: 4px solid #4caf50;
+}
+
+.badge-vinculada {
+  background-color: #4caf50;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  margin-left: 8px;
+}
 .disciplina-item {
   
   display: flex;
@@ -679,7 +761,7 @@
 }
 /* fim dos ajustes */
 /* Botão confirmar */
-#confirmar-disciplinas-btn {
+#confirmar-disciplinas-btn,#btn-salvar-alteracoes{
   display: block;
   margin: 20px auto 0 auto;
   padding: 10px 20px;
@@ -694,6 +776,11 @@
 }
 
 #confirmar-disciplinas-btn:hover {
+  background-color: #ca0000;
+  transform: translateY(-2px);
+}
+
+#btn-salvar-alteracoes:hover {
   background-color: #ca0000;
   transform: translateY(-2px);
 }

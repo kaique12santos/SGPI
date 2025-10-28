@@ -1,73 +1,89 @@
 import { obterPerfil } from "../services/perfilServices.js";
 import { iniciarObserverDescricoes } from '../utils/descricaoLista.js';
 import { ativar } from "../utils/alerts.js";
-import { getMinhasDisciplinas, getMeusGrupos, getMeusProjetos } from "../services/perfilAcademicoServices.js";
-import { getDisciplinasDisponiveis, vincularDisciplinasProfessor } from "../services/disciplinaService.js";
+import { getMinhasDisciplinas, getMeusGrupos, getMeusProjetos, getDisciplinasDisponiveisProfessor } from "../services/perfilAcademicoServices.js";
+import { getDisciplinasDisponiveis, vincularDisciplinasProfessor, desvincularDisciplinasProfessor } from "../services/disciplinaService.js";
 import { getDisciplinasDisponiveisAluno, atualizarDisciplinasAluno } from "../services/alunoDisciplinaService.js";
 import { confirmarAcao } from "../utils/confirmDialog.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Containers principais
+  // ============================================
+  // VARIÁVEIS GLOBAIS DO ESCOPO
+  // ============================================
   const disciplinasContainer = document.querySelector(".disciplinas-container");
   const gruposContainer = document.querySelector(".grupos-container");
   const projetosContainer = document.querySelector(".projetos-container");
-
-  // Botão e seção de disciplinas para professores/orientadores
   const btnDisciplinas = document.getElementById("btn-disciplinas-disponiveis");
   const sectionDisciplinas = document.getElementById("section-disciplinas-disponiveis");
-
-  // Botão e seção de gerenciamento de disciplinas (alunos)
   const btnGerenciar = document.getElementById("btn-gerenciar-disciplinas");
   const sectionGerenciar = document.getElementById("section-gerenciar-disciplinas");
+  const containerProf = document.querySelector(".disciplinas-disponiveis-container");
+  const confirmarBtnProf = document.getElementById("confirmar-disciplinas-btn");
+  const desvincularBtn = document.getElementById("desvincular-disciplinas-btn");
+  //-- alunos
+  const containerAluno = document.querySelector(".disciplinas-gerenciar-container");
+  const btnSalvarAluno = document.getElementById("btn-salvar-alteracoes");
+  const btnToggleGerenciamentoAluno = document.getElementById("btn-toggle-gerenciamento-aluno");
 
-  // FIX: helper para alternar seções de forma consistente
+  const rawRole = localStorage.getItem("userRole") || "";
+  const userRole = rawRole.toLowerCase();
+  const userId = localStorage.getItem("usuarioId");
+  const isProfessor = ["professor", "professor_orientador", "orientador"].includes(userRole);
+
+  // Variáveis de controle do modo desvinculação professores/orientadores
+  let modoDesvinculacao = false;
+  let disciplinasOriginais = [];
+  // --- Estado do Aluno ---
+  let modoGerenciamentoAluno = false;
+
+  // ============================================
+  // HELPER: Alternar Seções
+  // ============================================
   const allSections = Array.from(document.querySelectorAll(".perfil-section"));
+  
   function hideAllSections() {
     allSections.forEach(sec => {
       sec.classList.remove("active");
-      sec.style.display = "none"; // garante esconder
+      sec.style.display = "none";
     });
   }
+  
   function showSection(sectionEl) {
     if (!sectionEl) return;
     hideAllSections();
-    sectionEl.style.display = "block"; // FIX: remove bloqueio por inline style
+    sectionEl.style.display = "block";
     sectionEl.classList.add("active");
   }
 
-  // Dados do usuário (padroniza role)
-  const rawRole = localStorage.getItem("userRole") || "";
-  const userRole = rawRole.toLowerCase(); // FIX: padroniza
-  const userId = localStorage.getItem("usuarioId");
-
-  // ========== PROFESSOR / ORIENTADOR ==========
-  const containerProf = document.querySelector(".disciplinas-disponiveis-container");
-  const confirmarBtnProf = document.getElementById("confirmar-disciplinas-btn");
-
-  // FIX: exibe botão/aba de professores apenas se for docente
-  const isProfessor = ["professor", "professor_orientador", "orientador"].includes(userRole);
+  // ============================================
+  // CONFIGURAÇÃO INICIAL PROFESSOR
+  // ============================================
   if (isProfessor) {
     btnDisciplinas?.classList?.add("visible");
-    // deixa a seção oculta até clicar
     if (sectionDisciplinas) sectionDisciplinas.style.display = "none";
   } else {
-    // se não é professor, garante que não quebra ao acessar elementos
-    // e mantém seção escondida
     if (sectionDisciplinas) sectionDisciplinas.style.display = "none";
   }
 
-  // 🔹 Carregar disciplinas disponíveis para professores/orientadores
+  // ============================================
+  // FUNÇÕES: PROFESSORES/ORIENTADORES
+  // ============================================
+  
   async function carregarDisciplinasDisponiveis() {
-    if (!isProfessor) return; // FIX: não executa para alunos
-    if (!containerProf) return;
+    if (!isProfessor || !containerProf) return;
 
     containerProf.innerHTML = "<p>Carregando disciplinas...</p>";
     if (confirmarBtnProf) confirmarBtnProf.disabled = true;
+    if (desvincularBtn) desvincularBtn.disabled = true;
+
+    modoDesvinculacao = false;
+    disciplinasOriginais = [];
+    atualizarEstadoBotoes();
 
     try {
-      // FIX: passe um role compatível com seu backend se necessário
-      const data = await getDisciplinasDisponiveis(userRole);
-      // Suporte aos dois formatos: {success, disciplinas} OU array direto
+      const data = await getDisciplinasDisponiveisProfessor(userId);
+      console.log("📊 Dados recebidos:", data);
+      
       const disciplinasResp = Array.isArray(data) ? data :
         (data?.disciplinas && Array.isArray(data.disciplinas) ? data.disciplinas : []);
 
@@ -76,108 +92,175 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      disciplinasOriginais = disciplinasResp
+        .filter(d => d.minha)
+        .map(d => String(d.oferta_id));
+      
+      console.log("📌 Minhas disciplinas originais:", disciplinasOriginais);
+
       const orientacao = disciplinasResp.filter(d => d.disciplina_nome?.startsWith("Orientação de Projetos"));
       const regulares = disciplinasResp.filter(d => !d.disciplina_nome?.startsWith("Orientação de Projetos"));
-     
-     
-   
 
       let html = "";
 
       if (userRole === "professor_orientador" || userRole === "orientador") {
-        html += `
-          <div class="disciplinas-bloco">
-            <h3 class="disciplinas-titulo">📘 Disciplinas Regulares</h3>
-            <div class="disciplinas-lista">
-              ${
-                regulares.length
-                  ? regulares.map(d => `
-                      <label class="disciplina-item">
-                        <input type="checkbox" value="${d.disciplina_id}">
-                        <span>${d.disciplina_nome}</span> <small>(${d.semestre_id}º semestre)</small>
-                      </label>`).join("")
-                  : "<p class='disciplinas-vazio'>Nenhuma disciplina regular disponível.</p>"
-              }
-            </div>
-          </div>
-
-          <div class="disciplinas-bloco">
-            <h3 class="disciplinas-titulo">🎓 Disciplinas de Orientação</h3>
-            <div class="disciplinas-lista">
-              ${
-                orientacao.length
-                  ? orientacao.map(d => `
-                      <label class="disciplina-item orientacao">
-                        <input type="checkbox" value="${d.disciplina_id}">
-                        <span>${d.disciplina_nome}</span> <small>(${d.semestre_id}º semestre)</small>
-                      </label>`).join("")
-                  : "<p class='disciplinas-vazio'>Nenhuma disciplina de orientação disponível.</p>"
-              }
-            </div>
-          </div>
-        `;
+        html += gerarBlocoHTML("📘 Disciplinas Regulares", regulares);
+        html += gerarBlocoHTML("🎓 Disciplinas de Orientação", orientacao, "orientacao");
       } else {
-        html += `
-          <div class="disciplinas-bloco">
-            <h3 class="disciplinas-titulo">📘 Disciplinas Regulares</h3>
-            <div class="disciplinas-lista">
-              ${
-                regulares.length
-                  ? regulares.map(d => `
-                      <label class="disciplina-item">
-                        <input type="checkbox" value="${d.disciplina_id}">
-                        <span>${d.disciplina_nome}</span> <small>(${d.semestre_id}º semestre)</small>
-                      </label>`).join("")
-                  : "<p class='disciplinas-vazio'>Nenhuma disciplina disponível.</p>"
-              }
-            </div>
-          </div>
-        `;
+        html += gerarBlocoHTML("📘 Disciplinas Disponíveis", regulares);
       }
 
       containerProf.innerHTML = html;
       if (confirmarBtnProf) confirmarBtnProf.disabled = false;
+      if (desvincularBtn) desvincularBtn.disabled = false;
+
+      adicionarListenersCheckboxes();
     } catch (err) {
-      console.error("Erro ao carregar disciplinas:", err);
+      console.error("❌ Erro ao carregar disciplinas:", err);
       containerProf.innerHTML = "<div class='empty-state'><h3>Erro ao carregar disciplinas disponíveis.</h3></div>";
       ativar("Erro ao carregar disciplinas disponíveis.", "erro", "");
     }
   }
 
-  confirmarBtnProf?.addEventListener("click", async () => {
-    if (!isProfessor) return;
-    if (!containerProf) return;
+  function gerarBlocoHTML(titulo, disciplinas, classeExtra = "") {
+    if (!disciplinas.length) {
+      return `
+        <div class="disciplinas-bloco">
+          <h3 class="disciplinas-titulo">${titulo}</h3>
+          <p class='disciplinas-vazio'>Nenhuma disciplina disponível nesta categoria.</p>
+        </div>
+      `;
+    }
 
-    const selecionadas = Array.from(containerProf.querySelectorAll("input:checked")).map(i => i.value);
+    const items = disciplinas.map(d => `
+      <label class="disciplina-item ${classeExtra} ${d.minha ? 'vinculada' : ''} ${d.atribuida && !d.minha ? 'ocupada' : ''}" data-oferta-id="${d.oferta_id}">
+        <input 
+          type="checkbox" 
+          value="${d.oferta_id}" 
+          data-minha="${d.minha ? '1' : '0'}"
+          data-atribuida="${d.atribuida ? '1' : '0'}"
+          ${d.minha ? "checked" : ""} 
+          ${d.atribuida && !d.minha ? "disabled" : ""}>
+        <span>${d.disciplina_nome}</span>
+        <small>(${d.semestre_padrao}º semestre - 0${d.periodo}/${d.ano})</small>
+        ${d.minha ? '<span class="badge-vinculada">✓ Vinculada</span>' : ''}
+        ${d.atribuida && !d.minha ? '<span class="badge-ocupada">✕ Ocupada</span>' : ''}
+      </label>
+    `).join("");
+
+    return `
+      <div class="disciplinas-bloco">
+        <h3 class="disciplinas-titulo">${titulo}</h3>
+        <div class="disciplinas-lista">${items}</div>
+      </div>
+    `;
+  }
+
+  function adicionarListenersCheckboxes() {
+    if (!containerProf) return;
+    const checkboxes = containerProf.querySelectorAll('input[type="checkbox"]');
+    
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        const minha = e.target.dataset.minha === '1';
+        
+        if (!modoDesvinculacao) {
+          if (minha && !e.target.checked) {
+            e.target.checked = true;
+            ativar("Use o botão 'Gerenciar Minhas Disciplinas' para desvincular.", "aviso", "");
+          }
+        }
+      });
+    });
+  }
+
+  function alternarModo(ativarDesvinculacao) {
+    if (!containerProf) return;
+    modoDesvinculacao = ativarDesvinculacao;
+    
+    const checkboxes = containerProf.querySelectorAll('input[type="checkbox"]');
+    const labels = containerProf.querySelectorAll('.disciplina-item');
+    
+    checkboxes.forEach((checkbox, index) => {
+      const minha = checkbox.dataset.minha === '1';
+      const atribuida = checkbox.dataset.atribuida === '1';
+      const label = labels[index];
+      
+      if (modoDesvinculacao) {
+        if (!minha) {
+          checkbox.disabled = true;
+          label?.classList.add('desabilitada');
+        } else {
+          checkbox.disabled = false;
+          label?.classList.remove('desabilitada');
+        }
+      } else {
+        if (atribuida && !minha) {
+          checkbox.disabled = true;
+        } else {
+          checkbox.disabled = false;
+        }
+        label?.classList.remove('desabilitada');
+      }
+    });
+    
+    atualizarEstadoBotoes();
+  }
+
+  function atualizarEstadoBotoes() {
+    if (modoDesvinculacao) {
+      if (confirmarBtnProf) confirmarBtnProf.style.display = 'none';
+      if (desvincularBtn) {
+        desvincularBtn.innerHTML = '<span>✅</span> Confirmar Alterações';
+        desvincularBtn.classList.add('ativo');
+      }
+    } else {
+      if (confirmarBtnProf) confirmarBtnProf.style.display = 'inline-block';
+      if (desvincularBtn) {
+        desvincularBtn.innerHTML = '<span>⚙️</span> Gerenciar Minhas Disciplinas';
+        desvincularBtn.classList.remove('ativo');
+      }
+    }
+  }
+
+  // ============================================
+  // EVENTOS: VINCULAR/DESVINCULAR
+  // ============================================
+  
+  confirmarBtnProf?.addEventListener("click", async () => {
+    if (!isProfessor || !containerProf) return;
+
+    const selecionadas = Array.from(
+      containerProf.querySelectorAll('input[type="checkbox"]:checked[data-minha="0"]')
+    ).map(i => i.value);
 
     if (selecionadas.length === 0) {
-      ativar("Selecione pelo menos uma disciplina.", "erro", "");
+      ativar("Selecione pelo menos uma disciplina disponível para vincular.", "aviso", "");
       return;
     }
 
-    const resp = await obterPerfil();
-    if (resp.ok) {
-      const dataProfessores = await resp.json();
-      const userData = dataProfessores.usuario;
-      const nomeProfessor = userData.usuario_nome;
-      
-      
-      const confirmar = await confirmarAcao(
-        `${nomeProfessor} Tem Certeza que Deseja se Vincular a Essas Diciplinas?`,
-        `As Diciplinas Selecionadas Serão Vinculadas a Sua Grade`,
-        "Confirmar",
-        "Cancelar"
-      )
-      if (!confirmar) return;
-
-    } else {
-      const errorData = await resp.json();  // ✅ corrigido aqui
-      ativar(errorData.message || "Erro ao carregar dados do usuário", "erro", "");
-    }
-    
-
     try {
+      const resp = await obterPerfil();
+      if (resp.ok) {
+        const dataProfessores = await resp.json();
+        const nomeProfessor = dataProfessores.usuario.usuario_nome;
+        
+        const confirmar = await confirmarAcao(
+          `${nomeProfessor}, tem certeza?`,
+          `Você está vinculando ${selecionadas.length} disciplina(s) à sua grade.`,
+          "Confirmar Vínculo",
+          "Cancelar"
+        );
+        
+        if (!confirmar) return;
+      } else {
+        const errorData = await resp.json();
+        ativar(errorData.message || "Erro ao carregar dados do usuário", "erro", "");
+        return;
+      }
+
       const resposta = await vincularDisciplinasProfessor(userId, selecionadas);
+      
       if (resposta?.success) {
         ativar("Disciplinas vinculadas com sucesso!", "sucesso", "");
         await carregarDisciplinasDisponiveis();
@@ -185,70 +268,178 @@ document.addEventListener("DOMContentLoaded", () => {
         ativar(resposta?.message || "Erro ao vincular disciplinas.", "erro", "");
       }
     } catch (err) {
+      console.error("❌ Erro ao vincular:", err);
       ativar("Erro na comunicação com o servidor.", "erro", "");
     }
   });
 
-  btnDisciplinas?.addEventListener("click", () => {
-    if (!isProfessor) return;
-    showSection(sectionDisciplinas); // FIX: garante show + active
-    carregarDisciplinasDisponiveis();
+  desvincularBtn?.addEventListener("click", async () => {
+    if (!isProfessor || !containerProf) return;
+
+    if (!modoDesvinculacao) {
+      alternarModo(true);
+      ativar("Modo de gerenciamento ativado. Desmarque as disciplinas que deseja desvincular.", "info", "");
+      return;
+    }
+
+    const disciplinasAtuais = Array.from(
+      containerProf.querySelectorAll('input[type="checkbox"][data-minha="1"]:checked')
+    ).map(i => String(i.value));
+
+    const paraDesvincular = disciplinasOriginais.filter(id => !disciplinasAtuais.includes(id));
+
+    if (paraDesvincular.length === 0) {
+      ativar("Nenhuma alteração detectada. Desmarque disciplinas para desvinculá-las.", "aviso", "");
+      alternarModo(false);
+      return;
+    }
+
+    try {
+      const resp = await obterPerfil();
+      if (resp.ok) {
+        const dataProfessores = await resp.json();
+        const nomeProfessor = dataProfessores.usuario.usuario_nome;
+        
+        const confirmar = await confirmarAcao(
+          `${nomeProfessor}, deseja mesmo desvincular?`,
+          `Você está removendo ${paraDesvincular.length} disciplina(s) da sua grade.`,
+          "Sim, Desvincular",
+          "Cancelar"
+        );
+        
+        if (!confirmar) {
+          alternarModo(false);
+          await carregarDisciplinasDisponiveis();
+          return;
+        }
+      } else {
+        const errorData = await resp.json();
+        ativar(errorData.message || "Erro ao carregar dados do usuário", "erro", "");
+        return;
+      }
+
+      const resposta = await desvincularDisciplinasProfessor(userId, paraDesvincular);
+      
+      if (resposta?.success) {
+        ativar("Disciplinas desvinculadas com sucesso!", "sucesso", "");
+        await carregarDisciplinasDisponiveis();
+      } else {
+        ativar(resposta?.message || "Erro ao desvincular disciplinas.", "erro", "");
+      }
+    } catch (err) {
+      console.error("❌ Erro ao desvincular:", err);
+      ativar("Erro na comunicação com o servidor.", "erro", "");
+    }
   });
 
-  // === FUNÇÃO PARA ALUNOS ===
-  async function carregarDisciplinasAluno() {
-    const container = document.querySelector(".disciplinas-gerenciar-container");
-    const confirmarBtn = document.getElementById("btn-salvar-alteracoes");
-    if (!container || !confirmarBtn) return;
+  // ============================================
+  // FUNÇÕES: ALUNOS (INÍCIO DA SEÇÃO MODIFICADA)
+  // ============================================
 
-    container.innerHTML = "<p>Carregando disciplinas...</p>";
-    confirmarBtn.disabled = true;
+  /**
+   * Habilita ou desabilita os checkboxes e botões
+   * da seção de gerenciamento do aluno, baseado na variável global `modoGerenciamentoAluno`.
+   */
+  function atualizarEstadoGerenciamentoAluno() {
+    // Usamos as variáveis globais que você definiu no topo
+    if (!containerAluno || !btnSalvarAluno || !btnToggleGerenciamentoAluno) return;
+
+    const checkboxes = containerAluno.querySelectorAll('input[type="checkbox"]');
+    
+    if (modoGerenciamentoAluno) {
+      // MODO EDIÇÃO (DESBLOQUEADO)
+      checkboxes.forEach(cb => cb.disabled = false);
+      btnSalvarAluno.disabled = false;
+      btnToggleGerenciamentoAluno.innerHTML = "<span>❌</span> Cancelar";
+      btnToggleGerenciamentoAluno.classList.add("ativo"); // (Opcional, para estilo)
+    } else {
+      // MODO PADRÃO (BLOQUEADO)
+      checkboxes.forEach(cb => cb.disabled = true);
+      btnSalvarAluno.disabled = true;
+      btnToggleGerenciamentoAluno.innerHTML = "<span>⚙️</span> Gerenciar Matrículas";
+      btnToggleGerenciamentoAluno.classList.remove("ativo"); // (Opcional, para estilo)
+    }
+  }
+  
+  /**
+   * Carrega as disciplinas do aluno e aplica o estado de "bloqueado" por padrão.
+   */
+  async function carregarDisciplinasAluno() {
+    // Usamos as variáveis globais
+    if (!containerAluno || !btnSalvarAluno || !btnToggleGerenciamentoAluno) {
+      console.warn("Elementos do DOM de gerenciamento do Aluno não encontrados.");
+      return;
+    }
+
+    containerAluno.innerHTML = "<p>Carregando disciplinas...</p>";
+    
+    // Reseta o estado para "bloqueado" toda vez que carregar
+    modoGerenciamentoAluno = false;
+    atualizarEstadoGerenciamentoAluno(); // Chama a função para bloquear o formulário
 
     try {
       const { success, disciplinas } = await getDisciplinasDisponiveisAluno();
 
       if (!success || !disciplinas || disciplinas.length === 0) {
-        container.innerHTML = "<p class='disciplinas-vazio'>Nenhuma disciplina disponível no momento.</p>";
+        containerAluno.innerHTML = "<p class='disciplinas-vazio'>Nenhuma disciplina disponível no momento.</p>";
+        // Desabilita o botão de gerenciar se não há disciplinas
+        btnToggleGerenciamentoAluno.disabled = true;
         return;
       }
+      
+      // Habilita o botão de gerenciar, pois há disciplinas
+      btnToggleGerenciamentoAluno.disabled = false;
 
       const html = disciplinas.map(d => `
         <label class="disciplina-item">
           <input type="checkbox" value="${d.id}" ${d.matriculado ? "checked" : ""}>
           <span>${d.nome}</span>
-          <small>(${d.semestre_id}º semestre)</small>
+          <small>(${d.semestre_padrao}º semestre)</small>
         </label>
       `).join("");
 
-      container.innerHTML = `
+      containerAluno.innerHTML = `
         <div class="disciplinas-bloco">
           <h3 class="disciplinas-titulo">📘 Disciplinas disponíveis</h3>
           <div class="disciplinas-lista">${html}</div>
         </div>
       `;
-      confirmarBtn.disabled = false;
+
+      // Aplica o estado inicial (bloqueado) aos novos checkboxes
+      atualizarEstadoGerenciamentoAluno();
+
     } catch (err) {
       console.error("Erro ao carregar disciplinas do aluno:", err);
-      container.innerHTML = "<p>Erro ao carregar disciplinas.</p>";
+      containerAluno.innerHTML = "<p>Erro ao carregar disciplinas.</p>";
     }
   }
 
-  document.getElementById("btn-salvar-alteracoes")?.addEventListener("click", async () => {
-    const container = document.querySelector(".disciplinas-gerenciar-container");
-    if (!container) return;
-
-    const selecionadas = Array.from(container.querySelectorAll("input:checked"))
-    .map(i => Number(i.value))
-    .filter(id => !isNaN(id) && id !== 0 && id !== null);
-
-    if (selecionadas.length === 0) {
-      ativar("Selecione pelo menos uma disciplina.", "erro", "");
-      return;
+  // Listener para o botão "Gerenciar/Cancelar" (usa a variável global)
+  btnToggleGerenciamentoAluno?.addEventListener("click", () => {
+    if (modoGerenciamentoAluno) {
+      // Estava em modo edição, clicou em "Cancelar"
+      modoGerenciamentoAluno = false;
+      // Recarrega as disciplinas para resetar o estado dos checkboxes
+      carregarDisciplinasAluno(); 
+    } else {
+      // Estava bloqueado, clicou em "Gerenciar"
+      modoGerenciamentoAluno = true;
+      atualizarEstadoGerenciamentoAluno(); // Desbloqueia os inputs
+      ativar("Modo de edição ativado. Faça suas alterações e salve.", "info", "");
     }
+  });
+
+  // Listener para o botão "Salvar" (usa as variáveis globais)
+  btnSalvarAluno?.addEventListener("click", async () => {
+    if (!containerAluno) return;
+
+    const selecionadas = Array.from(containerAluno.querySelectorAll("input:checked"))
+      .map(i => Number(i.value))
+      .filter(id => !isNaN(id)); // Permite array vazio (desmatricular de tudo)
 
     const confirmar = await confirmarAcao(
       "Confirmar alteração?",
-      "As disciplinas antigas serão substituídas pelas novas seleções.",
+      "Sua lista de matrículas será atualizada para as disciplinas selecionadas.",
       "Confirmar",
       "Cancelar"
     );
@@ -258,6 +449,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const resposta = await atualizarDisciplinasAluno(selecionadas);
       if (resposta?.success) {
         ativar("Disciplinas atualizadas com sucesso!", "sucesso", "");
+        // Reseta o modo e recarrega a lista, bloqueando o formulário
+        modoGerenciamentoAluno = false; 
         await carregarDisciplinasAluno();
       } else {
         ativar(resposta?.message || "Erro ao atualizar disciplinas.", "erro", "");
@@ -268,23 +461,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Listener que MOSTRA a seção do aluno (usa a variável global `btnGerenciar`)
   if (userRole === "aluno") {
     if (btnGerenciar) btnGerenciar.style.display = "flex";
     btnGerenciar?.addEventListener("click", () => {
-      showSection(sectionGerenciar); // FIX
-      carregarDisciplinasAluno();
+      showSection(sectionGerenciar);
+      carregarDisciplinasAluno(); // Apenas chama a função de carregar
     });
   }
-
-  // ========== OUTRAS SEÇÕES ==========
-  // FIX: seus services provavelmente já retornam JSON.
-  // Pare de chamar resp.json(), use diretamente o objeto.
 
   async function carregarDisciplinas() {
     if (!disciplinasContainer) return;
     disciplinasContainer.innerHTML = "<p>Carregando...</p>";
     try {
-      const data = await getMinhasDisciplinas(); // FIX: sem .json()
+      const data = await getMinhasDisciplinas();
       const list = data?.disciplinas ?? [];
       if (!data?.success || list.length === 0) {
         disciplinasContainer.innerHTML = "<p>Nenhuma disciplina cadastrada.</p>";
@@ -307,7 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!gruposContainer) return;
     gruposContainer.innerHTML = "<p>Carregando...</p>";
     try {
-      const data = await getMeusGrupos(); // FIX
+      const data = await getMeusGrupos();
       if (!data?.success || !Array.isArray(data.grupos) || !data.grupos.length) {
         gruposContainer.innerHTML = "<p>Nenhum grupo encontrado.</p>";
         return;
@@ -316,7 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="grupo-card">
           <h3>${g.nome}</h3>
           <p>${g.descricao ?? ""}</p>
-          <small>Semestre: ${g.semestre_id}</small>
+          <small>Semestre: ${g.periodo}º / ${g.ano}</small>
         </div>`).join("");
     } catch (e) {
       console.error(e);
@@ -331,7 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     listaProjetos.innerHTML = "<p>Carregando projetos...</p>";
     try {
-      const data = await getMeusProjetos(semestreId); // FIX
+      const data = await getMeusProjetos(semestreId);
       if (!data?.success || !Array.isArray(data.projetos) || !data.projetos.length) {
         listaProjetos.innerHTML = "<p>Nenhum projeto encontrado.</p>";
         return;
@@ -340,7 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="projeto-card">
           <h3>${p.titulo} <small>${p.status ?? ""}</small></h3>
           <p>${p.descricao ?? ""}</p>
-          <small>Semestre: ${p.semestre_id}</small>
+          <small>Semestre: ${p.periodo}º / ${p.ano}</small>
         </div>
       `).join("");
     } catch (e) {
@@ -368,29 +558,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Navegação por clique (garante mostrar seção)
-  document.addEventListener("click", (e) => {
-    if (e.target.closest("#btn-disciplinas-disponiveis")) {
-      showSection(sectionDisciplinas);
-      carregarDisciplinasDisponiveis();
-    }
-    if (e.target.closest("#btn-minhas-disciplinas")) {
-      const sec = document.getElementById("section-minhas-disciplinas");
-      showSection(sec);
-      carregarDisciplinas();
-    }
-    if (e.target.closest("#btn-meus-grupos")) {
-      const sec = document.getElementById("section-meus-grupos");
-      showSection(sec);
-      carregarGrupos();
-    }
-    if (e.target.closest("#btn-meus-projetos")) {
-      const sec = document.getElementById("section-meus-projetos");
-      showSection(sec);
-      inicializarEventosFiltro();
-      carregarProjetos();
-    }
+  // ============================================
+  // NAVEGAÇÃO POR CLIQUE (CORRIGIDO)
+  // ============================================
+  
+  btnDisciplinas?.addEventListener("click", () => {
+    showSection(sectionDisciplinas);
+    carregarDisciplinasDisponiveis();
+  });
+
+  document.getElementById("btn-minhas-disciplinas")?.addEventListener("click", () => {
+    const sec = document.getElementById("section-minhas-disciplinas");
+    showSection(sec);
+    carregarDisciplinas();
+  });
+
+  document.getElementById("btn-meus-grupos")?.addEventListener("click", () => {
+    const sec = document.getElementById("section-meus-grupos");
+    showSection(sec);
+    carregarGrupos();
+  });
+
+  document.getElementById("btn-meus-projetos")?.addEventListener("click", () => {
+    const sec = document.getElementById("section-meus-projetos");
+    showSection(sec);
+    inicializarEventosFiltro();
+    carregarProjetos();
   });
 
   iniciarObserverDescricoes();
+
 });

@@ -85,7 +85,7 @@ function getItensMenu() {
     professor_orientador: [
     { texto: 'Avaliar Entregas', link: '/artefatosEntregues' },
     { texto: 'Criar Projetos', link: '/projetos' },
-    { texto: 'Gerenciar grupo', link: '/criar-grupos' },
+    { texto: 'Criar Grupos', link: '/criar-grupos' },
     { texto: 'Pedidos de reconsiderações', link: '/reconsideracoes' },
     { texto: 'Criar Atividades', link: '/criar-atividade' },
     {texto: 'Meu Perfil', link: '/perfil'},

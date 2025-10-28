@@ -70,31 +70,27 @@
         </div>
 
         <form id="formProjeto" class="projeto-form">
-            <label for="titulo" class="label-projeto">Título do Projeto:</label>
-            <input type="text" id="titulo" required>
-        
-            <label for="descricao" class="label-projeto">Descrição:</label>
-            <textarea id="descricao" rows="4"></textarea>
-        
-            <label for="semestre" class="label-projeto">Semestre:</label>
-            <select id="semestre" required>
-                <option value="0" disabled selected>Selecione o semestre</option>
-                <option value="1">1º Semestre</option>
-                <option value="2">2º Semestre</option>
-                <option value="3">3º Semestre</option>
-                <option value="4">4º Semestre</option>
-                <option value="5">5º Semestre</option>
-                <option value="6">6º Semestre</option>
-              </select>
-        
-            <label for="grupo" class="label-projeto">Grupo:</label>
-            <select id="grupo" required>
-              <option value="">Selecione um grupo</option>
-            </select>
-        
-            <button type="submit" class="btn-criar">Criar Projeto</button>
-            
-          </form>
+          <label for="titulo" class="label-projeto">Título do Projeto:</label>
+          <input type="text" id="titulo" required>
+      
+          <label for="descricao" class="label-projeto">Descrição:</label>
+          <textarea id="descricao" rows="4"></textarea>
+      
+          <label for="disciplina" class="label-projeto">Disciplina de Orientação:</label>
+          <select id="disciplina" required>
+            <option value="" disabled selected>Carregando disciplinas...</option>
+          </select>
+          
+          <label for="grupo" class="label-projeto">Grupo:</label>
+          <select id="grupo" required>
+            <option value="">Selecione uma disciplina acima</option>
+          </select>
+      
+          
+      
+          <button type="submit" class="btn-criar">Criar Projeto</button>
+          
+        </form>
           <div class="lista-titulo">
           <h1>Lista de Projetos</h1>
           </div>
@@ -105,33 +101,26 @@
               <h3>Editar Projeto</h3>
           
               <label for="modal-titulo">Título</label>
-              <input type="text" id="modal-titulo">
-          
-              <label for="modal-descricao">Descrição</label>
-              <textarea id="modal-descricao" rows="3"></textarea>
-          
-              <label for="modal-semestre">Semestre</label>
-              <select id="modal-semestre" required>
-                <option value="0">Selecione o semestre</option>
-                <option value="1">1º Semestre</option>
-                <option value="2">2º Semestre</option>
-                <option value="3">3º Semestre</option>
-                <option value="4">4º Semestre</option>
-                <option value="5">5º Semestre</option>
-                <option value="6">6º Semestre</option>
+              <input type="text" id="modal-titulo"> <label for="modal-descricao">Descrição</label>
+              <textarea id="modal-descricao" rows="3"></textarea> <label for="modal-semestre">Semestre Letivo</label>
+              <select id="modal-semestre" required disabled> <option value="0">Carregando semestres...</option>
+              </select>
+
+              <label for="modal-disciplina">Disciplina</label>
+              <select id="modal-disciplina" required disabled>
+                <option value="0">Carregando disciplinas...</option>
               </select>
           
               <label for="modal-status">Status</label>
-              <select id="modal-status">
-                <option>Em Proposta</option>
+              <select id="modal-status"> <option>Em Proposta</option>
                 <option>Em Andamento</option>
                 <option>Aguardando Avaliação</option>
                 <option>Concluído</option>
               </select>
           
               <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
-                <button onclick="fecharModal()" class="btn-salvar" style="background: gray;">Cancelar</button>
-                <button onclick="confirmarEdicao()" class="btn-salvar">Salvar</button>
+                <button id="btn-modal-cancelar" class="btn-salvar" style="background: gray;">Cancelar</button>
+                <button id="btn-modal-salvar" class="btn-salvar">Salvar</button>
               </div>
             </div>
           </div>          

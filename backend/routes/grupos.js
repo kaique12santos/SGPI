@@ -1,48 +1,140 @@
 const express = require('express');
 const router = express.Router();
 const { getConnection } = require('../conexaoMysql.js');
-router.post('/grupos', async (req, res) => {
-  const connection = await getConnection();
-  const { nome, descricao, semestre_id, disciplina_id, alunos } = req.body;
 
+// ====================================
+// UTILITÁRIOS
+// ====================================
+
+/**
+ * Obtém o semestre ativo atual
+ */
+async function obterSemestreAtivo(connection) {
+  const sql = `
+    SELECT id, periodo, ano
+    FROM Semestres
+    WHERE ativo = 1
+    ORDER BY ano DESC, periodo DESC
+    LIMIT 1
+  `;
+  // CORREÇÃO: Trocado 'execute' por 'query' e corrigida a leitura de 'rows'
+  const [rows] = await connection.query(sql); 
+  return rows.length ? rows[0] : null;
+}
+
+/**
+ * Verifica se um grupo tem projetos não finalizados
+ */
+async function grupoTemProjetoAtivo(connection, grupoId) {
+  const sql = `SELECT COUNT(*) AS total FROM Projetos WHERE grupo_id = ? AND status != 'Concluído'`;
+  // CORREÇÃO: Trocado 'execute' por 'query' e corrigida a leitura de 'rows'
+  const [rows] = await connection.query(sql, [grupoId]); 
+  const total = rows.length ? parseInt(rows[0].total, 10) : 0;
+  return total > 0;
+}
+
+/**
+ * GET /grupos/alunos-disponiveis/:orientadorId
+ * (Esta rota parece ser uma versão antiga, a rota mais abaixo com /:semestrePadrao é a usada)
+ */
+// ... (vou pular a correção desta rota duplicada, pois a de baixo é a mais completa)
+
+
+/**
+ * GET /grupos/semestre-ativo
+ * Retorna informações do semestre ativo
+ */
+router.get('/grupos/semestre-ativo', async (req, res) => {
+  let connection;
   try {
-    if (!nome || !semestre_id) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Nome e semestre são obrigatórios.' 
+    connection = await getConnection();
+    const semestreAtivo = await obterSemestreAtivo(connection); // Esta função já foi corrigida
+    
+    if (!semestreAtivo) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Não há semestre ativo no momento.' 
       });
     }
 
-    if (!Array.isArray(alunos) || alunos.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'É necessário ao menos um aluno para criar um grupo.' 
-      });
-    }
-
-    await connection.beginTransaction();
-
-    // Inserir grupo
-    const [resultGrupo] = await connection.execute(
-      `INSERT INTO Grupos (nome, descricao, semestre_id, disciplina_id) 
-       VALUES (?, ?, ?, ?)`,
-      [nome, descricao, semestre_id, disciplina_id]
-    );
-
-    const grupoId = resultGrupo.insertId;
-
-    // Adicionar alunos usando procedure
-    const alunosCSV = alunos.join(',');
-    await connection.execute(
-      `CALL adicionar_alunos_grupo2(?, ?)`,
-      [grupoId, alunosCSV]
-    );
-
-    await connection.commit();
-    res.status(201).json({ success: true, message: 'Grupo criado com sucesso!' });
+    res.json({
+      success: true,
+      semestre: semestreAtivo
+    });
 
   } catch (error) {
-    await connection.rollback();
+    console.error('Erro ao buscar semestre ativo:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erro ao buscar semestre ativo.', 
+      error: error.message 
+    });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+
+// ====================================
+// ROTA PRINCIPAL DE CRIAÇÃO (MODIFICADA)
+// ====================================
+router.post('/grupos', async (req, res) => {
+  // MODIFICADO: Recebendo os novos campos do frontend
+  const { nome, semestre_id, alunos, disciplina_id, orientador_id } = req.body;
+
+  // MODIFICADO: Adicionada validação dos novos campos
+  if (!nome || !semestre_id || !disciplina_id || !orientador_id) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Nome, semestre, disciplina e orientador são obrigatórios.' 
+    });
+  }
+
+  if (!Array.isArray(alunos) || alunos.length === 0) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'É necessário ao menos um aluno para criar um grupo.' 
+    });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+    console.log('Backend: Tentando inserir grupo. Nome:', nome, 'Semestre ID:', semestre_id, 'Orientador:', orientador_id, 'Disciplina:', disciplina_id);
+    
+    // MODIFICADO: Query de INSERT agora inclui os novos campos
+    const sqlInsert = `
+      INSERT INTO Grupos (nome, semestre_id, orientador_id, disciplina_id) 
+      VALUES (?, ?, ?, ?)
+    `;
+    
+    // CORREÇÃO: Trocado 'execute' por 'query' e corrigida a leitura do 'insertId'
+    const [resultGrupo] = await connection.query(sqlInsert, [
+      nome, 
+      semestre_id, 
+      orientador_id, 
+      disciplina_id
+    ]);
+    
+    const grupoId = resultGrupo.insertId; // Correção aqui
+    
+    console.log('Backend: Grupo inserido. Novo grupoId:', grupoId);
+
+    // Adicionar alunos ao grupo via procedure
+    const alunosCSV = alunos.join(',');
+    console.log('Backend: Tentando chamar procedure. GrupoID:', grupoId, 'AlunosCSV:', alunosCSV);
+    const sqlProc = `CALL adicionar_alunos_grupo2(?, ?)`;
+    
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    await connection.query(sqlProc, [grupoId, alunosCSV]);
+
+    res.status(201).json({ 
+      success: true, 
+      message: 'Grupo criado com sucesso!',
+      grupoId 
+    });
+
+  } catch (error) {
     console.error('Erro ao criar grupo:', error);
     res.status(500).json({ 
       success: false, 
@@ -50,39 +142,44 @@ router.post('/grupos', async (req, res) => {
       error: error.message 
     });
   } finally {
-    await connection.end();
+    if (connection) await connection.release();
   }
 });
 
-// Listar grupos
+/**
+ * GET /grupos
+ * Listar todos os grupos
+ */
 router.get('/grupos', async (req, res) => {
-  const connection = await getConnection();
-
+  let connection;
   try {
-    const [rows] = await connection.execute(
-      `SELECT g.id, g.nome, g.descricao, g.semestre_id, g.disciplina_id,
-              g.data_criacao, g.data_atualizacao,
-              s.periodo as semestre_periodo,
-              d.nome as disciplina_nome
-       FROM Grupos g
-       LEFT JOIN Semestres s ON g.semestre_id = s.id
-       LEFT JOIN Disciplinas d ON g.disciplina_id = d.id
-       ORDER BY g.data_criacao DESC`
-    );
+    connection = await getConnection();
 
-    const grupos = rows.map(row => ({
-      id: row.id,
-      nome: row.nome,
-      descricao: row.descricao,
-      semestre_id: row.semestre_id,
-      semestre_periodo: row.semestre_periodo,
-      disciplina_id: row.disciplina_id,
-      disciplina_nome: row.disciplina_nome,
-      data_criacao: row.data_criacao,
-      data_atualizacao: row.data_atualizacao
-    }));
+    const sql = `
+      SELECT 
+        g.id, 
+        g.nome, 
+        g.semestre_id,
+        s.periodo,
+        s.ano,
+        g.data_criacao, 
+        g.data_atualizacao,
+        COUNT(DISTINCT ug.usuario_id) as total_membros,
+        d.nome as disciplina_nome, -- BÔNUS: Já trazendo o nome da disciplina
+        u.nome as orientador_nome -- BÔNUS: Já trazendo o nome do orientador
+      FROM Grupos g
+      JOIN Semestres s ON g.semestre_id = s.id
+      LEFT JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      LEFT JOIN Disciplinas d ON g.disciplina_id = d.id -- BÔNUS
+      LEFT JOIN Usuarios u ON g.orientador_id = u.id -- BÔNUS
+      GROUP BY g.id, g.nome, g.semestre_id, s.periodo, s.ano, g.data_criacao, g.data_atualizacao, d.nome, u.nome
+      ORDER BY g.data_criacao DESC
+    `;
 
-    res.json(grupos);
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [grupos] = await connection.query(sql, []);
+
+    res.json(grupos); // 'grupos' já é o array de resultados
 
   } catch (error) {
     console.error('Erro ao listar grupos:', error);
@@ -92,49 +189,88 @@ router.get('/grupos', async (req, res) => {
       error: error.message 
     });
   } finally {
-    await connection.end();
+    if (connection) await connection.release();
   }
 });
 
-// Buscar grupo por ID
+/**
+ * GET /grupos/:id
+ * Obter detalhes de um grupo específico
+ */
 router.get('/grupos/:id', async (req, res) => {
-  const connection = await getConnection();
-  const grupoId = parseInt(req.params.id, 10);
+  const grupoId = Number(req.params.id);
 
-  if (isNaN(grupoId)) {
-    return res.status(400).json({ message: 'ID de grupo inválido' });
+  if (!grupoId || isNaN(grupoId)) {
+    return res.status(400).json({ success: false, message: 'ID de grupo inválido' });
   }
 
+  let connection;
   try {
-    const [rows] = await connection.execute(
-      `SELECT g.id, g.nome, g.descricao, g.semestre_id, g.disciplina_id,
-              g.data_criacao, g.data_atualizacao,
-              s.periodo as semestre_periodo,
-              d.nome as disciplina_nome
-       FROM Grupos g
-       LEFT JOIN Semestres s ON g.semestre_id = s.id
-       LEFT JOIN Disciplinas d ON g.disciplina_id = d.id
-       WHERE g.id = ?`,
-      [grupoId]
-    );
+    connection = await getConnection();
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Grupo não encontrado' });
+    // 1. Obter detalhes do grupo
+    const sql = `
+      SELECT 
+        g.id, 
+        g.nome, 
+        g.semestre_id,
+        s.periodo,
+        s.ano,
+        s.ativo as semestre_ativo,
+        g.data_criacao, 
+        g.data_atualizacao,
+        g.disciplina_id,        -- BÔNUS
+        g.orientador_id,        -- BÔNUS
+        d.nome as disciplina_nome, -- BÔNUS
+        u.nome as orientador_nome  -- BÔNUS
+      FROM Grupos g
+      JOIN Semestres s ON g.semestre_id = s.id
+      LEFT JOIN Disciplinas d ON g.disciplina_id = d.id -- BÔNUS
+      LEFT JOIN Usuarios u ON g.orientador_id = u.id -- BÔNUS
+      WHERE g.id = ?
+    `;
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [rows] = await connection.query(sql, [grupoId]);
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Grupo não encontrado' });
     }
 
-    const grupo = {
-      id: rows[0].id,
-      nome: rows[0].nome,
-      descricao: rows[0].descricao,
-      semestre_id: rows[0].semestre_id,
-      semestre_periodo: rows[0].semestre_periodo,
-      disciplina_id: rows[0].disciplina_id,
-      disciplina_nome: rows[0].disciplina_nome,
-      data_criacao: rows[0].data_criacao,
-      data_atualizacao: rows[0].data_atualizacao
-    };
+    const grupo = rows[0];
 
-    res.json(grupo);
+    // 2. LÓGICA do semestre_padrao
+    const sqlSemestrePadrao = `
+        SELECT d.semestre_padrao
+        FROM Usuario_Grupo ug
+        JOIN Aluno_Oferta ao ON ug.usuario_id = ao.aluno_id
+        JOIN Disciplinas_Ofertas do_tbl ON ao.oferta_id = do_tbl.id
+        JOIN Disciplinas d ON do_tbl.disciplina_id = d.id
+        WHERE ug.grupo_id = ? AND do_tbl.semestre_id = ?
+        LIMIT 1
+    `;
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [sp_rows] = await connection.query(sqlSemestrePadrao, [grupoId, grupo.semestre_id]);
+    
+    grupo.semestre_padrao = (sp_rows && sp_rows.length > 0) ? sp_rows[0].semestre_padrao : null;
+
+    if (!grupo.semestre_padrao && grupo.orientador_id) { // Lógica de fallback melhorada
+        const sqlOrientadorSP = `
+            SELECT d.semestre_padrao
+            FROM Disciplinas_Ofertas do_tbl
+            JOIN Disciplinas d ON do_tbl.disciplina_id = d.id
+            WHERE do_tbl.professor_responsavel = ?
+            AND do_tbl.semestre_id = ?
+            AND d.nome LIKE 'Orientação%'
+            LIMIT 1
+        `;
+        // CORREÇÃO: Trocado 'execute' por 'query'
+        const [osp_rows] = await connection.query(sqlOrientadorSP, [grupo.orientador_id, grupo.semestre_id]);
+        if (osp_rows && osp_rows.length > 0) {
+            grupo.semestre_padrao = osp_rows[0].semestre_padrao;
+        }
+    }
+
+    res.json(grupo); 
 
   } catch (error) {
     console.error('Erro ao buscar detalhes do grupo:', error);
@@ -144,36 +280,40 @@ router.get('/grupos/:id', async (req, res) => {
       error: error.message 
     });
   } finally {
-    await connection.end();
+    if (connection) await connection.release();
   }
 });
 
-// Listar membros de um grupo
+/**
+ * GET /grupos/:id/membros
+ * Listar membros de um grupo
+ */
 router.get('/grupos/:id/membros', async (req, res) => {
-  const connection = await getConnection();
-  const grupoId = parseInt(req.params.id, 10);
+  const grupoId = Number(req.params.id);
 
-  if (isNaN(grupoId)) {
-    return res.status(400).json({ message: 'ID de grupo inválido' });
+  if (!grupoId || isNaN(grupoId)) {
+    return res.status(400).json({ success: false, message: 'ID de grupo inválido' });
   }
 
+  let connection;
   try {
-    const [rows] = await connection.execute(
-      `SELECT u.id, u.nome, u.email, ug.papel, ug.data_entrada
-       FROM Usuario_Grupo ug
-       JOIN Usuarios u ON ug.usuario_id = u.id
-       WHERE ug.grupo_id = ?
-       ORDER BY u.nome`,
-      [grupoId]
-    );
+    connection = await getConnection();
 
-    const membros = rows.map(row => ({
-      id: row.id,
-      nome: row.nome,
-      email: row.email,
-      papel: row.papel,
-      data_entrada: row.data_entrada
-    }));
+    const sql = `
+      SELECT 
+        u.id, 
+        u.nome, 
+        u.email, 
+        ug.papel, 
+        ug.data_entrada
+      FROM Usuario_Grupo ug
+      JOIN Usuarios u ON ug.usuario_id = u.id
+      WHERE ug.grupo_id = ?
+      ORDER BY ug.papel DESC, u.nome ASC
+    `;
+
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [membros] = await connection.query(sql, [grupoId]);
 
     res.json(membros);
 
@@ -185,74 +325,71 @@ router.get('/grupos/:id/membros', async (req, res) => {
       error: error.message 
     });
   } finally {
-    await connection.end();
+    if (connection) await connection.release();
   }
 });
 
-// Atualizar grupo
+/**
+ * PUT /grupos/:id
+ * Atualizar grupo (nome e membros/papéis)
+ */
 router.put('/grupos/:id', async (req, res) => {
-  const connection = await getConnection();
-  const grupoId = parseInt(req.params.id, 10);
-  const { nome, descricao, semestre_id, disciplina_id, alunos } = req.body;
+  const grupoId = Number(req.params.id);
+  const { nome, membros } = req.body; 
 
-  if (isNaN(grupoId)) {
-    return res.status(400).json({ message: 'ID de grupo inválido' });
+  if (!grupoId || isNaN(grupoId)) {
+    return res.status(400).json({ success: false, message: 'ID de grupo inválido' });
   }
 
+  let connection;
   try {
-    await connection.beginTransaction();
+    connection = await getConnection();
 
-    // Verificar se o grupo existe
-    const [verificacao] = await connection.execute(
-      `SELECT COUNT(*) as count FROM Grupos WHERE id = ?`,
-      [grupoId]
-    );
+    // 1. Verificar se o grupo existe
+    const sqlVerifica = `SELECT id FROM Grupos WHERE id = ?`;
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [rowsVerifica] = await connection.query(sqlVerifica, [grupoId]);
 
-    if (verificacao[0].count === 0) {
-      return res.status(404).json({ message: 'Grupo não encontrado.' });
+    if (!rowsVerifica || rowsVerifica.length === 0) {
+      return res.status(404).json({ success: false, message: 'Grupo não encontrado.' });
     }
 
-    // Atualizar dados do grupo
-    const [result] = await connection.execute(
-      `UPDATE Grupos
-       SET nome = ?,
-           descricao = ?,
-           semestre_id = ?,
-           disciplina_id = ?,
-           data_atualizacao = CURRENT_TIMESTAMP
-       WHERE id = ?`,
-      [nome, descricao, semestre_id, disciplina_id, grupoId]
-    );
+    // 2. Atualizar nome do grupo (se fornecido)
+    if (nome && nome.trim()) {
+      const sqlUpdate = `UPDATE Grupos SET nome = ? WHERE id = ?`;
+      // CORREÇÃO: Trocado 'execute' por 'query'
+      await connection.query(sqlUpdate, [nome.trim(), grupoId]);
+    }
 
-    // Atualizar membros se fornecidos
-    if (Array.isArray(alunos)) {
-      // Remover todos os membros anteriores
-      await connection.execute(
-        `DELETE FROM Usuario_Grupo WHERE grupo_id = ?`,
-        [grupoId]
-      );
-
-      // Adicionar novos membros
-      for (const alunoId of alunos) {
-        await connection.execute(
-          `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel)
-           VALUES (?, ?, 'Membro')`,
-          [alunoId, grupoId]
-        );
+    // 3. Atualizar membros (se fornecido)
+    if (Array.isArray(membros)) {
+      
+      if (membros.length === 0) {
+        return res.status(400).json({ success: false, message: 'Um grupo não pode ficar sem membros.' });
       }
-    }
 
-    await connection.commit();
+      // 3a. Remover membros atuais
+      const sqlDelete = `DELETE FROM Usuario_Grupo WHERE grupo_id = ?`;
+      // CORREÇÃO: Trocado 'execute' por 'query'
+      await connection.query(sqlDelete, [grupoId]);
+
+      // 3b. Adicionar novos membros com papéis
+      const sqlInsertMember = `INSERT INTO Usuario_Grupo (grupo_id, usuario_id, papel, data_entrada) VALUES (?, ?, ?, NOW())`;
+      
+      const insertPromises = membros.map(member => {
+        const papel = member.papel || 'Membro';
+        // CORREÇÃO: Trocado 'execute' por 'query'
+        return connection.query(sqlInsertMember, [grupoId, member.id, papel]);
+      });
+      await Promise.all(insertPromises);
+    }
 
     res.json({
-      success: result.affectedRows > 0,
-      message: result.affectedRows > 0
-        ? 'Grupo atualizado com sucesso!'
-        : 'Erro ao atualizar grupo.'
+      success: true,
+      message: 'Grupo atualizado com sucesso!'
     });
 
   } catch (error) {
-    await connection.rollback();
     console.error('Erro ao atualizar grupo:', error);
     res.status(500).json({ 
       success: false, 
@@ -260,178 +397,55 @@ router.put('/grupos/:id', async (req, res) => {
       error: error.message 
     });
   } finally {
-    await connection.end();
+    if (connection) await connection.release();
   }
 });
 
-// Adicionar membro ao grupo
-router.post('/grupos/:id/membros', async (req, res) => {
-  const connection = await getConnection();
-  const grupoId = parseInt(req.params.id, 10);
-  const { usuario_id, papel } = req.body;
-
-  if (isNaN(grupoId) || isNaN(usuario_id)) {
-    return res.status(400).json({ message: 'IDs inválidos' });
-  }
-
-  try {
-    // Verificar se usuário já pertence ao grupo
-    const [verificacao] = await connection.execute(
-      `SELECT COUNT(*) as count 
-       FROM Usuario_Grupo 
-       WHERE grupo_id = ? AND usuario_id = ?`,
-      [grupoId, usuario_id]
-    );
-
-    if (verificacao[0].count > 0) {
-      return res.status(400).json({ message: 'Usuário já pertence ao grupo.' });
-    }
-
-    const [result] = await connection.execute(
-      `INSERT INTO Usuario_Grupo (usuario_id, grupo_id, papel)
-       VALUES (?, ?, ?)`,
-      [usuario_id, grupoId, papel || 'Membro']
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'Membro adicionado ao grupo com sucesso!'
-    });
-
-  } catch (error) {
-    console.error('Erro ao adicionar membro ao grupo:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Erro ao adicionar membro ao grupo.', 
-      error: error.message 
-    });
-  } finally {
-    await connection.end();
-  }
-});
-
-// Buscar alunos por semestre (sem grupo)
-router.get('/alunos/semestre/:semestre_id', async (req, res) => {
-  const connection = await getConnection();
-  const semestreId = parseInt(req.params.semestre_id, 10);
-
-  if (isNaN(semestreId)) {
-    return res.status(400).json({ message: 'ID de semestre inválido' });
-  }
-
-  try {
-    const [rows] = await connection.execute(
-      `SELECT DISTINCT u.id, u.nome, u.email 
-       FROM Usuarios u
-       JOIN Usuario_Semestre us ON u.id = us.usuario_id
-       WHERE us.semestre_id = ? 
-       AND u.tipo = 'Aluno'
-       AND u.ativo = 1
-       AND NOT EXISTS (
-           SELECT 1 
-           FROM Usuario_Grupo ug 
-           JOIN Grupos g ON ug.grupo_id = g.id
-           WHERE ug.usuario_id = u.id 
-           AND g.semestre_id = ?
-       )
-       ORDER BY u.nome`,
-      [semestreId, semestreId]
-    );
-
-    res.json(rows);
-  } catch (error) {
-    console.error('Erro ao buscar alunos por semestre:', error);
-    res.status(500).json({ 
-      message: 'Erro ao buscar alunos.', 
-      error: error.message 
-    });
-  } finally {
-    await connection.end();
-  }
-});
-
-// Remover membro do grupo
-router.delete('/grupos/:grupoId/membros/:usuarioId', async (req, res) => {
-  const connection = await getConnection();
-  const grupoId = parseInt(req.params.grupoId, 10);
-  const usuarioId = parseInt(req.params.usuarioId, 10);
-
-  if (isNaN(grupoId) || isNaN(usuarioId)) {
-    return res.status(400).json({ message: 'IDs inválidos' });
-  }
-
-  try {
-    const [result] = await connection.execute(
-      `DELETE FROM Usuario_Grupo
-       WHERE grupo_id = ? AND usuario_id = ?`,
-      [grupoId, usuarioId]
-    );
-
-    res.json({
-      success: result.affectedRows > 0,
-      message: result.affectedRows > 0
-        ? 'Membro removido do grupo com sucesso!'
-        : 'Membro não encontrado no grupo.'
-    });
-
-  } catch (error) {
-    console.error('Erro ao remover membro do grupo:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Erro ao remover membro do grupo.', 
-      error: error.message 
-    });
-  } finally {
-    await connection.end();
-  }
-});
-
-// Excluir grupo
+/**
+ * DELETE /grupos/:id
+ * Excluir grupo (apenas se não tiver projetos ativos)
+ */
 router.delete('/grupos/:id', async (req, res) => {
-  const connection = await getConnection();
-  const grupoId = parseInt(req.params.id, 10);
+  const grupoId = Number(req.params.id);
 
-  if (isNaN(grupoId)) {
-    return res.status(400).json({ message: 'ID de grupo inválido.' });
+  if (!grupoId || isNaN(grupoId)) {
+    return res.status(400).json({ success: false, message: 'ID de grupo inválido.' });
   }
 
+  let connection;
   try {
-    await connection.beginTransaction();
+    connection = await getConnection();
 
-    // Verificar se há projetos vinculados ao grupo
-    const [vinculo] = await connection.execute(
-      `SELECT COUNT(*) AS total FROM Projetos WHERE grupo_id = ?`,
-      [grupoId]
-    );
-
-    if (vinculo[0].total > 0) {
+    // Esta função já foi corrigida
+    const temProjetoAtivo = await grupoTemProjetoAtivo(connection, grupoId);
+    
+    if (temProjetoAtivo) {
       return res.status(400).json({
         success: false,
-        message: 'Não é possível excluir o grupo, pois ele está vinculado a um projeto.'
+        message: 'Não é possível excluir o grupo pois ele possui projetos não finalizados.'
       });
     }
 
     // Remover membros do grupo
-    await connection.execute(
-      `DELETE FROM Usuario_Grupo WHERE grupo_id = ?`,
-      [grupoId]
-    );
+    const sqlDeleteMembros = `DELETE FROM Usuario_Grupo WHERE grupo_id = ?`;
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    await connection.query(sqlDeleteMembros, [grupoId]);
 
     // Remover o grupo
-    const [result] = await connection.execute(
-      `DELETE FROM Grupos WHERE id = ?`,
-      [grupoId]
-    );
+    const sqlDeleteGrupo = `DELETE FROM Grupos WHERE id = ?`;
+    // CORREÇÃO: Trocado 'execute' por 'query' e corrigida leitura de 'affectedRows'
+    const [result] = await connection.query(sqlDeleteGrupo, [grupoId]);
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Grupo não encontrado.' });
+    if (!result.affectedRows || result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Grupo não encontrado.' });
     }
 
-    await connection.commit();
-    res.json({ success: true, message: 'Grupo excluído com sucesso!' });
+    res.json({ 
+      success: true, 
+      message: 'Grupo excluído com sucesso!' 
+    });
 
   } catch (error) {
-    await connection.rollback();
     console.error('Erro ao excluir grupo:', error);
     res.status(500).json({ 
       success: false, 
@@ -439,61 +453,166 @@ router.delete('/grupos/:id', async (req, res) => {
       error: error.message 
     });
   } finally {
-    await connection.end();
+    if (connection) await connection.release();
   }
 });
 
-// Listar semestres disponíveis
-router.get('/semestres', async (req, res) => {
-  const connection = await getConnection();
 
-  try {
-    const [rows] = await connection.execute(
-      `SELECT id, periodo, ano, descricao, data_inicio, data_fim, ativo
-       FROM Semestres
-       WHERE ativo = 1
-       ORDER BY periodo`
-    );
+// ====================================
+// ROTAS - ALUNOS DISPONÍVEIS
+// ====================================
 
-    res.json(rows);
-  } catch (error) {
-    console.error('Erro ao buscar semestres:', error);
-    res.status(500).json({ 
-      message: 'Erro ao buscar semestres.', 
-      error: error.message 
-    });
-  } finally {
-    await connection.end();
+/**
+ * GET /grupos/minhas-orientacoes/:orientadorId
+ * Lista as disciplinas de orientação que o professor leciona no semestre ativo.
+ */
+router.get('/grupos/minhas-orientacoes/:orientadorId', async (req, res) => {
+  const orientadorId = Number(req.params.orientadorId);
+
+  if (!orientadorId || isNaN(orientadorId)) {
+    return res.status(400).json({ success: false, message: 'ID de orientador inválido' });
   }
-});
 
-// Listar disciplinas disponíveis
-router.get('/disciplinas', async (req, res) => {
-  const connection = await getConnection();
-
+  let connection;
   try {
-    const [rows] = await connection.execute(
-      `SELECT id, nome, codigo, descricao, ativo
-       FROM Disciplinas
-       WHERE ativo = 1
-       ORDER BY nome`
-    );
-    res.json(rows);
-  } catch (error) {
-    console.error('Erro ao buscar disciplinas:', error);
-    res.status(500).json({ 
-      message: 'Erro ao buscar disciplinas.', 
-      error: error.message 
-    });
-  } finally {
-    if (connection) {
-      try { 
-        await connection.close(); 
-      } catch (closeErr) { 
-        console.warn('Aviso: Erro ao fechar conexão:', closeErr.message);
-      }
+    connection = await getConnection();
+
+    // Esta função já foi corrigida
+    const semestreAtivo = await obterSemestreAtivo(connection);
+    if (!semestreAtivo) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Não há semestre ativo no momento.' 
+      });
     }
+
+    // Buscar disciplinas de orientação do professor no semestre ativo
+    const sql = `
+      SELECT DISTINCT
+        d.id,
+        d.nome,
+        d.semestre_padrao
+      FROM Disciplinas d
+      JOIN Disciplinas_Ofertas do_tbl ON d.id = do_tbl.disciplina_id
+      WHERE do_tbl.professor_responsavel = ?
+      AND do_tbl.semestre_id = ?
+      AND d.nome LIKE 'Orientação%'
+      ORDER BY d.semestre_padrao
+    `;
+
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [disciplinas] = await connection.query(sql, [orientadorId, semestreAtivo.id]);
+
+    res.json({
+      success: true,
+      disciplinas
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar disciplinas de orientação:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Erro ao buscar disciplinas de orientação.', 
+      error: error.message 
+    });
+  } finally {
+    if (connection) await connection.release();
   }
-})
+});
+
+
+/**
+ * GET /grupos/alunos-disponiveis/:orientadorId/:semestrePadrao
+ * Lista alunos disponíveis para formar grupos baseado no orientador E no semestre padrão
+ */
+router.get('/grupos/alunos-disponiveis/:orientadorId/:semestrePadrao', async (req, res) => {
+  const orientadorId = Number(req.params.orientadorId);
+  const semestrePadrao = Number(req.params.semestrePadrao);
+
+  if (!orientadorId || isNaN(orientadorId)) {
+    return res.status(400).json({ success: false, message: 'ID de orientador inválido' });
+  }
+
+  if (!semestrePadrao || isNaN(semestrePadrao)) {
+    return res.status(400).json({ success: false, message: 'Semestre padrão inválido' });
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+
+    // Esta função já foi corrigida
+    const semestreAtivo = await obterSemestreAtivo(connection);
+    
+    if (!semestreAtivo) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Não há semestre ativo no momento.' 
+      });
+    }
+
+    const sql = `
+      SELECT DISTINCT
+        u.id,
+        u.nome,
+        u.email,
+        d.semestre_padrao
+      FROM Usuarios u
+      JOIN Alunos a ON u.id = a.usuario_id
+      JOIN Aluno_Oferta ao ON u.id = ao.aluno_id
+      JOIN Disciplinas_Ofertas do_tbl ON ao.oferta_id = do_tbl.id
+      JOIN Disciplinas d ON do_tbl.disciplina_id = d.id
+      WHERE u.ativo = 1
+      AND ao.status = 'Matriculado'
+      AND do_tbl.semestre_id = ?        -- (semestreAtivo.id)
+      AND d.semestre_padrao = ?        -- (semestrePadrao - O NOVO FILTRO)
+      AND d.semestre_padrao IN (       -- (Verificação de segurança)
+        SELECT DISTINCT d2.semestre_padrao
+        FROM Disciplinas_Ofertas do2
+        JOIN Disciplinas d2 ON do2.disciplina_id = d2.id
+        WHERE do2.professor_responsavel = ? -- (orientadorId)
+        AND do2.semestre_id = ?           -- (semestreAtivo.id)
+      )
+      AND u.id NOT IN (                -- (Verificação de aluno já em grupo)
+        SELECT ug.usuario_id
+        FROM Usuario_Grupo ug
+        JOIN Grupos g ON ug.grupo_id = g.id
+        WHERE g.semestre_id = ?           -- (semestreAtivo.id)
+      )
+      ORDER BY u.nome
+    `;
+
+    // CORREÇÃO: Trocado 'execute' por 'query'
+    const [alunos] = await connection.query(sql, [
+      semestreAtivo.id, 
+      semestrePadrao,
+      orientadorId, 
+      semestreAtivo.id, 
+      semestreAtivo.id
+    ]);
+
+    res.json({
+      success: true,
+      semestreAtivo: {
+        id: semestreAtivo.id,
+        periodo: semestreAtivo.periodo,
+        ano: semestreAtivo.ano
+      },
+      alunos
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar alunos disponíveis:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Erro ao buscar alunos disponíveis.', 
+      error: error.message 
+    });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+
 
 module.exports = router;

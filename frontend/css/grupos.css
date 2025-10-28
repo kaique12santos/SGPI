@@ -1,10 +1,12 @@
-
 .container-grupo {
   width: 100%;
   background-color: #f8f4f4;
   border-bottom: 2px solid #ec0b0b;
 }
-
+.p_Check-box{
+  font-size: 1rem;
+  font-weight: 500;
+}
 
 #formGrupo {
   display: flex;
@@ -55,9 +57,9 @@
 .grupos-existentes {
  
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  width: 90%;
+  width: 95%;
  
 }
 
@@ -71,30 +73,44 @@
 
 
 .grupo-card {
-  background-color: #f5deb3;
-  border: 1px solid #b88a36;
+  background-color: #ffffff;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0;
   margin-bottom: 1rem;
-  border-left: 3px solid #922b21;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #970000;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .grupo-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
-.grupo-card strong {
+.fundo_do_card {
+  background-color: #970000;
+  padding: 1rem;
+  color: white;
+  margin-bottom: 0;
+}
+
+.fundo_do_card strong {
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
+  color: #ffffff;
+  display: block;
+  margin: 0;
+}
+
+.grupo-card-content {
+  padding: 1rem;
 }
 
 .grupo-card p {
   margin: 0.3rem 0;
   color: #34495e;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .p_Check-box{
@@ -127,10 +143,13 @@
   color: #ffff;
   cursor: pointer;
   font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .send-button:hover{
   background-color: #a60000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(167, 0, 0, 0.3);
 }
 
 .btn svg {
@@ -141,30 +160,35 @@
 .btn-alterar {
   background: linear-gradient(135deg, #3498db, #2980b9);
   border-left: 3px solid #1a5276;
+  transition: all 0.3s ease;
 }
 .btn-alterar:hover {
   background: linear-gradient(135deg, #2980b9, #1a5276);
   transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
 }
 
 
 .btn-excluir {
-  background: linear-gradient(135deg, #eb0202, #c21502);
-  border-left: 3px solid #922b21;
+  background: #dc2828;
+  transition: all 0.3s ease;
 }
 .btn-excluir:hover {
-  background: linear-gradient(135deg, #c21401, #970e01);
+  background: #ff3232;
   transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(235, 2, 2, 0.3);
 }
 
 
 .btn-Ver {
   background: linear-gradient(135deg, #2ecc71, #27ae60);
   border-left: 3px solid #1e8449;
+  transition: all 0.3s ease;
 }
 .btn-Ver:hover {
   background: linear-gradient(135deg, #27ae60, #1e8449);
   transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(46, 204, 113, 0.3);
 }
 
 
@@ -249,5 +273,250 @@
   .div-mostrar {
     padding: 1.5rem;
     max-width: 90%;
+  }
+}
+
+.grupo-card p{
+  padding: 5px 0 0 1rem;
+}
+.grupo-card button{
+  margin: 5px;
+}
+
+.grupo-card-botoes {
+  display: flex; 
+  justify-content: center; 
+  gap: 1rem; 
+  flex-wrap: wrap; 
+}
+
+/* ===== MEDIA QUERIES ===== */
+
+/* Tablets (768px - 992px) */
+@media (max-width: 992px) {
+  .grupos-existentes {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+    width: 97%;
+  }
+
+  #formGrupo {
+    width: 98%;
+  }
+
+  .btn {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .send-button {
+    max-width: 150px;
+  }
+}
+
+/* Tablets pequenos e celulares grandes (600px - 768px) */
+@media (max-width: 768px) {
+  .container-grupo {
+    padding: 0.5rem 0;
+  }
+
+  .grupos-existentes {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.6rem;
+    width: 98%;
+    padding: 0.5rem;
+  }
+
+  .grupos-existentes h3 {
+    text-align: center;
+    margin-left: 0;
+  }
+
+  #formGrupo {
+    width: 98%;
+    padding: 1.5%;
+  }
+
+  .grupo-card {
+    margin-bottom: 0.5rem;
+  }
+
+  .fundo_do_card {
+    padding: 0.8rem;
+  }
+
+  .grupo-card-content {
+    padding: 0.8rem;
+  }
+
+  .btn {
+    padding: 0.4rem 0.6rem;
+    margin: 3px;
+    font-size: 0.9rem;
+  }
+
+  .btn svg {
+    margin-right: 0.3rem;
+  }
+
+  .send-button {
+    max-width: 120px;
+    padding: 6px 12px;
+  }
+
+  .div-mostrar {
+    max-width: 90vw;
+    padding: 1.5rem 1rem;
+  }
+
+  .grupo-card-botoes {
+    gap: 0.3rem;
+    padding: 0.3rem;
+  }
+}
+
+/* Celulares (até 600px) */
+@media (max-width: 600px) {
+  .container-grupo {
+    padding: 0.3rem 0;
+  }
+
+  .grupos-existentes {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    width: 98%;
+    padding: 0.3rem;
+  }
+
+  .grupos-existentes h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+
+  #formGrupo {
+    width: 98%;
+    padding: 1%;
+    gap: 3px;
+  }
+
+  .label-form {
+    margin-top: 8px;
+    font-size: 0.9rem;
+  }
+
+  .input-form,
+  .textarea-form,
+  .select-form {
+    padding: 6px;
+    font-size: 1rem;
+  }
+
+  .textarea-form {
+    min-height: 80px;
+  }
+
+  .grupo-card {
+    margin-bottom: 0.3rem;
+  }
+
+  .fundo_do_card {
+    padding: 0.7rem;
+  }
+
+  .fundo_do_card strong {
+    font-size: 1rem;
+  }
+
+  .grupo-card-content {
+    padding: 0.7rem;
+  }
+
+  .grupo-card p {
+    padding: 3px 0 0 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .aluno-checkbox {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+  }
+
+  .btn {
+    padding: 0.3rem 0.5rem;
+    margin: 2px;
+    font-size: 0.8rem;
+    width: auto;
+  }
+
+  .btn svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .send-button {
+    width: 100%;
+    max-width: 100%;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+  }
+
+  .div-zindex {
+    padding: 0.5rem;
+  }
+
+  .div-mostrar {
+    max-height: 90vh;
+    max-width: 95vw;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .div-mostrar p {
+    margin: 0.8rem 0;
+    font-size: 0.9rem;
+  }
+
+  .grupo-card-botoes {
+    gap: 0.2rem;
+    padding: 0.2rem;
+  }
+
+  .checkbox-container {
+    gap: 8px;
+    margin: 8px 0;
+  }
+}
+
+/* Celulares pequenos (até 480px) */
+@media (max-width: 480px) {
+  .grupos-existentes h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .fundo_do_card strong {
+    font-size: 0.95rem;
+  }
+
+  .grupo-card p {
+    font-size: 0.8rem;
+  }
+
+  .btn {
+    padding: 0.25rem 0.4rem;
+    margin: 2px;
+    font-size: 0.75rem;
+  }
+
+  .send-button {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+  }
+
+  .div-mostrar {
+    padding: 1rem 0.8rem;
+  }
+
+  #formGrupo {
+    padding: 0.8%;
   }
 }

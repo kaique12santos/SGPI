@@ -236,8 +236,9 @@ router.post('/validar-token', async (req, res) => {
       if (tipo === "Aluno") {
         // 1️⃣ Cadastra o aluno na tabela Alunos
         await connection.execute("INSERT INTO Alunos (usuario_id) VALUES (?)", [usuarioId]);
+        console.log(`✅ Inserido na tabela Alunos: ${usuarioId}`);
       
-        // 2️⃣ Se o aluno escolheu disciplinas no front
+        // 2️⃣ Se o aluno escolheu disciplinas no front (TODA a lógica de disciplina fica AQUI DENTRO)
         if (Array.isArray(disciplinas) && disciplinas.length > 0) {
           // Busca os IDs das disciplinas selecionadas
           const resultDisciplinas = await connection.execute(
@@ -255,9 +256,8 @@ router.post('/validar-token', async (req, res) => {
               disciplinaIds
             );
             
-            const ofertas = ofertasResult.rows; // ✅ CORREÇÃO AQUI!
+            const ofertas = ofertasResult.rows; 
             console.log("DEBUG ofertasResult:", ofertasResult.rows);
-
       
             if (ofertas.length > 0) {
               // Faz o vínculo do aluno com as ofertas encontradas
@@ -274,7 +274,26 @@ router.post('/validar-token', async (req, res) => {
             }
           }
         }
+        // FIM do bloco "Aluno"
+      
+      // ✅ CORREÇÃO: Os 'else if' começam AQUI, no mesmo nível do 'if (tipo === "Aluno")'
+      } else if (tipo === "Professor") {
+        await connection.execute("INSERT INTO Professores (usuario_id) VALUES (?)", [usuarioId]);
+        console.log(`✅ Inserido na tabela Professores: ${usuarioId}`);
+
+      } else if (tipo === "Professor_Orientador") {
+        await connection.execute("INSERT INTO Professores_Orientadores (usuario_id) VALUES (?)", [usuarioId]);
+        console.log(`✅ Inserido na tabela Professores_Orientadores: ${usuarioId}`);
+
+      } else if (tipo === "Coordenador") {
+        await connection.execute("INSERT INTO Coordenador (usuario_id) VALUES (?)", [usuarioId]);
+        console.log(`✅ Inserido na tabela Coordenador: ${usuarioId}`);
+
+      } else if (tipo === "Administrador") {
+        await connection.execute("INSERT INTO Administrador (usuario_id) VALUES (?)", [usuarioId]);
+        console.log(`✅ Inserido na tabela Administrador: ${usuarioId}`);
       }
+          
       
       
 

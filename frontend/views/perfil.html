@@ -276,13 +276,18 @@
                 </section>
                 <!-- 🔹 Seção: Disciplinas Disponíveis para Professores -->
                 <section id="section-disciplinas-disponiveis" class="perfil-section" style="display: none;">
-                    <h2>Selecionar Disciplinas</h2>
-                    <p>Escolha as disciplinas que você irá lecionar. As opções desaparecerão para outros professores após serem escolhidas.</p>
+                    <h2>Gerenciar Disciplinas</h2>
+                    <p>Escolha as disciplinas que você irá lecionar. Use os botões abaixo para vincular ou desvincular.</p>
                     
                     <div class="disciplinas-disponiveis-container"></div>
                 
                     <div class="botoes-acoes">
-                    <button id="confirmar-disciplinas-btn" class="btn-principal">Confirmar Seleção</button>
+                        <button id="confirmar-disciplinas-btn" class="btn-principal">
+                            <span>✓</span> Confirmar Selecionadas
+                        </button>
+                        <button id="desvincular-disciplinas-btn" class="btn-secundario">
+                            <span>✕</span> Remover Selecionadas
+                        </button>
                     </div>
                 </section>
   
@@ -292,7 +297,10 @@
                     <div class="disciplinas-gerenciar-container"></div>
                   
                     <div class="botoes-acoes">
-                      <button id="btn-salvar-alteracoes" class="btn-principal">Salvar Alterações</button>
+                      <button id="btn-salvar-alteracoes" class="btn-principal" disabled><span>💾</span> Salvar</button>
+                      <button id="btn-toggle-gerenciamento-aluno" class="btn btn-secundario">
+                        <span>⚙️</span> Gerenciar Matrículas
+                      </button>
                     </div>
                 </section>
                   

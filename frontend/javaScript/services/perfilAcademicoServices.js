@@ -4,6 +4,11 @@ export async function getMinhasDisciplinas() {
   const id = localStorage.getItem("usuarioId");
   return await fetchJsonComAuth(`/perfilAcademico/disciplinas/${id}`, null, "GET");
 }
+export async function getDisciplinasDisponiveisProfessor() {
+  const id =localStorage.getItem("usuarioId")
+  return await fetchJsonComAuth(`/perfilAcademico/disciplinas-disponiveis-professor/${id}`, null, "GET");
+}
+
 
 export async function getMeusGrupos() {
   const id = localStorage.getItem("usuarioId");
