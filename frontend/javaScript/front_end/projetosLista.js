@@ -1,4 +1,5 @@
 import { ativar } from "../utils/alerts.js";
+import { confirmarAcao } from "../utils/confirmDialog.js";
 import {
   obterProjetosPorOrientador,
   atualizarProjeto,
@@ -28,6 +29,35 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
+/**
+ * Retorna a classe CSS apropriada baseada no status
+ */
+function obterClasseStatus(status) {
+  const statusNormalizado = status.toLowerCase().trim();
+  
+  const mapeamento = {
+    'em proposta': 'status-proposta',
+    'proposta': 'status-proposta',
+    'em andamento': 'status-andamento',
+    'andamento': 'status-andamento',
+    'aguardando avaliação': 'status-aguardando',
+    'aguardando avaliacao': 'status-aguardando',
+    'aguardando': 'status-aguardando',
+    'concluído': 'status-concluido',
+    'concluido': 'status-concluido'
+  };
+  
+  return mapeamento[statusNormalizado] || 'status-proposta';
+}
+
+/**
+ * Formata o status como um badge HTML
+ */
+function formatarStatusBadge(status) {
+  const classe = obterClasseStatus(status);
+  return `<span class="status-badge ${classe}">${status}</span>`;
+}
 // MODIFICADO: Adicionamos 'export' para o 'projetos.js' (formulário) poder chamá-la
 export async function carregarProjetos() {
   const orientadorId = localStorage.getItem('usuarioId');
@@ -49,20 +79,23 @@ export async function carregarProjetos() {
       const card = document.createElement('div');
       card.className = 'projeto-card';
       
-      // MODIFICADO: O innerHTML não tem mais os botões
+      // MODIFICADO: Usando a função formatarStatusBadge
       card.innerHTML = `
-        <h3>${proj.titulo}</h3>
+        <div class="fundo_card">
+          <h3>${proj.titulo}</h3>
+        </div>
         <p><strong>Grupo:</strong> ${proj.grupo_nome || 'N/A'}</p>
         <p><strong>Disciplina:</strong> ${proj.disciplina_nome || 'N/A'}</p>
-        <p><strong>Semestre:</strong> ${proj.semestre_formatado || 'N/A'}</p>
-        <p><strong>Status:</strong> ${proj.status}</p>
+        <p><strong>Semestre:</strong> ${proj.semestre_padrao || 'N/A'}º Sem </p>
+        <p><strong>Status:</strong> ${formatarStatusBadge(proj.status)}</p>
       `;
-
-      // NOVO: Criando botões com JavaScript e addEventListener
+      
+      const botoesContainer = document.createElement("div");
+      botoesContainer.className = "grupo-card-botoes"; 
+      
       const btnEditar = document.createElement('button');
       btnEditar.className = 'btn-salvar';
       btnEditar.textContent = 'Editar';
-      // Adiciona o listener de evento
       btnEditar.addEventListener('click', () => {
         mostrarEdicao(proj.id);
       });
@@ -70,13 +103,13 @@ export async function carregarProjetos() {
       const btnDeletar = document.createElement('button');
       btnDeletar.className = 'btn-deletar';
       btnDeletar.textContent = 'Deletar';
-      // Adiciona o listener de evento
       btnDeletar.addEventListener('click', () => {
         deletarProjeto(proj.id);
       });
       
-      card.appendChild(btnEditar);
-      card.appendChild(btnDeletar);
+      botoesContainer.appendChild(btnEditar);
+      botoesContainer.appendChild(btnDeletar);
+      card.appendChild(botoesContainer);
 
       container.appendChild(card);
     });
@@ -154,19 +187,36 @@ function fecharModal() {
  */
 // MODIFICADO: Função agora é local, não precisa de 'window'
 async function confirmarEdicao() {
+  // --- Início da Adaptação ---
+  // 1. Chamar seu modal de confirmação primeiro.
+  const confirmou = await confirmarAcao(
+    'Confirmar Edição', // Título
+    'Deseja realmente salvar estas alterações?', // Mensagem
+    'Salvar', // Label "Sim"
+    'Cancelar' // Label "Não"
+  );
+
+  // 2. Se o usuário clicou em "Cancelar" (false), interrompe a função.
+  if (!confirmou) {
+    ativar("Alterações canceladas.", "info", "");
+    return;
+  }
+  // --- Fim da Adaptação ---
+
+  // 3. Se o usuário confirmou, o restante da sua função original é executado.
   const titulo = document.getElementById('modal-titulo').value;
   const descricao = document.getElementById('modal-descricao').value;
   const semestre_id = document.getElementById('modal-semestre').value;
-  const disciplina_id = document.getElementById('modal-disciplina').value; 
+  const disciplina_id = document.getElementById('modal-disciplina').value;
   const status = document.getElementById('modal-status').value;
-  const orientador_id = localStorage.getItem('usuarioId'); 
+  const orientador_id = localStorage.getItem('usuarioId');
 
   try {
-    const data = await atualizarProjeto(projetoEditandoId, { 
-      titulo, 
-      descricao, 
-      semestre_id, 
-      status, 
+    const data = await atualizarProjeto(projetoEditandoId, {
+      titulo,
+      descricao,
+      semestre_id,
+      status,
       disciplina_id,
       orientador_id
     });
@@ -182,13 +232,27 @@ async function confirmarEdicao() {
 
 // MODIFICADO: Função agora é local, não precisa de 'window'
 async function deletarProjeto(id) {
-  const confirmacao = confirm('Tem certeza que deseja deletar este projeto? Essa ação não poderá ser desfeita.');
-  if (!confirmacao) return;
+  // --- Início da Adaptação ---
+  // 1. Substituir o 'confirm' padrão do navegador pela sua função 'confirmarAcao'
+  const confirmacao = await confirmarAcao(
+    'Confirmar Exclusão', // Título
+    'Tem certeza que deseja deletar este projeto? Essa ação não poderá ser desfeita.', // Mensagem
+    'Sim, Deletar', // Label "Sim"
+    'Cancelar' // Label "Não"
+  );
+  // --- Fim da Adaptação ---
 
+  // 2. A lógica de verificação continua a mesma.
+  if (!confirmacao){
+    ativar("Exclusão cancelada","info","")
+    return;
+  } 
+
+  // 3. O restante da função original permanece igual.
   try {
     const orientadorId = localStorage.getItem('usuarioId');
     const data = await excluirProjeto(`${id}?orientador_id=${orientadorId}`);
-    
+
     ativar(data.message || (data.success ? 'Sucesso' : 'Erro'), data.success ? 'sucesso' : 'erro', '');
     if (data.success) carregarProjetos();
   } catch (err) {

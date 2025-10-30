@@ -8,7 +8,7 @@ export function confirmarAcao(
     const overlay = document.createElement("div");
     overlay.className = "confirm-overlay";
     overlay.innerHTML = `
-      <div class="confirm-dialog">
+      <div class="confirm-dialog info">
         <h3>${titulo}</h3>
         <p>${mensagem}</p>
         <div class="confirm-buttons">

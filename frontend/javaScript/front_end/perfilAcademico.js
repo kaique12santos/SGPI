@@ -39,19 +39,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================
   // HELPER: Alternar Seções
   // ============================================
-  const allSections = Array.from(document.querySelectorAll(".perfil-section"));
-  
   function hideAllSections() {
-    allSections.forEach(sec => {
+    // A busca é feita dinamicamente
+    const sectionsAtuais = document.querySelectorAll(".perfil-section"); 
+    
+    sectionsAtuais.forEach(sec => {
       sec.classList.remove("active");
-      sec.style.display = "none";
     });
   }
   
   function showSection(sectionEl) {
-    if (!sectionEl) return;
-    hideAllSections();
-    sectionEl.style.display = "block";
+    if (!sectionEl) {
+      console.warn("Tentativa de mostrar uma seção nula.");
+      return;
+    }
+    
+    // 1. Remove 'active' de todas
+    hideAllSections(); 
+    
+    // 2. Adiciona 'active' apenas na seção alvo
     sectionEl.classList.add("active");
   }
 
@@ -59,10 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // CONFIGURAÇÃO INICIAL PROFESSOR
   // ============================================
   if (isProfessor) {
+    // Professor logado:
     btnDisciplinas?.classList?.add("visible");
-    if (sectionDisciplinas) sectionDisciplinas.style.display = "none";
+    if (sectionGerenciar) sectionGerenciar.style.display = "none"; // Esconde a seção do ALUNO
   } else {
-    if (sectionDisciplinas) sectionDisciplinas.style.display = "none";
+    // Aluno logado:
+    if (sectionDisciplinas) sectionDisciplinas.style.display = "none"; // Esconde a seção do PROFESSOR
   }
 
   // ============================================

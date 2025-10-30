@@ -5,72 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-/* Container que envolve o input e o ícone */
-.password-field-wrapper {
-  position: relative; /* Essencial para o posicionamento absoluto do ícone */
-  width: 100%; /* Garante que o wrapper ocupe o espaço disponível */
-  display: flex; /* Para flexibilidade se precisar */
-  align-items: center; /* Para alinhar verticalmente o input e o ícone se o input não for 100% da altura do wrapper */
+/* Estilos básicos para o card */
+.card-visualizar-grupo {
+  position: relative; /* Para o botão "X" */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  font-family: Arial, sans-serif;
+  overflow: hidden; /* Para o rodapé se encaixar bem */
 }
 
-/* O input real dentro do wrapper */
-.password-field-wrapper .password-toggle-input {
-  width: 100%; /* O input deve ocupar a largura total do seu wrapper */
-  padding-right: 40px; /* Espaço para o ícone */
-  /* Outros estilos padrão do seu input (border, padding-left, border-radius, etc.) */
-  padding: 10px 40px 10px 10px; /* Exemplo de padding */
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; /* Inclui padding e border na largura total */
+/* Cabeçalho */
+.card-header {
+  padding: 24px 24px 16px 24px;
+}
+.card-header .label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+.card-header .titulo-grupo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 4px 0 0 0;
 }
 
-/* O ícone de alternância */
-.password-toggle-icon {
-  position: absolute;
-  right: 10px; /* Ajuste a distância da borda direita */
-  top: 50%; /* Centraliza verticalmente */
-  transform: translateY(-50%); /* Ajuste fino para o centro vertical */
-  cursor: pointer;
-  color: #888; /* Cor do ícone */
-  display: flex; /* Para centralizar o SVG dentro do span */
+/* Corpo */
+.card-body {
+  padding: 0 24px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.info-item {
+  font-size: 0.95rem;
+  color: #495057;
+}
+.info-item strong {
+  color: #212529;
+}
+
+.divisor {
+  border: none;
+  border-top: 1px solid #e9ecef;
+  margin: 8px 0;
+}
+
+/* Seção de Membros */
+.secao-membros h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.lista-membros {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lista-membros li {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  z-index: 10; /* Garante que o ícone fique acima do input, se necessário */
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.tag-funcao {
+  font-size: 0.8rem;
+  background-color: #e0e0e0;
+  color: #555;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
 }
 
-.password-toggle-icon svg {
-  width: 20px; /* Tamanho do ícone */
-  height: 20px;
-  display: block; /* Remove espaço extra que alguns SVGs podem ter */
+/* Rodapé e Botões */
+.card-footer {
+  background-color: #f8f9fa;
+  padding: 16px 24px;
+  text-align: right;
+  border-top: 1px solid #e9ecef;
 }
 
-/* Classe para esconder um dos ícones */
-.password-toggle-icon .hidden {
-  display: none;
+.btn-fechar-secundario {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-fechar-secundario:hover {
+  background-color: #5a6268;
+}
+
+.btn-fechar-icone {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+}
+.btn-fechar-icone:hover {
+  color: #333;
 }
     </style>
 </head>
 <body>
     
 
-    <div class="login-form">
-        Senha
-        <div class="password-field-wrapper"> <!-- Classe genérica -->
-            <input type="password" id="loginPassword" name="password" placeholder="Digite aqui" class="login-input password-toggle-input" required autocomplete="current-password">
-            <span class="password-toggle-icon"> <!-- Classe genérica -->
-                <!-- Seus SVGs ou ícones aqui -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                </svg>
-            </span>
-        </div>
-        <span id="passwordError"></span>  
+  <div class="card-visualizar-grupo">
+  
+    <button class="btn-fechar-icone">&times;</button> 
+  
+    <div class="card-header">
+      <span class="label">Grupo</span>
+      <h2 class="titulo-grupo">asdasd</h2>
     </div>
+  
+    <div class="card-body">
+      <div class="info-item">
+        <strong>Semestre:</strong>
+        <span>1º Sem</span>
+      </div>
+      <div class="info-item">
+        <strong>Data de Criação:</strong>
+        <span>28/10/2025, 21:20</span>
+      </div>
+  
+      <hr class="divisor">
+  
+      <div class="secao-membros">
+        <h3>Membros:</h3>
+        <ul class="lista-membros">
+          <li>
+            <span class="nome-membro">Aluno Teste 07</span>
+            <span class="tag-funcao">Membro</span>
+          </li>
+          </ul>
+      </div>
+    </div>
+  
+    <div class="card-footer">
+      <button class="btn-fechar-secundario">Fechar</button> 
+    </div>
+  </div>
       <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Encontra todos os elementos que têm a classe 'password-toggle-icon'

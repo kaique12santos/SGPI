@@ -162,6 +162,7 @@ router.get('/grupos', async (req, res) => {
         g.semestre_id,
         s.periodo,
         s.ano,
+        d.semestre_padrao,
         g.data_criacao, 
         g.data_atualizacao,
         COUNT(DISTINCT ug.usuario_id) as total_membros,

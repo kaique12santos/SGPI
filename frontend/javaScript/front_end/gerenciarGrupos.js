@@ -1,4 +1,5 @@
 import { ativar } from "../utils/alerts.js";
+import { confirmarAcao } from "../utils/confirmDialog.js";
 import {
   obterGrupos,
   obterGrupo,
@@ -68,7 +69,7 @@ async function carregarSemestreAtivo() {
     const resultado = await obterSemestreAtivo();
     
     if (!resultado.success || !resultado.semestre) {
-      ativar("Não há semestre ativo. Configure um semestre antes de gerenciar grupos.", "erro", "");
+      ativar("Não há semestre ativo. Avise o Administrador do sistema", "erro", "");
       if (selectDisciplina) {
         selectDisciplina.innerHTML = "<option value='' disabled selected>Falha ao carregar semestre</option>";
       }
@@ -159,8 +160,7 @@ function inicializarGerenciamentoGrupos() {
 
   containerGrupo.insertAdjacentElement("afterend", listagemSection);
   carregarGrupos();
-  // MODIFICADO: Não carregamos mais os alunos aqui.
-  // carregarAlunosDisponiveis(); 
+  
 }
 /**
  * Carrega e renderiza grupos
@@ -210,6 +210,7 @@ function renderizarGrupos(grupos) {
  * Cria card de grupo
  */
 function criarCardGrupo(grupo) {
+  
   const card = document.createElement("div");
   card.className = "grupo-card";
   card.dataset.grupoId = grupo.id;
@@ -218,7 +219,7 @@ function criarCardGrupo(grupo) {
     <div class="fundo_do_card">
       <strong>${grupo.nome}</strong>
     </div>
-    <p>Semestre: ${grupo.periodo}º/${grupo.ano}</p>
+    <p>Semestre: ${grupo.semestrePadrao}º Sem.</p>
     <p>Membros: ${grupo.totalMembros}</p>
   `;
 
@@ -260,35 +261,79 @@ async function exibirDetalhesGrupo(grupoId) {
     const membros = await obterMembrosDoGrupo(grupoId);
 
     const overlay = document.createElement("div");
-    overlay.className = "div-zindex";
+    overlay.className = "div-zindex"; //
 
     const modal = document.createElement("div");
-    modal.className = "div-mostrar";
+    modal.className = "div-mostrar"; //
 
-    let membrosHTML = "<p><strong>Membros:</strong></p><ul>";
+    // --- Bloco de Membros Modificado ---
+    let membrosHTML = '<div class="secao-membros">';
+    membrosHTML += '<h3>Membros:</h3>'; // Mais semântico que <p><strong>
+
     if (membros && membros.length > 0) {
-      membros.forEach(
-        (membro) => (membrosHTML += `<li>${membro.nome} (${membro.papel})</li>`)
-      );
+      membrosHTML += '<ul class="lista-membros">'; // Nova classe
+      membros.forEach((membro) => {
+        // Nova estrutura para o <li> com tags
+        membrosHTML += `
+          <li>
+            <span class="nome-membro">${membro.nome}</span>
+            <span class="tag-funcao">${membro.papel} </span>
+          </li>
+        `;
+      });
+      membrosHTML += "</ul>";
     } else {
-      membrosHTML += "<li>Nenhum membro cadastrado</li>";
+      membrosHTML += "<p>Nenhum membro cadastrado</p>"; // Simplificado
     }
-    membrosHTML += "</ul>";
+    membrosHTML += "</div>";
+    // --- Fim do Bloco de Membros ---
 
+
+    // --- Estrutura HTML Principal Modificada ---
     const detalhesHTML = `
-      <h2>${grupo.nome}</h2>
-      <p><strong>Semestre:</strong> ${grupo.periodo}º/${grupo.ano}</p>
-      <p><strong>Data de Criação:</strong> ${formatarData(grupo.dataCriacao)}</p>
-      ${foiAtualizado(grupo.dataCriacao, grupo.dataAtualizacao) 
-        ? `<p><strong>Última atualização:</strong> ${formatarData(grupo.dataAtualizacao)}</p>` 
-        : ''}
-      ${membrosHTML}
-      <button id="fecharModal" class='send-button' style="margin-top: 1rem;">Fechar</button>
+      <button class="btn-fechar-icone" id="fecharModalIcone">&times;</button>
+      
+      <div class="card-header">
+        <span class="label">Grupo</span>
+        <h2 class="titulo-grupo">${grupo.nome}</h2>
+      </div>
+
+      <div class="card-body">
+        <div class="info-item">
+          <strong>Semestre:</strong>
+          <span>${grupo.semestrePadrao}º Sem</span>
+        </div>
+        <div class="info-item">
+          <strong>Data de Criação:</strong>
+          <span>${formatarData(grupo.dataCriacao)}</span>
+        </div>
+        
+        ${foiAtualizado(grupo.dataCriacao, grupo.dataAtualizacao) 
+          ? `<div class="info-item">
+               <strong>Última atualização:</strong>
+               <span>${formatarData(grupo.dataAtualizacao)}</span>
+             </div>` 
+          : ''}
+        
+        <hr class="divisor">
+        
+        ${membrosHTML}
+      </div>
+
+      <div class="card-footer">
+        <button id="fecharModal" class="btn-fechar-secundario">Fechar</button>
+      </div>
     `;
+    // --- Fim da Estrutura HTML ---
 
     modal.innerHTML = detalhesHTML;
-    modal.querySelector("#fecharModal").onclick = () =>
-      document.body.removeChild(overlay);
+
+    // --- Adiciona Eventos aos DOIS Botões de Fechar ---
+    const fecharModal = () => document.body.removeChild(overlay);
+    
+    modal.querySelector("#fecharModalIcone").onclick = fecharModal;
+    modal.querySelector("#fecharModal").onclick = fecharModal;
+    // --- Fim dos Eventos ---
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
@@ -306,35 +351,44 @@ async function abrirModalEdicao(grupoCardInfo) {
   overlay.className = "div-zindex";
 
   const modal = document.createElement("div");
-  modal.className = "div-mostrar form-task"; // Reutilizando classes existentes
+  // Adicionamos a classe 'form-edit-modal' para especificidade
+  modal.className = "div-mostrar form-edit-modal"; 
 
-  // 1. Estrutura do Modal (com botão de fechar e campo de nome)
+  // 1. Estrutura do Modal (com classes CSS e sem estilos inline)
   modal.innerHTML = `
     <form id="editar-grupo">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2>Editar Grupo</h2>
-        <button type="button" id="cancelar-edicao" class="btn-excluir" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--cor-texto-preto);">&times;</button>
-      </div>
       
-      <label>Nome do Grupo:
-        <input type="text" id="edit-nome" value="${grupoCardInfo.nome}" required class="input-form" maxlength="100">
-      </label>
-      
-      <p><strong>Semestre:</strong> ${grupoCardInfo.periodo}º/${grupoCardInfo.ano}</p>
-      
-      <h3>Membros Atuais (Máx. 5)</h3>
-      <div id="membros-atuais-container" class="checkbox-container" style="min-height: 100px; max-height: 200px; overflow-y: auto;">
-        <p>Carregando membros...</p>
-      </div>
-      
-      <h3>Adicionar Alunos (do semestre de origem)</h3>
-      <div id="alunos-adicionar-container" class="checkbox-container" style="min-height: 100px; max-height: 200px; overflow-y: auto;">
-        <p>Carregando alunos disponíveis...</p>
+      <div class="card-header">
+        <h2 class="titulo-grupo">✏️ Editar Grupo</h2>
+        <button type-="button" id="cancelar-edicao" class="btn-fechar-icone">&times;</button>
       </div>
 
-      <div class="btn-group">
-        <button type="submit" class="btn-alterar send-button">Salvar Alterações</button>
+      <div class="card-body">
+        <label for="edit-nome" class="label-form">Nome do Grupo:</label>
+        <input type="text" id="edit-nome" value="${grupoCardInfo.nome}" required class="input-form" maxlength="100">
+        
+        <div class="info-item">
+          <strong>Semestre:</strong>
+          <span>${grupoCardInfo.semestrePadrao}º Sem</span>
+        </div>
+
+        <hr class="divisor">
+
+        <h3 class="label-form">👥 Membros Atuais (Máx. 5)</h3>
+        <div id="membros-atuais-container" class="lista-edit-container">
+          <p>Carregando membros...</p>
+        </div>
+        
+        <h3 class="label-form">Adicionar Alunos (do semestre de origem)</h3>
+        <div id="alunos-adicionar-container" class="lista-edit-container">
+          <p>Carregando alunos disponíveis...</p>
+        </div>
       </div>
+
+      <div class="card-footer">
+        <button type="submit" class="btn btn-alterar" style="width: 100%;">💾 Salvar Alterações</button>
+      </div>
+
     </form>
   `;
 
@@ -353,7 +407,7 @@ async function abrirModalEdicao(grupoCardInfo) {
   const containerAlunos = modal.querySelector("#alunos-adicionar-container");
 
   try {
-    // 1. Obter detalhes do grupo (para pegar o semestre_padrao de referência)
+    // 1. Obter detalhes do grupo
     grupoCompleto = await obterGrupo(grupoCardInfo.id);
     if (!grupoCompleto || !grupoCompleto.semestrePadrao) {
       throw new Error("Não foi possível encontrar a referência de semestre para este grupo. Grupos vazios ou sem referência não podem ser editados.");
@@ -363,7 +417,7 @@ async function abrirModalEdicao(grupoCardInfo) {
     membrosAtuais = await obterMembrosDoGrupo(grupoCardInfo.id);
     renderizarMembrosAtuais();
 
-    // 3. Obter alunos disponíveis (baseado no semestre_padrao do grupo)
+    // 3. Obter alunos disponíveis
     const resultadoAlunos = await obterAlunosDisponiveis(orientadorId, grupoCompleto.semestrePadrao);
     if (resultadoAlunos.success) {
       const idsMembrosAtuais = membrosAtuais.map(m => m.id);
@@ -376,7 +430,7 @@ async function abrirModalEdicao(grupoCardInfo) {
   } catch (error) {
     console.error("Erro ao carregar dados para edição:", error);
     ativar(`Erro: ${error.message}`, "erro", "");
-    containerMembros.innerHTML = `<p style="color: red;">${error.message}</p>`;
+    containerMembros.innerHTML = `<p class="texto-erro">${error.message}</p>`; // Use uma classe para erros
     containerAlunos.innerHTML = "";
   }
 
@@ -391,19 +445,18 @@ async function abrirModalEdicao(grupoCardInfo) {
 
     membrosAtuais.forEach(membro => {
       const div = document.createElement("div");
-      div.className = "membro-edit-item"; // (Estilize .membro-edit-item no seu CSS)
-      div.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;";
+      div.className = "membro-edit-item"; // Classe principal
       div.dataset.id = membro.id;
       div.dataset.nome = membro.nome;
 
       div.innerHTML = `
-        <span>${membro.nome}</span>
+        <span class="nome-membro">${membro.nome}</span>
         <div class="membro-actions">
-          <select class="membro-papel-select" style="margin-right: 5px;">
+          <select class="membro-papel-select select-form-mini">
             <option value="Membro" ${membro.papel === 'Membro' ? 'selected' : ''}>Membro</option>
             <option value="Líder" ${membro.papel === 'Líder' ? 'selected' : ''}>Líder</option>
           </select>
-          <button type="button" class="btn-excluir btn-remover-membro" data-id="${membro.id}">&times; Remover</button>
+          <button type="button" class="btn btn-excluir btn-mini btn-remover-membro" data-id="${membro.id}">&times; Remover</button>
         </div>
       `;
       containerMembros.appendChild(div);
@@ -415,16 +468,19 @@ async function abrirModalEdicao(grupoCardInfo) {
         const idParaRemover = Number(e.target.dataset.id);
         const itemElement = e.target.closest('.membro-edit-item');
         
-        // Adicionar de volta à lista de "disponíveis"
         const membroRemovido = membrosAtuais.find(m => m.id === idParaRemover);
         if (membroRemovido) {
-           alunosDisponiveis.unshift(membroRemovido); // Adiciona no início da lista
-           renderizarAlunosParaAdicionar();
+            alunosDisponiveis.unshift(membroRemovido); 
+            renderizarAlunosParaAdicionar();
         }
         
-        // Remover da lista de "atuais"
         membrosAtuais = membrosAtuais.filter(m => m.id !== idParaRemover);
-        itemElement.remove(); // Remove do DOM
+        itemElement.remove();
+        
+        // Se esvaziar a lista, mostrar a mensagem
+        if (membrosAtuais.length === 0) {
+            containerMembros.innerHTML = "<p>Nenhum membro neste grupo.</p>";
+        }
       };
     });
   }
@@ -438,14 +494,13 @@ async function abrirModalEdicao(grupoCardInfo) {
 
     alunosDisponiveis.forEach(aluno => {
       const div = document.createElement("div");
-      div.className = "aluno-add-item"; // (Estilize no seu CSS)
-      div.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;";
+      div.className = "aluno-add-item"; // Classe principal
       div.dataset.id = aluno.id;
       div.dataset.nome = aluno.nome;
 
       div.innerHTML = `
-        <span>${aluno.nome}</span>
-        <button type="button" class="btn-adicionar" data-id="${aluno.id}" style="background-color: var(--cor-primaria-verde); color: white;">+ Adicionar</button>
+        <span class="nome-membro">${aluno.nome}</span>
+        <button type="button" class="btn btn-Ver btn-mini btn-adicionar" data-id="${aluno.id}">+ Adicionar</button>
       `;
       containerAlunos.appendChild(div);
     });
@@ -456,34 +511,44 @@ async function abrirModalEdicao(grupoCardInfo) {
         const idParaAdicionar = Number(e.target.dataset.id);
         const itemElement = e.target.closest('.aluno-add-item');
 
-        // Verificar limite
         if (membrosAtuais.length >= 5) {
             ativar("Um grupo pode ter no máximo 5 membros.", "erro", "");
             return;
         }
         
-        // Adicionar à lista de "atuais"
+        // Se a lista estava vazia, limpa a mensagem "Nenhum membro"
+        if (membrosAtuais.length === 0) {
+            containerMembros.innerHTML = ""; 
+        }
+
         const alunoAdicionado = alunosDisponiveis.find(a => a.id === idParaAdicionar);
         if (alunoAdicionado) {
             membrosAtuais.push({ ...alunoAdicionado, papel: 'Membro' });
             renderizarMembrosAtuais();
         }
 
-        // Remover da lista de "disponíveis"
         alunosDisponiveis = alunosDisponiveis.filter(a => a.id !== idParaAdicionar);
-        itemElement.remove(); // Remove do DOM
+        itemElement.remove();
+        
+        // Se esvaziar a lista, mostrar a mensagem
+        if (alunosDisponiveis.length === 0) {
+            containerAlunos.innerHTML = "<p>Nenhum aluno disponível para adicionar.</p>";
+        }
       };
     });
   }
 
-
-  // --- Lógica de Submit ---
+  // --- Lógica de Submit (sem alterações) ---
   modal.querySelector("#editar-grupo").addEventListener("submit", async (e) => {
     e.preventDefault();
     
     const nomeAtualizado = modal.querySelector("#edit-nome").value;
-
-    // Coletar membros atuais e seus papéis
+    if (!grupoCompleto || !grupoCompleto.semestrePadrao) {
+      ativar("Erro crítico: Não foi possível identificar o semestre de origem deste grupo. Recarregue a página.", "erro", "");
+      return;
+    }
+    const semestrePadraoDoGrupo = grupoCompleto.semestrePadrao;
+    
     const membrosFinal = [];
     containerMembros.querySelectorAll(".membro-edit-item").forEach(item => {
       membrosFinal.push({
@@ -491,7 +556,9 @@ async function abrirModalEdicao(grupoCardInfo) {
         papel: item.querySelector('.membro-papel-select').value
       });
     });
-
+    
+    const lideresCount = membrosFinal.filter(membro => membro.papel === 'Líder').length;
+    
     if (membrosFinal.length === 0) {
       ativar("Um grupo não pode ficar sem membros. Adicione ao menos um.", "erro", "");
       return;
@@ -500,17 +567,32 @@ async function abrirModalEdicao(grupoCardInfo) {
         ativar(`Um grupo não pode ter mais que 5 membros. Você tem ${membrosFinal.length}.`, "erro", "");
         return;
     }
+    if (lideresCount > 1) {
+      ativar("Apenas um membro pode ser selecionado como Líder no grupo.", "erro", "");
+      return;
+    }
 
     const dadosAtualizados = {
       nome: nomeAtualizado,
       membros: membrosFinal,
     };
+    const confirmacao = await confirmarAcao(
+      "Confirmar Alterações",
+      `Deseja realmente salvar as alterações no grupo <strong>"${dadosAtualizados.nome}"</strong>?`,
+      "Salvar",
+      "Cancelar"
+    );
 
+    if (!confirmacao) {
+      ativar("Alterações canceladas.", "info", "");
+      return;
+    }
     try {
       const resultado = await atualizarGrupo(grupoCardInfo.id, dadosAtualizados);
       document.body.removeChild(overlay);
       ativar(resultado.message || "Grupo atualizado com sucesso!", "sucesso", "");
-      carregarGrupos(); // Recarregar a lista principal
+      carregarGrupos();
+      carregarAlunosDisponiveis(semestrePadraoDoGrupo); 
     } catch (error) {
       console.error("Erro:", error);
       ativar(`Falha ao atualizar grupo: ${error.message}`, "erro", "");
@@ -518,15 +600,18 @@ async function abrirModalEdicao(grupoCardInfo) {
   });
 }
 
-/**
- * Confirma e executa exclusão de grupo
- */
 async function confirmarExclusaoGrupo(grupoId, grupoNome) {
-  const confirmacao = confirm(
-    `Tem certeza que deseja excluir o grupo "${grupoNome}"?\nEssa ação não pode ser desfeita.`
+
+  const confirmacao = await confirmarAcao(
+    "Confirmar Exclusão",
+    `Tem certeza que deseja excluir o grupo <strong>"${grupoNome}"</strong>? Esta ação não pode ser desfeita.`,
+    "Excluir", // labelSim
+    "Cancelar" // labelNao
   );
-  
-  if (!confirmacao) return;
+  if (!confirmacao) {
+    ativar("Exclusão do grupo cancelada.", "info", "");
+    return;
+  }
 
   try {
     const resultado = await excluirGrupo(grupoId);
@@ -589,6 +674,16 @@ async function criarNovoGrupo(event) {
     "Disciplina:", grupoData.disciplina_id,
     "Orientador:", grupoData.orientador_id
   );
+  const confirmacao = await confirmarAcao(
+    "Confirmar Criação",
+    `Deseja realmente criar o grupo <strong>"${grupoData.nome}"</strong> com <strong>${alunosSelecionados.length}</strong> aluno(s)?`,
+    "Criar",
+    "Cancelar"
+  );
+  if (!confirmacao) {
+    ativar("Criação de grupo cancelada.", "info", "");
+    return;
+  }
 
   try {
     const resultado = await criarGrupo(grupoData);
@@ -717,7 +812,7 @@ function renderizarAlunosDisponiveis(alunos, containerId = "alunos-container") {
 
     const label = document.createElement("label");
     label.htmlFor = checkbox.id;
-    label.textContent = `${aluno.nome}${aluno.semestrePadrao ? ` (${aluno.semestrePadrao}º sem)` : ''}`;
+    label.textContent = `${aluno.nome}`;
 
     const div = document.createElement("div");
     div.classList.add("aluno-checkbox");

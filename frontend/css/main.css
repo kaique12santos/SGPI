@@ -84,6 +84,7 @@ body{
     justify-content: space-between; 
     width: 100%; 
     max-width: 100%; 
+    font-weight: 500;
     border-top: 1px solid #970000;
     border-bottom: 1px solid #970000;
     
@@ -124,10 +125,11 @@ body{
 .menu-desktop-nav {
     display: flex;
     justify-content: flex-start;
-   
     margin: 0 auto;
-  
+    align-items: center;
+    max-width: 100%;
     gap: 0;
+    overflow-x: auto;
 }
 
 .menu-desktop-item {

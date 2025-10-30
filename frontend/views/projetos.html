@@ -12,6 +12,7 @@
      <link rel="stylesheet" href="/css/main.css">
      
      <link rel="stylesheet" href="/css/alerts.css">
+     <link rel="stylesheet" href="/css/alertConfirm.css">
      <link rel="stylesheet" href="/css/projetos.css">
      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
      
@@ -95,36 +96,54 @@
           <h1>Lista de Projetos</h1>
           </div>
           <div id="container-projetos"></div>
-
-          <div id="modal-edicao" class="modal-overlay hidden">
-            <div class="modal-content animated">
-              <h3>Editar Projeto</h3>
-          
-              <label for="modal-titulo">Título</label>
-              <input type="text" id="modal-titulo"> <label for="modal-descricao">Descrição</label>
-              <textarea id="modal-descricao" rows="3"></textarea> <label for="modal-semestre">Semestre Letivo</label>
-              <select id="modal-semestre" required disabled> <option value="0">Carregando semestres...</option>
-              </select>
-
-              <label for="modal-disciplina">Disciplina</label>
-              <select id="modal-disciplina" required disabled>
-                <option value="0">Carregando disciplinas...</option>
-              </select>
-          
-              <label for="modal-status">Status</label>
-              <select id="modal-status"> <option>Em Proposta</option>
-                <option>Em Andamento</option>
-                <option>Aguardando Avaliação</option>
-                <option>Concluído</option>
-              </select>
-          
-              <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
-                <button id="btn-modal-cancelar" class="btn-salvar" style="background: gray;">Cancelar</button>
-                <button id="btn-modal-salvar" class="btn-salvar">Salvar</button>
-              </div>
-            </div>
-          </div>          
         </div>
+          <div id="modal-edicao" class="modal-overlay hidden">
+            <div class="modal-content">
+              <!-- Cabeçalho -->
+              <div class="modal-header">
+                <h3>✏️ Editar Projeto</h3>
+              </div>
+              
+              <!-- Corpo -->
+              <div class="modal-body">
+                <label for="modal-titulo">Título</label>
+                <input type="text" id="modal-titulo" placeholder="Digite o título do projeto">
+                
+                <label for="modal-descricao">Descrição</label>
+                <textarea id="modal-descricao" placeholder="Descreva o projeto"></textarea>
+                
+                <label for="modal-semestre">Semestre Letivo</label>
+                <select id="modal-semestre" disabled>
+                  <option value="0">Selecione</option>
+                </select>
+                
+                <label for="modal-disciplina">Disciplina</label>
+                <select id="modal-disciplina" disabled>
+                  <option value="0">Selecione</option>
+                </select>
+                
+                <label for="modal-status">Status</label>
+                <select id="modal-status">
+                  <option value="Em Proposta">Em Proposta</option>
+                  <option value="Em Andamento">Em Andamento</option>
+                  <option value="Aguardando Avaliação">Aguardando Avaliação</option>
+                  <option value="Concluído">Concluído</option>
+                </select>
+                <!-- Rodapé -->
+              <div class="modal-footer">
+                <button id="btn-modal-cancelar" class="btn-modal btn-modal-cancelar">
+                  ✖ Cancelar
+                </button>
+                <button id="btn-modal-salvar" class="btn-modal btn-modal-salvar">
+                  💾 Salvar Alterações
+                </button>
+              </div>
+              </div>
+              
+              
+            </div>
+          </div>         
+        
         <footer class="sgpi-footer">
           <div class="footer-container">
               <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>

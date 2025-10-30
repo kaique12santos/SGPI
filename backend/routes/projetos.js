@@ -125,6 +125,7 @@ router.get('/api/projetos', async (req, res) => {
         p.semestre_id,
         s.periodo as semestre_periodo,
         s.ano as semestre_ano,
+        d.semestre_padrao,
         p.disciplina_id,
         d.nome AS disciplina_nome,
         p.status
@@ -146,6 +147,7 @@ router.get('/api/projetos', async (req, res) => {
       grupo_nome: p.grupo_nome,
       semestre_id: p.semestre_id,
       semestre_formatado: (p.semestre_periodo && p.semestre_ano) ? `${p.semestre_periodo}/${p.semestre_ano}` : 'N/A',
+      semestre_padrao: p.semestre_padrao,
       disciplina_id: p.disciplina_id,
       disciplina_nome: p.disciplina_nome,
       status: p.status

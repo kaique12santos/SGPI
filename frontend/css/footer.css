@@ -24,6 +24,7 @@
 .footer-text {
     color: #f1f1f1;
     font-size: 13px;
+    font-weight: 500;
     flex: 1;
     max-width: 60%;
     line-height: 1.3;
@@ -33,6 +34,7 @@
 .footer-links {
     display: flex;
     align-items: center;
+
     gap: 15px;
     flex-shrink: 0; /* Impede que os links encolham */
 }
@@ -42,6 +44,7 @@
     text-decoration: none;
     transition: color 0.3s ease;
     font-size: 13px;
+    font-weight: 500;
     white-space: nowrap; /* Links não quebram */
 }
 

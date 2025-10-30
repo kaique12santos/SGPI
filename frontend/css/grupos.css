@@ -7,12 +7,14 @@
   font-size: 1rem;
   font-weight: 500;
 }
-
+#nomeGrupo{
+  width: 98%;
+}
 #formGrupo {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  
+  align-items: flex-start;
   padding: 1%;
   border: none;
   width: 97%;
@@ -143,6 +145,7 @@
   color: #ffff;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
@@ -179,7 +182,10 @@
   box-shadow: 0 6px 12px rgba(235, 2, 2, 0.3);
 }
 
-
+.checkbox-container{
+  display: flex;
+  flex-direction: row;
+}
 .btn-Ver {
   background: linear-gradient(135deg, #2ecc71, #27ae60);
   border-left: 3px solid #1e8449;
@@ -192,6 +198,7 @@
 }
 
 
+/* Overlay do Modal */
 .div-zindex {
   position: fixed;
   top: 0;
@@ -203,7 +210,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(8px);
   animation: fadeIn 0.3s ease;
 }
 
@@ -212,68 +219,396 @@
   to { opacity: 1; }
 }
 
-.div-mostrar {
-  max-height: 80vh;
-  overflow-y: auto;
+/* Container do Modal */
+.div-mostrar{
   background-color: #ffffff;
-  padding: 2.5rem;
-  border-radius: 12px;
-  max-width: 500px;
+  border-radius: 16px;
+  max-width: 600px;
   width: 90%;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+  padding: 0;
 }
 
-.div-mostrar p {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  line-height: 1.6;
-  color: #333;
-  margin: 1rem 0;
+.div-mostrar .card-header {
+  background: #970000;
+  padding: 1.5rem 2rem;
+  border-bottom: none;
+  position: relative;
 }
 
+.div-mostrar .card-header .titulo-grupo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
 
-.checkbox-container {
+/* Corpo do Modal */
+.div-mostrar .card-body {
+  padding: 2rem;
+  max-height: calc(85vh - 200px);
+  overflow-y: auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.aluno-checkbox {
+/* Scrollbar personalizada */
+.div-mostrar .card-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.div-mostrar .card-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.div-mostrar .card-body::-webkit-scrollbar-thumb {
+  background: #970000;
+  border-radius: 10px;
+}
+
+.div-mostrar .card-body::-webkit-scrollbar-thumb:hover {
+  background: #c20000;
+}
+
+/* Labels */
+.div-mostrar .label-form {
+  display: block;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+
+.div-mostrar.form-edit-modal {
+  background-color: #ffffff;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+  padding: 0;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Botão X de fechar */
+.btn-fechar-icone {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 6px;
-  background-color: #f5f5f5;
-  padding: 6px 10px;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.btn-fechar-icone:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* Cabeçalho do Modal */
+.form-edit-modal .card-header {
+  background: #970000;
+  padding: 1.5rem 2rem;
+  border-bottom: none;
+  position: relative;
+}
+
+.form-edit-modal .card-header .titulo-grupo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+/* Corpo do Modal */
+.form-edit-modal .card-body {
+  padding: 2rem;
+  max-height: calc(85vh - 200px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Scrollbar personalizada */
+.form-edit-modal .card-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.form-edit-modal .card-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.form-edit-modal .card-body::-webkit-scrollbar-thumb {
+  background: #970000;
+  border-radius: 10px;
+}
+
+.form-edit-modal .card-body::-webkit-scrollbar-thumb:hover {
+  background: #c20000;
+}
+
+/* Labels */
+.form-edit-modal .label-form {
+  display: block;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+/* Inputs e Selects */
+.form-edit-modal .input-form,
+.form-edit-modal .select-form {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
+  font-size: 1rem;
+  color: #2d3748;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
-
-
-@media (max-width: 992px) {
-  .grupos-existentes {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.form-edit-modal .input-form:focus,
+.form-edit-modal .select-form:focus {
+  outline: none;
+  border-color: #970000;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1);
 }
 
-@media (max-width: 768px) {
-  .grupos-existentes {
-    grid-template-columns: 1fr;
-  }
+/* Seção de Membros e Alunos */
+.form-edit-modal h3.label-form {
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
 
-  .btn-group {
-    flex-direction: column;
-  }
+/* Container de Listas */
+.lista-edit-container {
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  min-height: 100px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  .btn {
-    width: 100%;
-    justify-content: center;
-  }
+.lista-edit-container::-webkit-scrollbar {
+  width: 6px;
+}
 
-  .div-mostrar {
-    padding: 1.5rem;
-    max-width: 90%;
-  }
+.lista-edit-container::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.lista-edit-container::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+}
+
+/* Items da Lista */
+.membro-edit-item,
+.aluno-add-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.membro-edit-item:hover,
+.aluno-add-item:hover {
+  border-color: #970000;
+  box-shadow: 0 2px 4px rgba(151, 0, 0, 0.1);
+}
+
+.membro-edit-item .nome-membro,
+.aluno-add-item .nome-membro {
+  font-weight: 500;
+  color: #2d3748;
+  flex: 1;
+}
+
+/* Ações dos Membros */
+.membro-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Select de Papel (Líder/Membro) */
+.membro-papel-select,
+.select-form-mini {
+  background-color: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  color: #2d3748;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.membro-papel-select:focus,
+.select-form-mini:focus {
+  outline: none;
+  border-color: #970000;
+  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1);
+}
+
+/* Botões Mini */
+.btn-mini {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  box-shadow: none;
+  margin: 0;
+}
+/* Botão Remover */
+.btn-mini.btn-excluir,
+.btn-remover-membro {
+  background-color: #dc2626;
+  color: white;
+}
+
+.btn-mini.btn-excluir:hover,
+.btn-remover-membro:hover {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Botão Adicionar */
+.btn-mini,
+.btn-adicionar {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-mini:hover,
+.btn-adicionar:hover {
+  background-color: #27ae60;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+}
+
+/* Texto de Erro */
+.texto-erro {
+  color: #970000;
+  font-weight: 500;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Rodapé do Modal */
+.form-edit-modal .card-footer {
+  background-color: #f8fafc;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* Botões do Rodapé */
+.div-zindex .btn-alterar {
+  background: #970000;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(151, 0, 0, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-alterar:hover {
+  box-shadow: 0 6px 16px rgba(151, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-alterar:active {
+  transform: translateY(0);
+}
+
+/* Info Item */
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item strong {
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+/* Divisor */
+.divisor {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0.5rem 0;
 }
 
 .grupo-card p{
@@ -520,3 +855,265 @@
     padding: 0.8%;
   }
 }
+
+/* --- INÍCIO: Estilos do Modal de Visualização --- */
+
+/* Ajustamos seu .div-mostrar para funcionar como um container sem padding,
+   pois o header, body e footer controlarão o espaçamento interno. */
+   .div-mostrar {
+    padding: 0; /* Remove o padding de 2.5rem original */
+   /* Garante que o border-radius seja aplicado nos cantos */
+    position: relative; /* Necessário para o botão "X" */
+  }
+  
+  /* Botão "X" no canto */
+  .btn-fechar-icone {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+  }
+  .btn-fechar-icone:hover {
+    color: #333;
+  }
+  
+  /* Cabeçalho */
+  .card-header {
+    padding: 24px 24px 16px 24px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  .card-header .label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .card-header .titulo-grupo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212529;
+    margin: 4px 0 0 0;
+  }
+  
+  /* Corpo */
+  .card-body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    /* Remove a necessidade de mexer em <p> dentro do modal */
+  }
+
+
+  .card-body input{
+    background-color: #fff;
+  }
+  .info-item {
+    font-size: 1rem;
+    color: #495057;
+    line-height: 1.5;
+  }
+  .info-item strong {
+    color: #212529;
+    margin-right: 6px;
+  }
+  
+  .divisor {
+    border: none;
+    border-top: 1px solid #e9ecef;
+    margin: 8px 0;
+  }
+  
+  /* Seção de Membros */
+  .secao-membros h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  .lista-membros {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lista-membros li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+  }
+  .nome-membro {
+    font-weight: 500;
+    color: #333;
+  }
+  .tag-funcao {
+    font-size: 0.85rem;
+    background-color: #e2e2e2; /* Cor dos seus inputs */
+    color: #555;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  
+  /* Rodapé */
+  .card-footer {
+    background-color: #f8f9fa;
+    padding: 16px 24px;
+    text-align: right;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  /* Novo estilo para o botão fechar (substitui o .send-button) */
+  .btn-fechar-secundario {
+    background-color: #970000;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  .btn-fechar-secundario:hover {
+    background-color: #c40000;
+    transform: translateY(-2px);
+  }
+  
+  /* --- FIM: Estilos do Modal de Visualização --- */
+  /* --- INÍCIO: Estilos do Modal de EDIÇÃO --- */
+
+/* Ajusta o .div-mostrar quando for o modal de edição */
+.div-mostrar.form-edit-modal {
+  padding: 0; /* Remove o padding antigo */
+  /* Garante o border-radius */
+}
+
+/* Garante que o formulário interno não tenha margens estranhas */
+.form-edit-modal form {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Reutiliza os estilos de header, body e footer do modal de visualização */
+.form-edit-modal .card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-edit-modal .card-header .titulo-grupo {
+  font-size: 1.5rem; /* Um pouco menor que o de visualização */
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.div-mostrar .card-header .label{
+  font-size: 1.5rem; /* Um pouco menor que o de visualização */
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+
+.form-edit-modal .card-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-edit-modal .card-footer {
+  background-color: #f8f9fa;
+  padding: 16px 24px;
+  text-align: right;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Estilo para as caixas de listagem de membros/alunos */
+.lista-edit-container {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 1rem;
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Estilo para cada item nas listas de edição */
+.membro-edit-item,
+.aluno-add-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.membro-edit-item .nome-membro,
+.aluno-add-item .nome-membro {
+  font-weight: 500;
+  color: #333;
+}
+
+.membro-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Estilo para o <select> de papel (Líder/Membro) */
+.select-form-mini {
+  background-color: #e2e2e2;
+  border: none;
+  border-bottom: #686868 solid 1px;
+  border-radius: 5px;
+  padding: 4px 8px; /* Menor que o .select-form normal */
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Nova classe para botões pequenos (Remover/Adicionar) */
+.btn-mini {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  box-shadow: none; /* Remove a sombra grande */
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Ajusta o padding para os botões com ícone */
+.btn-mini.btn-excluir {
+  padding-left: 0.4rem;
+}
+
+/* Mensagem de erro dentro das caixas */
+.texto-erro {
+  color: #970000; /* Vermelho escuro do seu tema */
+  font-weight: 500;
+}
+
+/* --- FIM: Estilos do Modal de EDIÇÃO --- */

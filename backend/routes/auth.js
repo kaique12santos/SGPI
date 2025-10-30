@@ -203,35 +203,6 @@ router.post('/validar-token', async (req, res) => {
         );
 
       }
-      // if (tipo === "Aluno") {
-      //   await connection.execute("INSERT INTO Alunos (usuario_id) VALUES (?)", [usuarioId]);
-
-      //   if (Array.isArray(disciplinas) && disciplinas.length > 0) {
-      //     const resultDisciplinas = await connection.execute(
-      //       `SELECT id FROM Disciplinas WHERE codigo IN (${disciplinas.map(() => "?").join(",")})`,
-      //       disciplinas
-      //     );
-      //     const disciplinaIds = resultDisciplinas.rows.map(d => d.id);
-
-      //     if (disciplinaIds.length > 0) {
-      //       const resultSemestres = await connection.execute(
-      //         `SELECT DISTINCT semestre_id FROM Disciplinas_Ofertas WHERE disciplina_id IN (${disciplinaIds.map(() => "?").join(",")})`,
-      //         disciplinaIds
-      //       );
-
-
-      //       for (const oferta of ofertasResult) {
-      //         await connection.execute(
-      //           `INSERT INTO Aluno_Oferta (aluno_id, oferta_id, status)
-      //            VALUES (?, ?, 'Matriculado')`,
-      //           [usuarioId, oferta.oferta_id]
-      //         );
-      //       }
-      //       console.log(`✅ ${ofertasResult.length} disciplinas vinculadas ao aluno ID ${usuarioId}`);
-      //     }
-          
-      //   }
-      // }
 
       if (tipo === "Aluno") {
         // 1️⃣ Cadastra o aluno na tabela Alunos
