@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const { getConnection } = require('../conexaoMysql.js');
+const sharp = require("sharp");
 
 /**
  * GET /perfil/:id
@@ -104,12 +105,18 @@ router.put('/:id', upload.single("foto"), async (req, res) => {
       );
     }
 
-    // Se vier foto, atualiza
     if (req.file) {
-      const fotoBuffer = req.file.buffer;
+
+      // Converte e comprime
+      const fotoProcessada = await sharp(req.file.buffer)
+        .rotate()                 // corrige orientação de fotos de celular
+        .resize(500)              // largura máxima
+        .jpeg({ quality: 70 })    // compressão ideal para avatar
+        .toBuffer();
+    
       await connection.execute(
         `UPDATE Usuarios SET foto = ? WHERE id = ?`,
-        [fotoBuffer, usuarioId]
+        [fotoProcessada, usuarioId]
       );
     }
 
