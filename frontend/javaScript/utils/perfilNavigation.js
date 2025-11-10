@@ -1,5 +1,3 @@
-// frontend/pages/perfilNavigation.js
-// ⚡ Gera dinamicamente as abas laterais do perfil com base na role logada
 
 // 1️⃣ Mapeamento de abas por tipo de usuário
 const perfilTabsByRole = {

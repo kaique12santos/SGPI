@@ -72,6 +72,9 @@ html {
     font-size: smaller;
     padding: 10px;
 }
+.login-actions a {
+    font-weight: 500;
+}
 
 .login-form{
     display: flex;
@@ -93,6 +96,7 @@ html {
 .login-button{
     background-color: #970000;
     border: none;
+    font-weight: 500;
     border-radius: 15px;
     padding: 5px;
     width: 22%;

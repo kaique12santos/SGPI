@@ -1,16 +1,24 @@
-function realizarLogout(e) {
+import { confirmarAcao } from "../utils/confirmDialog.js";
+async function realizarLogout(e) {
     e.preventDefault();
-    
-    const confirmacao = confirm('Tem certeza que deseja sair do sistema?');
-    
-    if (confirmacao) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('tipoUsuario')
-        localStorage.removeItem('usuarioId')
-        localStorage.removeItem('userRole');
-        window.location.href = '/index';
-    }
+  
+    const confirmar = await confirmarAcao(
+      "Sair do sistema?",
+      "Você realmente deseja encerrar sua sessão e sair?",
+      "Sair",
+      "Cancelar"
+    );
+  
+    if (!confirmar) return;
+  
+    localStorage.removeItem('token');
+    localStorage.removeItem('tipoUsuario');
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('userRole');
+  
+    window.location.href = '/index';
 }
+  
 
 function gerarMenu(tipoPerfil) {
     gerarMenuMobile(tipoPerfil);
@@ -92,7 +100,6 @@ function getItensMenu() {
     {texto: 'Sair',id:'logout-button'}
     ],
     coordenador: [
-    { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios' },
     { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador' },
     { texto: 'Monitoramento Geral', link: '/listaProjetos'},
     { texto: 'Controle de Chaves', link: '/palavraChave'},

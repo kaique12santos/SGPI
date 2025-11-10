@@ -1,120 +1,160 @@
-  .atividade-detalhes {
-    max-width: 672px; /* max-w-2xl */
-    overflow-wrap: break-word;
-    margin: 20px;
-    padding: 32px;
-    background-color: rgb(255, 255, 255);
-    border-radius: 12px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
-    border: 1px solid #a8a8a8;
-  }
-  
-  .atividade-detalhes h2 {
-    font-size: 30px;
-    font-weight: bold;
-    color: #374151;
-    margin-bottom: 24px;
-    
-    padding-bottom: 12px;
-  }
-  
-  .atividade-detalhes p {
-    color: #374151;
-    margin-bottom: 16px;
-  }
-  
-  .atividade-detalhes strong {
-    color: #374151;
-    font-weight: 600;
-  }
-  
-  .atividade-detalhes span {
-    margin-left: 8px;
-  }
-  
-  .upload-area {
-    background-color: #f9fafb;
-    padding: 10px;
-    border-radius: 8px;
-    border: 2px groove #d1d5db;
-    margin-top: 20px;
-    transition: border-color 0.2s ease;
-  }
-  
-  .upload-area:hover {
-    border-color: #3f3f3fbd;
-  }
-  
-  .upload-area label {
-    display: block;
-    color: #374151;
-    font-weight: 500;
-    
-  }
-  
-  .upload-area input[type="file"] {
-    display: block;
-    width: 65%;
-    font-size: 14px;
-    color: #6b7280;
-    padding: 8px 0px;
-    
-    
-  }
-  
-  .upload-area input[type="file"]::-webkit-file-upload-button {
-    margin-right: 16px;
-    padding: 8px 16px;
-    border-radius: 9px;
-    border: 0;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: #8d8d8d3f;
-    
-    cursor: pointer;
-  }
-  
-  .upload-area input[type="file"]::-webkit-file-upload-button:hover {
-    background-color: #c0c0c0;
-  }
-  
-  .botao-enviar {
-    background-color: #970000;
-    color: #ffffff;
-    font-weight: 600;
-    padding: 8px 24px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-  
-  .botao-enviar:hover {
-    background-color: #7f0000;
-  }
-  
-  .alerta-sucesso {
-    margin-top: 16px;
-    padding: 12px;
-    background-color: #dcfce7;
-    color: #166534;
-    border-radius: 6px;
-    display: none;
-  }
-  
-  .alerta-erro {
-    margin-top: 16px;
-    padding: 12px;
-    background-color: #fef2f2;
-    color: #991b1b;
-    border-radius: 6px;
-    display: none;
-  }
-  
-  /* Para mostrar os alertas quando necessário */
-  .alerta-sucesso.mostrar,
-  .alerta-erro.mostrar {
-    display: block;
-  }
-  
+/* ==================================== */
+/* Card Principal (Mantido)             */
+/* ==================================== */
+.atividade-detalhes {
+  max-width: 672px; /* max-w-2xl */
+  overflow-wrap: break-word;
+  margin: 20px auto; /* Centralizado */
+  padding: 32px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+  border: 1px solid #a8a8a8;
+}
+
+.atividade-detalhes h2 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+}
+
+.atividade-detalhes p {
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.atividade-detalhes strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.atividade-detalhes span {
+  margin-left: 8px;
+}
+
+/* ==================================== */
+/* NOVA Área de Entrega (Reestilizada)  */
+/* ==================================== */
+
+/* O container principal que envolve os estados de upload */
+.area-entrega-container {
+  background-color: #f9fafb; /* Fundo cinza claro */
+  padding: 24px;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db; /* Borda tracejada (estilo drop-zone) */
+  margin-top: 20px;
+  text-align: center;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Efeito de hover para parecer mais interativo */
+.area-entrega-container:hover {
+  border-color: #970000;
+  background-color: #fff8f8;
+}
+
+/* Títulos dentro da área de upload (ex: "Enviar entrega") */
+.area-entrega-container h3 {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  color: #1f2937; /* Cinza escuro */
+  margin: 0;
+  margin-bottom: 16px;
+}
+
+/* Esconde o <input type="file"> real */
+.upload-area input[type="file"] {
+  display: none;
+}
+
+/* Estiliza o <label> para parecer um botão */
+.upload-area label[for="arquivo"] {
+  display: inline-block;
+  background-color: #e5e7eb; /* Botão cinza claro */
+  color: #1f2937;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.upload-area label[for="arquivo"]:hover {
+  background-color: #d1d5db; /* Cinza um pouco mais escuro */
+}
+
+/* Div para mostrar o nome do arquivo selecionado */
+#nome-arquivo {
+  color: #6b7280;
+  font-size: 0.9rem; /* 14px */
+  margin-top: 12px;
+  margin-bottom: 16px;
+  min-height: 1.2em; /* Reserva espaço para o texto não "pular" */
+}
+
+/* ==================================== */
+/* Estado: Entrega Existente            */
+/* ==================================== */
+#entrega-existente {
+  text-align: left; /* Alinha o texto à esquerda */
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+#entrega-existente h3 {
+  text-align: center; /* Centraliza só o título */
+}
+
+#entrega-existente p {
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+/* Link para download do arquivo */
+#entrega-existente a {
+  color: #970000;
+  font-weight: 600;
+  text-decoration: underline;
+  word-break: break-all; /* Quebra nomes de arquivo longos */
+}
+
+/* ==================================== */
+/* Botões e Alertas (Levemente Aprimorados) */
+/* ==================================== */
+.botao-enviar {
+  background-color: #970000;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 10px 24px; /* Mais preenchimento */
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.botao-enviar:hover {
+  background-color: #7f0000;
+}
+
+.botao-enviar:disabled {
+  background-color: #cccccc;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Botão de "Trocar Arquivo" */
+.botao-trocar {
+  background-color: #525252; /* Cinza escuro */
+  width: 100%; /* Ocupa a largura toda */
+  margin-top: 10px;
+}
+.botao-trocar:hover {
+  background-color: #3f3f3f; /* Cinza mais escuro */
+}
+

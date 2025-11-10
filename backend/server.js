@@ -66,12 +66,11 @@ const authPerfil = require('./middlewares/authPerfil.js');
 const auth = require('./routes/auth.js')
 const redefinirSenha = require('./routes/redefinirSenha.js');
 const palavraChaveRoutes = require('./routes/palavraChave');
-const professorOrientador = require('./routes/professorOrientador.js');
 const atualizarPerfil = require('./routes/atualizarPerfil.js');
 const grupos = require('./routes/grupos.js');
 const notificacoes = require('./routes/notificacoes.js')
 const usuarios = require ('./routes/usuarios.js');
-const aluno = require('./routes/alunoAtividade.js')
+const alunoAtividadesRoutes = require('./routes/alunoAtividadesRoutes.js');
 const entregas = require('./routes/entregas.js')
 const projetos = require('./routes/projetos.js')
 const avaliar = require('./routes/avaliacoes.js')
@@ -83,6 +82,7 @@ const perfilAcademico = require('./routes/perfilAcademico.js')
 const perfilDashboard = require( './routes/perfilDashboard.js'); 
 const professoresDiciplinas = require('./routes/professoresDiciplinas.js')
 const semestreRoutes = require('./routes/semestres.js');
+const atividadesProfessorRoutes = require ('./routes/atividadesProfessorRoutes.js')
 
 
 //importar as rotas de tratamento de erros
@@ -111,8 +111,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usar as rotas importadas
 app.use('/',auth)
-app.use('/professor', professorOrientador);
-app.use('/professor_orientador', professorOrientador);
+app.use('/professor', atividadesProfessorRoutes);
+app.use('/professor_orientador', atividadesProfessorRoutes);
 app.use('/perfil', atualizarPerfil);
 app.use('/perfilAcademico',perfilAcademico);
 app.use('/dashboard', perfilDashboard);
@@ -120,7 +120,7 @@ app.use('/',grupos);
 app.use('/', notificacoes);
 app.use('/',usuarios);
 app.use('/', redefinirSenha);
-app.use('/', aluno);
+app.use('/aluno', authPerfil, alunoAtividadesRoutes);
 app.use('/', entregas);
 app.use('/',projetos);
 app.use('/',avaliar);

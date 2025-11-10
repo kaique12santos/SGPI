@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/footer-estrutura.css">
     <link rel="stylesheet" href="/css/main.css">
-    
+    <link rel="stylesheet" href="css/alertConfirm.css">
     <link rel="stylesheet" href="/css/alerts.css">
     
     <link rel="stylesheet" href="/css/entregas.css">
@@ -66,25 +66,48 @@
         
         </div>
         <div class="page-name">
-            <h2>Minhas Atividades</h2>
+            <h2 id="titulo-pagina">Carregando...</h2>
         </div>
 
         <div class="atividade-detalhes">
-            <h2 id="titulo"></h2>
-            <p><strong>Descrição:</strong> <span id="descricao"></span></p>
-            <p><strong>Professor:</strong> <span id="professor"></span></p>
-            <p><strong>Prazo:</strong> <span id="prazo"></span></p>
-            <p><strong>Criterios:</strong> <span id="criterios"></span></p>
-        
-            <div class="upload-area">
-              <label>Envie sua entrega:</label><br />
-              <input type="file" id="arquivo" accept=".pdf,.doc,.docx,.xls,.xlsx" /><br/>
-              <button class="botao-enviar" onclick="enviarEntrega()">Enviar</button>
-              <div class="alerta-sucesso" id="sucesso">Entrega enviada com sucesso!</div>
-              <div class="alerta-erro" id="erro">Erro ao enviar entrega.</div>
+            <div id="loading-detalhes">Carregando detalhes...</div>
+            <div id="info-atividade" style="display: none;">
+                <h2 id="titulo"></h2>
+                <p><strong>Descrição:</strong> <span id="descricao"></span></p>
+                <p><strong>Professor:</strong> <span id="professor"></span></p>
+                <p><strong>Prazo:</strong> <span id="prazo"></span></p>
+                <p><strong>Nota Máxima:</strong> <span id="nota-maxima"></span></p>
+                <p><strong>Meu Grupo:</strong> <span id="grupo-nome"></span></p>
             </div>
-          </div>
+
+            <div class="area-entrega-container">
+                
+                <div id="loading-entrega">Carregando status da entrega...</div>
+
+                <div id="entrega-existente" style="display: none;">
+                    <h3>Entrega Atual do Grupo</h3>
+                    <p><strong>Arquivo:</strong> <a id="link-download" href="#" download></a></p>
+                    <p><strong>Enviado por:</strong> <span id="responsavel-nome"></span></p>
+                    <p><strong>Data:</strong> <span id="data-entrega"></span></p>
+                    <button id="btn-trocar-arquivo" class="botao-enviar botao-trocar">Trocar Arquivo</button>
+                </div>
+
+                <div id="nova-entrega" class="upload-area" style="display: none;">
+                    <h3 id="titulo-upload">Enviar nova entrega</h3>
+                    <label for="arquivo">Selecione o arquivo (Max: 10MB):</label><br />
+                    <input type="file" id="arquivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.ppt,.pptx" /><br/>
+                    <div id="nome-arquivo"></div>
+                    <button id="btn-enviar" class="botao-enviar">Enviar</button>
+                </div>
+
+                <div id="prazo-vencido" class="alerta-erro" style="display: none;">
+                    O prazo para esta atividade encerrou. Não é mais possível enviar ou alterar arquivos.
+                </div>
+            </div>
+
+          
         </div>
+    </div>
           <footer class="sgpi-footer">
             <div class="footer-container">
                 <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
@@ -106,7 +129,7 @@
     <script defer src="/javaScript/utils/efeitoMenu.js"></script>
     
     <script type="module" src="/javaScript/front_end/entregas.js"></script>
-    <script src="/javaScript/front_end/GerarMenu.js"></script>
+    <script type="module" src="/javaScript/front_end/GerarMenu.js"></script>
     <script type="module" src="/javaScript/front_end/imagemPerfil.js"></script>
     <script type="module" src="./javaScript/front_end/notificacoes-flutuante.js" defer></script>
     <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>

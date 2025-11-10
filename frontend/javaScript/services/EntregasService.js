@@ -1,12 +1,15 @@
-import { fetchJsonComAuth } from "../utils/fetchHelper.js";
+// ASSUMINDO que você tem os helpers 'fetchJsonComAuth' e 'fetchFormDataComAuth'
+import { fetchJsonComAuth, fetchFormDataComAuth } from "../utils/fetchHelper.js";
 
-// Buscar detalhes da atividade pelo aluno
-export async function obterDetalhesAtividade(atividadeId, alunoId) {
-  const url = `/api/atividade/${atividadeId}?aluno_id=${alunoId}`;
+// Buscar detalhes da atividade E entrega existente
+export async function obterDetalhesAtividade(atividadeId) {
+  // O alunoId não é mais necessário na URL, o backend pega do token
+  const url = `/aluno/atividade/${atividadeId}/detalhes`;
   return fetchJsonComAuth(url, null, 'GET');
 }
 
-// Enviar entrega do aluno
+// Enviar entrega (FormData)
 export async function enviarEntregaService(formData) {
-  return fetchFormDataComAuthVersaoFormatada('/api/entregas', formData, 'POST');
+  // Rota agora é /aluno/entregas
+  return fetchFormDataComAuth('/aluno/entregas', formData, 'POST');
 }

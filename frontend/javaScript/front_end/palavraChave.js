@@ -68,12 +68,15 @@ class PalavraChaveDOM {
         this.elementos.salvarProfessor.addEventListener('click', () => this.salvarChave('professor'));
         this.elementos.salvarOrientador.addEventListener('click', () => this.salvarChave('orientador'));
         
+
+        
         // Eventos do modal
         this.elementos.modalCancelar.addEventListener('click', () => this.fecharModal());
         this.elementos.modalFechar.addEventListener('click', () => this.fecharModal());
         this.elementos.modal.addEventListener('click', (e) => {
             if (e.target === this.elementos.modal) this.fecharModal();
         });
+        this.elementos.historicoLista.addEventListener('click', (e) => this.handleHistoricoClick(e));
         
         // Escape para fechar modal
         document.addEventListener('keydown', (e) => {
@@ -249,11 +252,11 @@ class PalavraChaveDOM {
                 </td>
                 <td>
                     <div class="acoes-historico">
-                        <button class="btn btn-secondary btn-small" onclick="palavraChaveDOM.copiarChaveHistorico('${item.chave}')" title="Copiar chave">
+                        <button class="btn btn-secondary btn-small js-copiar-historico" data-chave="${item.chave}" title="Copiar chave">
                             📋
                         </button>
                         ${item.status === 'ativo' ? `
-                            <button class="btn btn-success btn-small" onclick="palavraChaveDOM.marcarComoUsada('${item.chave}')" title="Marcar como usada">
+                            <button class="btn btn-success btn-small js-marcar-usada" data-chave="${item.chave}" title="Marcar como usada">
                                 ✓
                             </button>
                         ` : ''}
@@ -342,6 +345,31 @@ class PalavraChaveDOM {
      */
     capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    /**
+ * Manipula cliques na lista do histórico usando event delegation
+ * @param {Event} e - O evento de clique
+ */
+    handleHistoricoClick(e) {
+        // e.target é o elemento exato clicado (pode ser o ícone 📋)
+        // .closest('button') encontra o botão "pai" mais próximo
+        const target = e.target.closest('button');
+
+        // Se o clique não foi em um botão, ou no ícone dentro dele, ignora
+        if (!target) return;
+
+        // Pega a chave guardada no atributo data-chave
+        const chave = target.dataset.chave;
+        if (!chave) return;
+
+        // Verifica qual botão foi clicado pela classe CSS
+        if (target.classList.contains('js-copiar-historico')) {
+            this.copiarChaveHistorico(chave);
+        } 
+        else if (target.classList.contains('js-marcar-usada')) {
+            this.marcarComoUsada(chave);
+        }
     }
 }
 

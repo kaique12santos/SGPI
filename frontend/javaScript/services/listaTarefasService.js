@@ -1,8 +1,8 @@
 import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
-export async function listarAtividadesAluno(alunoId) {
-    if (!alunoId) throw new Error('ID do aluno não informado');
-  
-    const data = await fetchJsonComAuth(`/api/atividades?aluno_id=${alunoId}`, null, 'GET');
+// A função não precisa mais do alunoId, pois o backend pega do token
+export async function listarAtividadesAluno() {
+    // CORREÇÃO: A rota agora é /aluno/atividades (baseado na mudança do server.js)
+    const data = await fetchJsonComAuth(`/aluno/atividades`, null, 'GET');
     return data; // { success: true, atividades: [...] }
 }

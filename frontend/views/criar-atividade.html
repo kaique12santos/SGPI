@@ -5,30 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Tarefas</title>
 
-    <!--__________LINKS AQUI__________-->
-    
     <link rel="shortcut icon" href="/imagens/favicon-32x32.png" type="image/x-icon">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/footer-estrutura.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/professor.css">
-    
+    <link rel="stylesheet" href="css/alertConfirm.css">
     <link rel="stylesheet" href="/css/alerts.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
     
-    <!--______________________________-->
-
-</head>
+    </head>
 
 <header>
-    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
-        <!-- Div da esquerda com logos e SGPI -->
-        <div class="header-left">
+    <div class="header-content"> <div class="header-left">
             <img src="/imagens/logo_cps.png" alt="logo do centro paula souza" class="logo-image">
             <h1>SGPI</h1>
         </div>
         
-        <!-- Div da direita com mensagem de usuário e perfil -->
         <div class="header-right">
             
             <img src="/imagens/logo_fatec_br.png" alt="logo da fatec Zona Leste" class="logo-image">
@@ -46,15 +39,12 @@
 
 <body>
 
-    <div class="container"> <!--Div container para facilitar configurações globais-->
-        <div class="wrapper">
+    <div class="container"> <div class="wrapper">
             <nav class="menu-desktop">
                 <div class="menu-desktop-nav" id="menu-desktop">
-                    <!-- Links gerados pelo JavaScript -->
-                </div>
+                    </div>
             </nav>
-        <div class="menu-dropdown"> <!--Div feita para o menu-->
-            <button class="dropbutton" aria-expanded="false" id="menuToggleButton">
+        <div class="menu-dropdown"> <button class="dropbutton" aria-expanded="false" id="menuToggleButton">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
                 </svg>
@@ -71,37 +61,27 @@
             
 
 
-        <div class="content"> <!--Div com o conteúdo principal da página-->
-            <div class="page-name">
+        <div class="content"> <div class="page-name">
                 <h2>Criar Atividade</h2>
             </div>
 
-            <div class="form-task"> <!--Div para o formulário de criação de atividade-->
-                <form id="create-task" >
-                    <label for="nome">Nome da atividade</label>
+            <div class="form-task"> <form id="create-task" >
+                    <label for="nomeAtividade">Nome da atividade</label>
                     <input type="text" placeholder="Nome" class="input-atividade" id="nomeAtividade" name="nomeAtividade" required>
 
                     <label for="descricao">Descricao da Atividade</label>
                     <textarea placeholder="Descrição" name="descricaoAtividade"  class="input-atividade textarea-tamanho" id="descricao" required></textarea>
 
-                    <label for="semestre">Selecione o Semestre</label>
-                        <select id="semestre" name="semestre" class="input-atividade selectSemestre" required>
-                            <option value="0" disabled selected>-- Escolha --</option>
-                            <option value="1">1º Semestre</option>
-                            <option value="2">2º Semestre</option>
-                            <option value="3">3º Semestre</option>
-                            <option value="4">4º Semestre</option>
-                            <option value="5">5º Semestre</option>
-                            <option value="6">6º Semestre</option>
+                    <label for="create-oferta">Oferta (Disciplina/Semestre)</label>
+                    <select id="create-oferta" name="oferta_id" class="input-atividade selectSemestre" required>
+                        <option value="0" disabled selected>-- Carregando ofertas... --</option>
                         </select>
-                    <span id="semestreError"></span>
-
-                    <label for="data">Data de entrega</label>
+                    <span id="ofertaError" class="error-message" style="color: red; font-size: 0.9em;"></span>
+                    <label for="dataEntrega">Data de entrega</label>
                     <input type="datetime-local" placeholder="Data" class="input-atividade" id="dataEntrega" name="dataEntrega" min="2015-01-01T00:00" max="2035-12-31T23:59" required>
 
-                    <label for="pontos">Pontos</label>
-                    <input type="number" placeholder="Pontos" class="input-atividade" id="pontos" name="pontos" min="1" max="100" required>
-
+                    <label for="create-nota-maxima">Nota Máxima (0.0 a 10.0)</label>
+                    <input type="number" placeholder="Ex: 10.0" class="input-atividade" id="create-nota-maxima" name="nota_maxima" min="0" max="10" step="0.1" required>
                     <div class="">
                         <button type="submit" class="send-button">Enviar</button>
                     </div>
@@ -112,7 +92,9 @@
             </div>
             <h1>Lista de Atividades Criadas</h1>
         </div>
-    </div>
+        <div class="atividades-criadas">
+        </div>
+    
     <footer class="sgpi-footer">
         <div class="footer-container">
             <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
@@ -132,7 +114,7 @@
     </footer>
     
     <script defer src="/javaScript/utils/efeitoMenu.js"></script>  
-    <script src="/javaScript/front_end/GerarMenu.js"></script>
+    <script type="module" src="/javaScript/front_end/GerarMenu.js"></script>
     <script type="module" src="/javaScript/front_end/Atividades.js" defer></script>
     <script type="module" src="/javaScript/front_end/imagemPerfil.js"></script>
     <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
