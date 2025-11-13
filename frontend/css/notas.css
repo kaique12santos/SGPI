@@ -169,6 +169,23 @@ margin: 0.5rem;}
     color: #4b5563;
     margin-bottom: 10px;
 }
+
+.card-nota p{
+margin: 0.5rem;
+}
+    
+/* ==== ADICIONE ESTA CLASSE AQUI ==== */
+.truncate-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* Limita o texto a 3 linhas (para navegadores antigos) */
+    line-clamp: 3;         /* Limita o texto a 3 linhas (para navegadores novos) */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    min-height: 1.2em; 
+}
+/* ==================================== */
 /* Responsividade */
 @media (max-width: 768px) {
     #notas-container {
@@ -183,4 +200,70 @@ margin: 0.5rem;}
         width: 90%;
         max-width: 400px;
     }
+}
+
+/* ==== AJUSTES DE LAYOUT DOS CARDS ==== */
+.card-nota {
+    background-color: #fce8a8; /* Um amarelo-bege mais vibrante */
+    border: 1px solid #d4a017; /* Borda mais escura e definida */
+    border-left: 3px solid #a37200; 
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    min-height: 210px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative; /* Adicione esta linha */
+}
+
+.card-nota:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+/* Nota em destaque */
+.nota-badge {
+    background: #8a1e1e;
+    color: #fff;
+    font-weight: bold;
+    font-size: 20px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute; /* Adicione esta linha */
+    right: 20px;
+    top: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10; /* Adicione esta linha para garantir que ele esteja acima do conteúdo */
+}
+/* Comentário resumido */
+.comentario-resumido {
+cursor: pointer;
+display: inline-block;
+color: #333;
+}
+.comentario-resumido:hover {
+text-decoration: underline;
+}
+
+/* Modal de comentário */
+#texto-comentario-completo {
+margin-bottom: 15px;
+white-space: pre-line;
+}
+#fechar-comentario {
+padding: 10px 16px;
+border: none;
+border-radius: 6px;
+background-color: #f3f4f6;
+color: #4b5563;
+cursor: pointer;
+}
+#fechar-comentario:hover {
+background-color: #c0c0c0;
 }

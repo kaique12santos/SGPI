@@ -66,15 +66,23 @@
             
 
 
-        <div class="container"> <!--Div com o conteúdo principal da página-->
+         <!--Div com o conteúdo principal da página-->
             <div class="page-name">
                 <h2>Minhas Avaliações</h2>
             </div>
-        </div>
+        
         <div class="container">
-            
+            <div class="filters" style="margin: 10px 0; padding: 0 10px;">
+                <label for="filtro-reconsideracao">Filtrar por Status:</label>
+                <select id="filtro-reconsideracao">
+                  <option value="todos">Todos</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="negado">Negado</option>
+                </select>
+            </div>
             <div id="notas-container"></div>
-          </div>
+          
         
           <div id="modal-reconsideracao" class="modal hidden">
             <div class="modal-content">
@@ -84,6 +92,7 @@
               <button id="cancelar-reconsideracao">Cancelar</button>
             </div>
           </div> 
+    </div>
     </div>
     <footer class="sgpi-footer">
         <div class="footer-container">

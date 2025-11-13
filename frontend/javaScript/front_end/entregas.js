@@ -1,5 +1,6 @@
 import { obterDetalhesAtividade, enviarEntregaService } from "../services/EntregasService.js";
 import { ativar } from "../utils/alerts.js";
+import { confirmarAcao } from "../utils/confirmDialog.js";
 
 // Elementos do DOM
 const dom = {
@@ -50,7 +51,60 @@ document.addEventListener("DOMContentLoaded", () => {
   dom.btnTrocarArquivo.addEventListener('click', habilitarTrocaArquivo);
   dom.fileInput.addEventListener('change', mostrarNomeArquivo);
 });
+async function handleDownload(entregaId, nomeOriginal) {
+  const link = dom.linkDownload;
+  const originalText = link.innerText;
+  
+  try {
+    link.innerText = 'Baixando...';
+    link.style.pointerEvents = 'none'; // Desabilita o link temporariamente
+    
+    // 1. Pega o token (assumindo que você o salva no localStorage)
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+      mostrarAlerta("Usuário não autenticado. Faça login novamente.", "erro");
+      return;
+    }
 
+    // 2. Faz a requisição FETCH autenticada
+    const response = await fetch(`/aluno/entregas/download/${entregaId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      // Tenta ler a mensagem de erro que o backend enviou
+      const errData = await response.json();
+      throw new Error(errData.message || 'Falha no download');
+    }
+
+    // 3. Converte a resposta em um "Blob" (o arquivo)
+    const blob = await response.blob();
+
+    // 4. Cria um link "fantasma" na memória para forçar o download
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = nomeOriginal; // Usa o nome original que queremos!
+    document.body.appendChild(a);
+    
+    a.click(); // Simula o clique no link fantasma
+    
+    // 5. Limpa da memória
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+  } catch (err) {
+    console.error("Erro no download:", err);
+    mostrarAlerta(`Erro ao baixar: ${err.message}`, "erro");
+  } finally {
+    link.innerText = originalText;
+    link.style.pointerEvents = 'auto'; // Reabilita o link
+  }
+}
 async function carregarDetalhes() {
   mostrarLoading(true);
   try {
@@ -104,16 +158,25 @@ function atualizarAreaEntrega(entrega) {
   // 2. Verifica se existe entrega
   if (entrega) {
     dom.entregaExistente.style.display = 'block';
-    // O caminho do arquivo precisa ser ajustado para a rota de download
-    // Assumindo que /uploads é servido estaticamente
-    const parts = entrega.caminho_arquivo.split(/[\\\/]/);
-    const filename = parts[parts.length - 1];
-    dom.linkDownload.href = `/uploads/${filename}`;
-    dom.linkDownload.innerText = filename;
-    dom.responsavelNome.innerText = entrega.aluno_responsavel_nome || 'Não registrado';
-    dom.dataEntrega.innerText = new Date(entrega.data_entrega).toLocaleString('pt-BR');
-    // ===========================================
+    
+    const nomeExibicao = entrega.nome_arquivo_original || entrega.caminho_arquivo.split(/[\\\/]/).pop();
+    dom.linkDownload.innerText = nomeExibicao; 
 
+    // ==== CORREÇÃO AQUI ====
+    // Remove o link e o atributo download
+    dom.linkDownload.href = '#'; 
+    dom.linkDownload.removeAttribute('download');
+
+    // Adiciona um listener de clique seguro
+    // (A técnica de replaceWith/cloneNode previne listeners duplicados)
+    const novoLink = dom.linkDownload.cloneNode(true);
+    dom.linkDownload.parentNode.replaceChild(novoLink, dom.linkDownload);
+    dom.linkDownload = novoLink; // Re-atribui o elemento do DOM
+
+    dom.linkDownload.addEventListener('click', (e) => {
+        e.preventDefault(); // Previne o clique no '#'
+        handleDownload(entrega.id, nomeExibicao);
+    });
     // Se o prazo venceu, desabilita o botão de troca
     if (prazoGlobal < agora) {
         dom.btnTrocarArquivo.disabled = true;
@@ -148,6 +211,14 @@ async function enviarEntrega() {
     ativar("Selecione um arquivo.", "erro");
     return;
   }
+  const confirmar = await confirmarAcao(
+    "Confirmar Envio",
+    "Deseja realmente enviar a tarefa?",
+    "Enviar",
+    "Cancelar"
+  );
+
+  if (!confirmar) return;
 
   const formData = new FormData();
   formData.append("arquivo", dom.fileInput.files[0]);
@@ -156,7 +227,7 @@ async function enviarEntrega() {
 
   dom.btnEnviar.disabled = true;
   dom.btnEnviar.innerText = 'Enviando...';
-
+  
   try {
     // 1. 'response' aqui é o "envelope" (o objeto Response)
     const response = await enviarEntregaService(formData); 

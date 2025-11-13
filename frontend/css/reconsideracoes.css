@@ -5,68 +5,79 @@
   margin: 2rem auto;
   padding: 0 1rem;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ajuste para melhor responsividade */
   gap: 1.5rem;
-}
-.container{
-  height: stretch;
-}
-#lista-reconsideracao{
-  width: 100%;
-  
 }
 
 .reconsideracao-card {
-  width: 80%;
-  background-color: #f5deb3;
-  border: 1px solid #d4d4d4;
+  width: auto; /* Remover width fixo para se ajustar ao grid */
+  background-color: #fce8a8; /* Um amarelo-bege mais vibrante */
+  border: 1px solid #d4a017; /* Cor de fundo mais clara e harmoniosa */
+   /* Borda sutil para definir o card */
   border-radius: 12px;
-  padding: 0 1.5rem 1.5rem 1.5rem;
-  border-left: 4px solid #970000;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 1.5rem; /* Padding uniforme */
+  border-left: 4px solid #a30000; /* Vermelho mais intenso para a barra lateral */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra mais destacada */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
+  display: flex; /* Para flexibilizar o conteúdo */
+  flex-direction: column;
 }
 
 .reconsideracao-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px); /* Efeito de elevação sutil */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra mais pronunciada no hover */
 }
 
 .reconsideracao-card h3 {
-  color: #970000;
+  color: #8b0000; /* Vermelho escuro, correspondendo ao cabeçalho */
+  margin-top: 0; /* Remover margin-top padrão */
   margin-bottom: 1rem;
-  font-size: 1.2rem;
+  font-size: 1.3rem; /* Título um pouco maior */
   font-weight: 700;
+  border-bottom: 1px solid #eee; /* Separador sutil */
+  padding-bottom: 0.75rem;
 }
+.reconsideracao-card h4 { /* Estilo para o nome do aluno */
+    color: #8b0000;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
 
 .reconsideracao-card .info-item {
   margin-bottom: 0.8rem;
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
+  font-size: 0.95rem; /* Fonte ligeiramente menor para os itens de informação */
 }
 
 .reconsideracao-card .info-label {
   font-weight: 600;
-  color: #2e3136;
-  min-width: 100px;
+  color: #333333; /* Cor mais escura para melhor legibilidade */
+  min-width: 110px; /* Ajuste para alinhar melhor os labels */
 }
 
 .reconsideracao-card .info-value {
-  color: #444444;
+  color: #555555; /* Cor mais neutra para os valores */
   flex: 1;
 }
 
 .reconsideracao-card .motivo {
-  background-color: #fef3c7;
-  border-left: 3px solid #f59e0b;
+  background-color: #fff9e6; /* Fundo mais claro para o motivo */
+  border-left: 3px solid #f5b041; /* Laranja mais vibrante para o destaque */
   padding: 0.75rem;
   border-radius: 6px;
-  margin-top: 1rem;
+  margin-top: 1.2rem; /* Espaçamento maior acima do motivo */
   font-style: italic;
+  color: #444444;
+  flex-grow: 1; /* Permite que o motivo ocupe o espaço restante */
+  overflow: hidden; /* Garante que o texto truncado funcione */
+  text-overflow: ellipsis;
 }
+
 
 /* Modal de Reconsideração */
 .modal-reconsideracao {
@@ -75,12 +86,12 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65); /* Fundo mais escuro */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(4px); /* Blur mais suave */
 }
 
 .modal-reconsideracao.hidden {
@@ -92,20 +103,20 @@
 }
 
 .modal-reconsideracao-content {
-  background: white;
-  padding: 2rem;
+  background: #ffffff; /* Fundo branco puro */
+  padding: 2.5rem; /* Padding um pouco maior */
   border-radius: 16px;
-  max-width: 600px;
+  max-width: 650px; /* Largura um pouco maior para o modal */
   width: 90%;
-  max-height: 80vh;
+  max-height: 90vh; /* Aumentar a altura máxima */
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  animation: modalSlideIn 0.3s ease-out;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25); /* Sombra mais proeminente */
+  animation: modalSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Curva de animação mais suave */
 }
 
 @keyframes modalSlideIn {
   from {
-      transform: scale(0.9) translateY(-20px);
+      transform: scale(0.95) translateY(-30px);
       opacity: 0;
   }
   to {
@@ -115,155 +126,389 @@
 }
 
 .modal-reconsideracao-content h3 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
   color: #970000;
-  font-size: 1.5rem;
+  font-size: 1.8rem; /* Título maior */
   font-weight: 700;
   text-align: center;
-}
-
-.modalMotivo{
-  font-style: italic;
-  background-color: #fef3c7;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border-left: 3px solid #f59e0b;
+  border-bottom: 2px solid #e0e0e0; /* Linha de separação mais forte */
+  padding-bottom: 1rem;
 }
 
 .modal-info-section {
-  background-color: #f9fafb;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  border: 1px solid #e5e7eb;
+  background-color: #fdfdfd; /* Fundo quase branco */
+  padding: 1.8rem;
+  border-radius: 10px;
+  margin-bottom: 1.8rem;
+  border: 1px solid #e8e8e8; /* Borda mais suave */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Sombra interna para profundidade */
 }
 
 .modal-info-section h4 {
-  color: #374151;
-  margin-bottom: 1rem;
+  color: #4a4a4a;
+  margin-bottom: 1.2rem;
   font-weight: 600;
+  font-size: 1.15rem;
+  border-bottom: 1px dashed #e0e0e0; /* Separador tracejado */
+  padding-bottom: 0.75rem;
 }
 
 .modal-info-item {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.8rem;
   display: flex;
+  flex-wrap: wrap; /* Para melhor responsividade em telas menores */
   gap: 0.5rem;
 }
 
 .modal-info-item .label {
   font-weight: 600;
-  color: #374151;
-  min-width: 120px;
+  color: #4a4a4a;
+  min-width: 130px; /* Ajustado para melhor alinhamento */
 }
 
 .modal-info-item .value {
-  color: #6b7280;
+  color: #666666;
   flex: 1;
 }
 
+.modalMotivo {
+    font-style: italic;
+    background-color: #fffde7; /* Fundo mais claro e suave */
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid #f0ad4e; /* Laranja mais vibrante */
+    color: #555555;
+    margin-top: 1rem;
+    line-height: 1.6;
+}
+
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
 }
 
 .form-group label {
   display: block;
   font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.5rem;
+  color: #333333;
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
 }
 
 .form-group textarea,
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 0.9rem;
+  border: 1px solid #cccccc; /* Borda mais neutra */
+  border-radius: 8px; /* Cantos mais arredondados */
   font-size: 1rem;
-  font-family: inherit;
+  font-family: 'Inter', sans-serif;
   resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group textarea:focus,
 .form-group input:focus {
   outline: none;
-  border-color: #970000;
-  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1);
+  border-color: #a30000; /* Vermelho escuro no foco */
+  box-shadow: 0 0 0 4px rgba(163, 0, 0, 0.15); /* Sombra de foco mais sutil */
 }
 
 .modal-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 2.5rem; /* Mais espaçamento */
+  padding-top: 1.8rem;
+  border-top: 1px solid #e8e8e8; /* Borda sutil */
+}
+
+.modal-actions button {
+    padding: 0.85rem 1.8rem; /* Padding ligeiramente maior */
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+    min-width: 100px; /* Garante tamanho mínimo */
 }
 
 .btn-aprovar {
-  background-color: #10b981;
+  background-color: #06b6d4; /* Azul teal vibrante para aprovar */
   color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .btn-aprovar:hover {
-  background-color: #059669;
-  transform: translateY(-1px);
+  background-color: #0891b2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
 }
 
 .btn-recusar {
-  background-color: #ef4444;
+  background-color: #ef4444; /* Vermelho forte para recusar */
   color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .btn-recusar:hover {
   background-color: #dc2626;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
 
 .btn-cancelar {
-  background-color: #6b7280;
+  background-color: #a30000; /* Vermelho escuro do sistema para cancelar */
   color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .btn-cancelar:hover {
-  background-color: #4b5563;
-  transform: translateY(-1px);
+  background-color: #8b0000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(163, 0, 0, 0.3);
 }
 
-/* Responsive */
+/* Responsividade */
 @media (max-width: 768px) {
   .container-reconsideracoes {
-      grid-template-columns: repeat(2, 1fr);
-      padding: 0 0.5rem;
+      grid-template-columns: 1fr; /* Uma coluna em telas menores */
+      padding: 0 0.8rem;
   }
   
   .modal-reconsideracao-content {
       width: 95%;
-      padding: 1.5rem;
+      padding: 1.8rem;
   }
   
   .modal-actions {
       flex-direction: column;
+      gap: 0.8rem;
   }
   
   .modal-actions button {
       width: 100%;
+      padding: 0.8rem;
+  }
+
+  .modal-info-item {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .modal-info-item .label {
+      min-width: unset;
+      width: 100%;
+      margin-bottom: 0.3rem;
+  }
+}
+
+/* ==== ADICIONE ESTA CLASSE AQUI ==== */
+.truncate-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Limita o texto a 3 linhas (para navegadores antigos) */
+  line-clamp: 3;         /* Limita o texto a 3 linhas (para navegadores novos) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  min-height: 1.2em;
+}
+/* ==================================== */
+
+/* Container do modal */
+.modal-reconsideracao {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65); /* Fundo mais escuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px); /* Blur para o fundo */
+  opacity: 0; /* Começa invisível para animação */
+  visibility: hidden; /* Esconde para que não seja interativo */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-reconsideracao.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Conteúdo do modal */
+.modal-reconsideracao-content {
+  background: #ffffff; /* Fundo branco puro */
+  padding: 2.5rem; /* Padding generoso */
+  border-radius: 16px;
+  max-width: 650px; /* Largura máxima */
+  width: 90%; /* Ocupa 90% da largura em telas menores */
+  max-height: 90vh; /* Altura máxima para caber na tela */
+  overflow-y: auto; /* Scroll se o conteúdo for grande */
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25); /* Sombra proeminente */
+  position: relative; /* Para posicionar o botão de fechar */
+  transform: scale(0.95) translateY(-30px); /* Começa menor e acima para animação */
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-reconsideracao.show .modal-reconsideracao-content {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Título do Modal */
+.modal-reconsideracao-content h3 {
+  margin-top: 0; /* Reseta margem padrão */
+  margin-bottom: 1.8rem;
+  color: #970000; /* Vermelho do sistema */
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 2px solid #e0e0e0; /* Separador */
+  padding-bottom: 1rem;
+}
+
+/* Estilos para os parágrafos de informação */
+.modal-reconsideracao-content p {
+  margin-bottom: 0.8rem;
+  color: #555555;
+  line-height: 1.5;
+  font-size: 1.05rem;
+}
+
+.modal-reconsideracao-content p strong {
+  color: #333333;
+  font-weight: 600;
+  min-width: 120px; /* Para alinhar se estiverem em linha */
+  display: inline-block; /* Para que min-width funcione */
+}
+
+/* Estilo específico para o motivo do aluno */
+.modal-reconsideracao-content p:last-of-type { /* Seleciona o último <p> que é o Motivo do Aluno */
+    background-color: #fffde7; /* Fundo suave */
+    border-left: 4px solid #f0ad4e; /* Laranja vibrante */
+    padding: 1rem;
+    border-radius: 6px;
+    font-style: italic;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    color: #444444;
+}
+/* Se houver um <strong> "Motivo do Aluno" dentro do <p>, você pode estilizar */
+.modal-reconsideracao-content p:last-of-type strong {
+    display: block; /* Para que o "Motivo do Aluno:" fique em sua própria linha */
+    color: #333333;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+
+/* Labels dos campos de formulário */
+.modal-reconsideracao-content label {
+  display: block;
+  font-weight: 600;
+  color: #333333;
+  margin-top: 1.5rem; /* Espaçamento acima do label */
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
+}
+
+/* Textarea e Input de Nota */
+.modal-reconsideracao-content textarea,
+.modal-reconsideracao-content input[type="number"] {
+  width: 100%;
+  padding: 0.9rem;
+  border: 1px solid #cccccc; /* Borda neutra */
+  border-radius: 8px; /* Cantos arredondados */
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif; /* Usar a mesma fonte do resto */
+  resize: vertical; /* Apenas redimensionamento vertical para textarea */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-reconsideracao-content textarea:focus,
+.modal-reconsideracao-content input[type="number"]:focus {
+  outline: none;
+  border-color: #a30000; /* Vermelho escuro no foco */
+  box-shadow: 0 0 0 4px rgba(163, 0, 0, 0.15); /* Sombra de foco sutil */
+}
+
+/* Contêiner dos botões de ação */
+.modal-reconsideracao-content .actions { /* Ajustado de '.modal-actions' para '.actions' */
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2.5rem; /* Mais espaçamento */
+  padding-top: 1.8rem;
+  border-top: 1px solid #e8e8e8; /* Borda sutil */
+}
+
+/* Estilo dos botões */
+.modal-reconsideracao-content .actions button {
+  padding: 0.85rem 1.8rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  min-width: 100px;
+}
+
+/* Cores específicas para cada botão */
+/* Cores específicas para cada botão */
+#btn-aprovar {
+  background-color: #009c60; /* Um verde-acinzentado suave, mais natural */
+  color: white;
+}
+
+#btn-aprovar:hover {
+  background-color: #558070; /* Um pouco mais escuro no hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(106, 156, 137, 0.3);
+}
+
+#btn-recusar {
+  background-color: #d40000; /* Um vermelho mais queimado/terroso */
+  color: white;
+}
+
+#btn-recusar:hover {
+  background-color: #b93d3d; /* Um pouco mais escuro no hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(212, 106, 106, 0.3);
+}
+
+#btn-cancelar {
+  background-color: #a30000; /* Mantém o vermelho escuro principal do sistema */
+  color: white;
+}
+
+#btn-cancelar:hover {
+  background-color: #8b0000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(163, 0, 0, 0.3);
+}
+
+/* Responsividade para o modal */
+@media (max-width: 768px) {
+  .modal-reconsideracao-content {
+      padding: 1.8rem;
+  }
+  
+  .modal-reconsideracao-content .actions {
+      flex-direction: column;
+      gap: 0.8rem;
+  }
+  
+  .modal-reconsideracao-content .actions button {
+      width: 100%;
+      padding: 0.8rem;
+  }
+
+  .modal-reconsideracao-content p {
+      font-size: 0.95rem;
   }
 }

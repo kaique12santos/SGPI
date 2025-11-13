@@ -170,7 +170,7 @@ async function abrirModalEdicao(div, atividade) {
   const dataFormatada = dataISO.toISOString().slice(0, 16);
 
   const modal = document.createElement("div");
-  modal.className = "div-mostrar form-task";
+  modal.className = "div-mostrar modal-edicao";
   modal.innerHTML = `
     <form id="editar-atividade">
       <h2>Editar Atividade</h2>
@@ -188,8 +188,8 @@ async function abrirModalEdicao(div, atividade) {
       <label>Nota Máxima<input type="number" id="edit-nota-maxima" class="input-atividade" value="${nota_maxima}" min="0" max="10" step="0.1" required></label>
       
       <div class="btn-group">
-        <button type="submit" class="send-button">Salvar</button>
-        <button type="button" id="cancelar-edicao" class="btn-excluir">Cancelar</button>
+        <button type="submit" class="btn send-button">Salvar</button>
+        <button type="button" id="cancelar-edicao" class="btn btn-cancelar">Cancelar</button>
       </div>
     </form>
   `;

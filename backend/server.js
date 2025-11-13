@@ -73,9 +73,6 @@ const usuarios = require ('./routes/usuarios.js');
 const alunoAtividadesRoutes = require('./routes/alunoAtividadesRoutes.js');
 const entregas = require('./routes/entregas.js')
 const projetos = require('./routes/projetos.js')
-const avaliar = require('./routes/avaliacoes.js')
-const notas = require('./routes/alunoNotas.js')
-const reconsideracoes = require('./routes/professorReconsideracoes.js')
 const ListaProjetos = require('./routes/CoordenadorProjetos.js')
 const coordenadorRelatorios= require('./routes/CoordenadorRelatorios.js')
 const perfilAcademico = require('./routes/perfilAcademico.js')
@@ -111,8 +108,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usar as rotas importadas
 app.use('/',auth)
-app.use('/professor', atividadesProfessorRoutes);
-app.use('/professor_orientador', atividadesProfessorRoutes);
+app.use('/professor',authPerfil, atividadesProfessorRoutes);
+app.use('/professor_orientador',authPerfil, atividadesProfessorRoutes);
 app.use('/perfil', atualizarPerfil);
 app.use('/perfilAcademico',perfilAcademico);
 app.use('/dashboard', perfilDashboard);
@@ -123,9 +120,9 @@ app.use('/', redefinirSenha);
 app.use('/aluno', authPerfil, alunoAtividadesRoutes);
 app.use('/', entregas);
 app.use('/',projetos);
-app.use('/',avaliar);
-app.use('/',notas);
-app.use('/',reconsideracoes);
+
+
+
 app.use('/coordenador',ListaProjetos);
 app.use('/coordenador',coordenadorRelatorios);
 app.use('/api', palavraChaveRoutes);

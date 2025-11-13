@@ -1,96 +1,181 @@
 import { ativar } from "../utils/alerts.js";
 import { listarNotas, pedirReconsideracao } from "../services/notasServices.js";
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const alunoId = localStorage.getItem('usuarioId');
+/* ---------- FILTRO ---------- */
+function filtrarNotas() {
+  const statusEscolhido = document.getElementById('filtro-reconsideracao').value;
   const container = document.getElementById('notas-container');
-  const modal = document.getElementById('modal-reconsideracao');
+
+  container.querySelectorAll('.card-nota').forEach(card => {
+    const statusCard = card.dataset.statusReconsideracao;
+    card.style.display = (statusEscolhido === 'todos' || statusCard === statusEscolhido) ? '' : 'none';
+  });
+}
+
+/* ---------- DOWNLOAD DEVOLUTIVA ---------- */
+async function handleDownloadDevolutiva(avaliacaoId, nomeOriginal, link) {
+  const originalText = link.innerText;
+  try {
+    link.innerText = 'Baixando...';
+    link.style.pointerEvents = 'none';
+
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error("Usuário não autenticado.");
+
+    const response = await fetch(`/aluno/avaliacoes/download/${avaliacaoId}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) throw new Error(`Erro ${response.status}: falha no download`);
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeOriginal;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    ativar(`Erro ao baixar: ${err.message}`, 'erro', '');
+  } finally {
+    link.innerText = originalText;
+    link.style.pointerEvents = 'auto';
+  }
+}
+
+/* ---------- EVENTO PRINCIPAL ---------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  const container = document.getElementById('notas-container');
+  const modalRecons = document.getElementById('modal-reconsideracao');
   const comentarioInput = document.getElementById('comentario-reconsideracao');
   const btnEnviar = document.getElementById('enviar-reconsideracao');
   const btnCancelar = document.getElementById('cancelar-reconsideracao');
+  const filtro = document.getElementById('filtro-reconsideracao');
   let avaliacaoSelecionada = null;
 
-  if (!alunoId) {
-    container.innerHTML = '<p>Usuário não autenticado.</p>';
-    return;
-  }
+  // 🔹 Modal novo para visualizar comentário completo
+  const modalComentario = document.createElement('div');
+  modalComentario.className = 'modal hidden';
+  modalComentario.innerHTML = `
+    <div class="modal-content">
+      <h2>Comentário Completo</h2>
+      <p id="texto-comentario-completo"></p>
+      <button id="fechar-comentario">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modalComentario);
 
   try {
-    const data = await listarNotas(alunoId);
+    const data = await listarNotas();
 
-    if (!data.success || !Array.isArray(data.avaliacoes) || data.avaliacoes.length === 0) {
-      container.innerHTML = '<p>Nenhuma avaliação disponível.</p>';
+    if (!data.success || !Array.isArray(data.avaliacoes) || !data.avaliacoes.length) {
+      container.innerHTML = '<p>Nenhuma avaliação disponível para o semestre ativo.</p>';
       return;
     }
 
     data.avaliacoes.forEach(av => {
       const card = document.createElement('div');
       card.className = 'card-nota';
-      const dentroDoPrazo = av.dentro_prazo;
+      const dentroPrazo = av.dentro_prazo;
       const jaSolicitado = av.status_reconsideracao !== null;
+      const notaFloat = parseFloat(av.nota);
+      const statusFiltro = jaSolicitado ? (av.status_reconsideracao || 'pendente').toLowerCase() : 'nenhum';
+      card.dataset.statusReconsideracao = statusFiltro;
+
+      /* ---- HTML do Card ---- */
+      const devolutivaHtml = av.nome_original_devolutiva ? `
+        <p class="devolutiva-container">
+          <strong>Devolutiva:</strong>
+          <a href="#" class="link-devolutiva" data-id="${av.id}" data-nome="${av.nome_original_devolutiva}">
+            ${av.nome_original_devolutiva}
+          </a>
+        </p>` : '';
+
+      const comentarioResumido = av.comentario ? av.comentario.substring(0, 120) + (av.comentario.length > 120 ? '...' : '') : 'Nenhum comentário';
 
       card.innerHTML = `
-        <p><strong>Atividade:</strong><span> ${av.atividade}</span></p>
-        <p><strong>Nota:</strong><span> ${av.nota}</span></p>
-        <p><strong>Comentário do Professor:</strong><span> ${av.comentario || 'Nenhum'}</span></p>
+        <div class="nota-badge">${notaFloat.toFixed(1)}</div>
+        <p><strong>Atividade:</strong> ${av.atividade}</p>
+        <p><strong>Comentário:</strong> 
+          <span class="comentario-resumido" data-comentario="${av.comentario || 'Nenhum comentário'}">${comentarioResumido}</span>
+        </p>
+        ${devolutivaHtml}
         <p><strong>Data da Avaliação:</strong> ${new Date(av.data_avaliacao).toLocaleDateString('pt-BR')}</p>
       `;
 
-      // Status de reconsideração
+      // Status da reconsideração
       if (jaSolicitado) {
         let badgeClass = '';
         switch (av.status_reconsideracao) {
           case "Pendente": badgeClass = 'status-pendente'; break;
-          case "Entregue": badgeClass = 'status-entregue'; break;
-          case "Negado":   badgeClass = 'status-reprovado'; break;
-          case "Aprovado": badgeClass = 'status-aprovado';  break;
+          case "Negado": badgeClass = 'status-reprovado'; break;
+          case "Aprovado": badgeClass = 'status-aprovado'; break;
         }
-        card.innerHTML += `<p><strong>Reconsideração:</strong><span class="status-badge ${badgeClass}">${av.status_reconsideracao}</span></p>`;
+        card.innerHTML += `<p><strong>Reconsideração:</strong> <span class="status-badge ${badgeClass}">${av.status_reconsideracao}</span></p>`;
       }
 
       // Botão de reconsideração
-      const podePedir = dentroDoPrazo && !jaSolicitado;
+      const podePedir = dentroPrazo && !jaSolicitado;
       const botao = document.createElement('button');
       botao.className = 'btn-reconsiderar';
       botao.textContent = 'Pedir Reconsideração';
       botao.disabled = !podePedir;
-
       if (!podePedir) {
         botao.style.opacity = 0.6;
-        botao.title = jaSolicitado 
-          ? `Já solicitado (${av.status_reconsideracao})`
-          : 'Fora do prazo (7 dias)';
+        botao.title = jaSolicitado ? `Já solicitado (${av.status_reconsideracao})` : 'Fora do prazo (15 dias)';
       }
-
       botao.addEventListener('click', () => {
         avaliacaoSelecionada = av.id;
-        modal.classList.remove('hidden');
+        modalRecons.classList.remove('hidden');
       });
 
       card.appendChild(botao);
       container.appendChild(card);
     });
 
-    // Cancelar modal
-    btnCancelar.onclick = () => {
-      modal.classList.add('hidden');
-      comentarioInput.value = '';
-    };
+    // 🔹 Evento: abrir modal de comentário completo
+    container.querySelectorAll('.comentario-resumido').forEach(el => {
+      el.addEventListener('click', () => {
+        const texto = el.dataset.comentario;
+        document.getElementById('texto-comentario-completo').innerText = texto;
+        modalComentario.classList.remove('hidden');
+      });
+    });
 
-    // Enviar reconsideração
+    // 🔹 Fechar modal de comentário
+    document.getElementById('fechar-comentario').onclick = () => modalComentario.classList.add('hidden');
+
+    // 🔹 Links de download
+    container.querySelectorAll('.link-devolutiva').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        handleDownloadDevolutiva(e.target.dataset.id, e.target.dataset.nome, e.target);
+      });
+    });
+
+    // 🔹 Modal de reconsideração
+    btnCancelar.onclick = () => { modalRecons.classList.add('hidden'); comentarioInput.value = ''; };
     btnEnviar.onclick = async () => {
       const comentario = comentarioInput.value.trim();
-      if (!comentario) return;
-
-      const resposta = await pedirReconsideracao(avaliacaoSelecionada, parseInt(alunoId), comentario);
-
-      ativar(resposta.message, 'sucesso', '/notas');
-      modal.classList.add('hidden');
-      comentarioInput.value = '';
+      if (!comentario) return ativar('Por favor, escreva um motivo.', 'info', '');
+      try {
+        const r = await pedirReconsideracao(avaliacaoSelecionada, comentario);
+        ativar(r.message, r.success ? 'sucesso' : 'erro', '');
+        if (r.success) window.location.reload();
+      } catch (err) {
+        ativar(err.message, 'erro', '');
+      } finally {
+        modalRecons.classList.add('hidden');
+        comentarioInput.value = '';
+      }
     };
 
   } catch (err) {
-    console.error('Erro ao carregar notas:', err);
-    container.innerHTML = '<p>Erro ao carregar avaliações.</p>';
+    container.innerHTML = `<p>Erro ao carregar avaliações: ${err.message}</p>`;
   }
+
+  filtro.addEventListener('change', filtrarNotas);
+  filtrarNotas();
 });

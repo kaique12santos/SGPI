@@ -5,39 +5,154 @@
     justify-content: center;
     width: 100%;
 }
-
-#create-task{
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    gap: 5px;
-    background-color: #f8f4f4;
-    padding: 2%;
-    border: none;
-    width: 95%;
-    color: #111111;
-    cursor: pointer;
-    font-size: 1rem;
+.btn-cancelar {
+  background-color: #7a7a7a;
+  border-left: 3px solid #b0b0b0;
+  color: #ffffff; /* Texto escuro para fundo claro */
+}
+.btn-cancelar:hover {
+  background: #acacac;
+  transform: translateY(-3px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
 }
 
-.form-task .input-atividade{
-    background-color: #e2e2e2;
-    border: none;
-    border-bottom: #686868 solid 1px;
-    border-radius: 5px;
-    padding: 5px;
-    width: 100%;
-    color: #111111;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-bottom: 4px;
-    margin-top: 4px;
+
+#create-task {
+  background-color: #ffffff; /* Fundo branco para destacar */
+ 
+  border-radius: 8px; /* Cantos arredondados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave */
+  padding: 0.5rem; /* Mais preenchimento interno */
+  width: 95%;
+
+  margin: 5px;
+
 }
+
+#create-task label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px; /* Espaço entre o label e o input */
+}
+
+/*Inputs e Textareas do formulário principal */
+.form-task .input-atividade {
+  background-color: #ffffff; /* Fundo branco */
+  border: 1px solid #cccccc; /* Borda visível */
+  border-radius: 5px;
+  padding: 10px; /* Mais preenchimento */
+  font-size: 1rem;
+  color: #111111;
+  width: 100%;
+  margin: 5px 0 5px 0;
+  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Efeito de Foco para os inputs */
+.form-task .input-atividade:focus {
+  border-color: #970000; /* Cor do tema ao focar */
+  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1); /* "Brilho" de foco */
+  outline: none; /* Remove o contorno padrão */
+}
+
+/* Ajuste no botão Enviar */
+.form-task .send-button {
+  
+  min-width: 150px; /* Largura mínima */
+  padding: 6px 10px; /* Mais robusto */
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 15px; /* Espaço acima do botão */
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.form-task .send-button:hover {
+  background-color: #a60000;
+  transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
+}
+
+/* Estilizando a mensagem de erro do select */
+#ofertaError {
+  margin-top: -4px; /* Puxa para mais perto do select */
+  margin-bottom: 8px;
+}
+
+/* ==============================================
+   2. ESTILOS DO MODAL DE EDIÇÃO
+   ============================================== */
+
+/* Container do modal */
+.modal-edicao {
+  max-width: 600px; /* Um modal um pouco mais largo */
+  padding: 2rem; /* Preenchimento padronizado */
+  animation: slideUp 0.3s ease-out; /* Já estava no seu div-mostrar, mas garantindo */
+}
+
+.modal-edicao h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+/* Formulário dentro do modal */
+.modal-edicao #editar-atividade {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espaçamento entre os labels/inputs */
+}
+
+/* Labels dentro do modal */
+.modal-edicao #editar-atividade label {
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  flex-direction: column; /* Coloca o input abaixo do label */
+  gap: 5px;
+}
+
+/* Inputs, Textareas e Selects DENTRO DO MODAL */
+.modal-edicao .input-atividade {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1rem;
+  color: #111111;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-edicao .input-atividade:focus {
+  border-color: #970000; /* Foco azul, para diferenciar da criação */
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+  outline: none;
+}
+
+.modal-edicao .textarea-tamanho {
+  min-height: 120px; /* Um pouco menor para o modal */
+  resize: vertical; /* Permite que o usuário redimensione verticalmente */
+}
+
+/* Grupo de botões no final do modal */
+.modal-edicao .btn-group {
+  display: flex;
+  justify-content: flex-end; /* Alinha botões à direita */
+  gap: 10px;
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+}
+
 
 .send-button{
     background-color: #970000;
     border: none;
     border-radius: 15px;
+    font-weight: 600;
     padding: 5px;
     width: 20%;
     color: #ffff;
@@ -46,7 +161,9 @@
 }
 
 .send-button:hover{
-    background-color: #a60000;
+    background-color: #b41b1b;
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
 }
 
 .atividades-criadas {
@@ -153,8 +270,33 @@
   .btn-Ver:active {
     transform: translateY(-1px);
   }
-  
- 
+  /* ==============================================
+   3. REFINAMENTO DOS BOTÕES DOS CARDS
+   ============================================== */
+
+/* Ajuste na classe .btn base para os cards */
+.atividade-card .btn {
+  padding: 0.5rem 0.9rem; /* Aumenta o "respiro" interno */
+  font-size: 0.8rem; /* Levemente menor e mais nítido */
+  font-weight: 600; /* Mais forte */
+  border-radius: 6px; /* Um pouco menos arredondado */
+  border: none; /* Remove qualquer borda padrão */
+  letter-spacing: 0.5px; /* Espaçamento entre letras */
+  text-transform: uppercase; /* Caixa alta dá um ar mais "botão" */
+  margin: 3px; /* Espaçamento entre eles */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra mais sutil */
+}
+
+
+
+/* Garantindo que o primeiro botão não tenha margem esquerda desnecessária */
+.btn-Ver {
+  margin-left: 0;
+}
+
+.content{
+  border-bottom: 1px solid red;
+}
   .btn-icon {
     padding-left: 1rem;
   }

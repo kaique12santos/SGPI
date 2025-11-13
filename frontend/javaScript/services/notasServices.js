@@ -1,18 +1,31 @@
 import { fetchJsonComAuth } from "../utils/fetchHelper.js";
 
-export async function listarNotas(alunoId) {
-    if (!alunoId) throw new Error("ID do aluno não informado");
-    return await fetchJsonComAuth(`/api/aluno/notas?aluno_id=${alunoId}`, null, 'GET');
+export async function listarNotas() {
+    return await fetchJsonComAuth(`/aluno/notas`, null, 'GET');
 }
   
-export async function pedirReconsideracao(avaliacaoId, alunoId, comentario) {
-  if (!avaliacaoId || !alunoId || !comentario) {
-    throw new Error("Dados obrigatórios não informados");
-  }
-  
-    return await fetchJsonComAuth('/api/aluno/reconsiderar', { 
+export async function pedirReconsideracao(avaliacaoId, comentario) {
+    return await fetchJsonComAuth('/aluno/reconsiderar', { 
       avaliacao_id: avaliacaoId, 
-      aluno_id: alunoId, 
-      comentario 
+      comentario: comentario 
     }, 'POST');
+}
+
+// ==== FUNÇÃO ADICIONADA ====
+// (Esta função não será usada diretamente, mas é bom tê-la no service)
+// O 'notas.js' fará o fetch autenticado manualmente para 'blob'
+export async function baixarDevolutiva(avaliacaoId) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Usuário não autenticado');
+
+    const response = await fetch(`/aluno/avaliacoes/download/${avaliacaoId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || 'Falha no download');
+    }
+    return response.blob();
 }

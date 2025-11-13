@@ -74,9 +74,9 @@ async function fetchJsonComAuth(url, data = null, method = 'GET', extraOptions =
   } catch (error) {
       console.error(`Erro em fetchJsonComAuth para URL ${url}:`, error);
       // Re-lança o erro para que a função chamadora (ex: obterUsuarios) possa tratá-lo.
-      if (typeof ativar === 'function') {
-         ativar(`Falha na comunicação com o servidor: ${error.message}`, 'erro','');
-      }
+      // if (typeof ativar === 'function') {
+      //    ativar(`Falha na comunicação com o servidor: ${error.message}`, 'erro','');
+      // }
       throw error; // É importante re-lançar para que o try-catch em 'carregarUsuarios' funcione
   }
 }

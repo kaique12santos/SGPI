@@ -1,5 +1,7 @@
-import { fetchJsonComAuth } from "../utils/fetchHelper.js";
+// O 'fetchJsonComAuth' é trocado por 'fetchFormDataComAuth'
+import { fetchFormDataComAuth } from "../utils/fetchHelper.js";
 
-export async function enviarAvaliacao(dados, baseEndpoint) {
-    return fetchJsonComAuth(`${baseEndpoint}/avaliacoes`, dados, 'POST');
+// A função agora envia FormData
+export async function enviarAvaliacao(formData, baseEndpoint) {
+    return fetchFormDataComAuth(`${baseEndpoint}/avaliacoes`, formData, 'POST');
 }
