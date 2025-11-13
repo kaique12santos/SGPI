@@ -44,7 +44,36 @@ async function handleDownloadDevolutiva(avaliacaoId, nomeOriginal, link) {
     link.style.pointerEvents = 'auto';
   }
 }
+/**
+ * Função que cria e exibe o modal de comentário completo.
+ */
+function abrirModalComentario(comentarioCompleto) {
+  // 1. Cria o 'backdrop' do modal
+  const modalBackdrop = document.createElement('div');
+  modalBackdrop.className = 'modal-backdrop'; // Use esta classe para estilizar
 
+  // 2. Cria o conteúdo do modal
+  modalBackdrop.innerHTML = `
+    <div class="modal-conteudo">
+      <h2>Comentário Completo</h2>
+      <p>${comentarioCompleto}</p>
+      <button id="modal-fechar">Fechar</button>
+    </div>
+  `;
+
+  // 3. Adiciona ao body
+  document.body.appendChild(modalBackdrop);
+  document.body.style.overflow = 'hidden'; // Trava o scroll da página
+
+  // 4. Adiciona listeners para fechar
+  const btnFechar = document.getElementById('modal-fechar');
+  modalBackdrop.addEventListener('click', (e) => {
+    if (e.target === modalBackdrop || e.target === btnFechar) {
+      document.body.removeChild(modalBackdrop);
+      document.body.style.overflow = 'auto';
+    }
+  });
+}
 /* ---------- EVENTO PRINCIPAL ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('notas-container');

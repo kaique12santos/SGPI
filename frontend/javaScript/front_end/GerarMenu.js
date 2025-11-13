@@ -84,8 +84,8 @@ function getItensMenu() {
     return {
     aluno: [
 
-    { texto: 'Artefatos pendentes', link: '/listaTarefas' },
-    { texto: 'Visualizar Notas', link: '/notas' },
+    { texto: 'Próximas entregas', link: '/listaTarefas' },
+    { texto: 'Avaliações', link: '/notas' },
     { texto: 'Manual do Curso', link: '/uploads/manuais/Manual_de_Projetos_Interdisciplinares_para_o_CST_em_Desenvolvimento_de_Software Multiplataforma.pdf' },
     {texto: 'Meu Perfil', link: '/perfil'},
     {texto: 'Sair', id:'logout-button'}

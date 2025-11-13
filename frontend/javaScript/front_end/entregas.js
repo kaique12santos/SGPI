@@ -177,6 +177,8 @@ function atualizarAreaEntrega(entrega) {
         e.preventDefault(); // Previne o clique no '#'
         handleDownload(entrega.id, nomeExibicao);
     });
+    dom.responsavelNome.innerText = entrega.aluno_responsavel_nome || 'Não registrado';
+    dom.dataEntrega.innerText = new Date(entrega.data_entrega).toLocaleString('pt-BR');
     // Se o prazo venceu, desabilita o botão de troca
     if (prazoGlobal < agora) {
         dom.btnTrocarArquivo.disabled = true;
