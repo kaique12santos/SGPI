@@ -5,37 +5,44 @@ const ExcelJS = require('exceljs');
 
 /**
  * Rota: GET /coordenador/grupos/:semestre
- * Descrição: Lista todos os grupos de um semestre, com nome e id, para exibir no front-end.
+ * Descrição: Lista todos os grupos de um semestre.
  */
 router.get('/grupos/:semestre', async (req, res) => {
-  const semestreEscolhido = String(req.params.semestre);
+  const semestrePadrao = Number(req.params.semestre);
+  if (isNaN(semestrePadrao)) {
+    return res.status(400).json({ success: false, message: 'Semestre inválido.' });
+  }
 
   let connection;
   try {
     connection = await getConnection();
 
+    // SQL CORRIGIDA (da etapa anterior)
     const sqlListarGrupos = `
       SELECT
-        g.id AS grupo_id,
-        g.nome AS grupo_nome,
-        GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS nomes_membros
+        g.id AS GRUPO_ID,
+        g.nome AS GRUPO_NOME,
+        GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS NOMES_MEMBRO
       FROM Grupos g
       JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
       JOIN Usuarios u ON ug.usuario_id = u.id
-      WHERE g.semestre = ?
+      JOIN Disciplinas d ON g.disciplina_id = d.id
+      WHERE d.semestre_padrao = ?
       GROUP BY g.id, g.nome
       ORDER BY g.nome
     `;
 
-    const [rows] = await connection.execute(sqlListarGrupos, [semestreEscolhido]);
-    return res.json({ success: true, grupos: rows });
+    // FIX 1: Alterado de const [rows] para 'const result' e pegar 'result.rows'
+    const result = await connection.execute(sqlListarGrupos, [semestrePadrao]);
+    return res.json({ success: true, grupos: result.rows });
 
   } catch (err) {
     console.error('Erro ao buscar grupos do semestre:', err.stack || err);
     return res.status(500).json({ success: false, message: 'Erro ao buscar grupos.' });
   } finally {
     if (connection) {
-      try { await connection.close(); } catch (_) { /**/ }
+      // FIX 2: Alterado de .end() para .release()
+      try { await connection.release(); } catch (_) { /**/ }
     }
   }
 });
@@ -44,6 +51,7 @@ router.get('/grupos/:semestre', async (req, res) => {
  * Função auxiliar para definir estilos do Excel
  */
 function getExcelStyles() {
+  // ... (Seu código de estilos continua aqui, sem alterações) ...
   return {
     // Estilo para título principal
     titleStyle: {
@@ -140,45 +148,49 @@ function getExcelStyles() {
  * Função auxiliar para formatar datas
  */
 function formatDate(date) {
+  // ... (Sua função de data continua aqui, sem alterações) ...
   if (!date) return '';
   const d = new Date(date);
-  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 /**
  * Rota: GET /coordenador/grupos/:grupoId/relatorio
- * Descrição: Gera um arquivo Excel (.xlsx) com o relatório completo do grupo e envia como download.
+ * Descrição: Gera um arquivo Excel (.xlsx) com o relatório completo do grupo.
  */
 router.get('/grupos/:grupoId/relatorio', async (req, res) => {
   const grupoId = Number(req.params.grupoId);
-  const semestreParam = String(req.query.semestre || '');
+  const semestrePadrao = Number(req.query.semestre);
 
-  if (isNaN(grupoId) || semestreParam.trim() === '') {
-    return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
+  if (isNaN(grupoId) || isNaN(semestrePadrao)) {
+    return res.status(400).json({ success: false, message: 'Parâmetros inválidos (ID do grupo ou semestre).' });
   }
 
   let connection;
   try {
     connection = await getConnection();
 
-    // 1) Buscar dados do GRUPO
+    // 1) Buscar dados do GRUPO (SQL Corrigida)
     const sqlGrupo = `
       SELECT
-        id AS grupo_id,
-        nome AS grupo_nome,
-        semestre AS grupo_semestre,
-        descricao AS grupo_descricao
-      FROM Grupos
-      WHERE id = ? AND semestre = ?
+        g.id AS grupo_id,
+        g.nome AS grupo_nome,
+        d.semestre_padrao AS grupo_semestre,
+        g.disciplina_id,
+        g.semestre_id
+      FROM Grupos g
+      JOIN Disciplinas d ON g.disciplina_id = d.id
+      WHERE g.id = ? AND d.semestre_padrao = ?
     `;
-    const [resultGrupo] = await connection.execute(sqlGrupo, [grupoId, semestreParam]);
-    
-    if (resultGrupo.length === 0) {
-      return res.status(404).json({ success: false, message: 'Grupo não encontrado.' });
-    }
-    const grupo = resultGrupo[0];
+    // FIX 1: Alterado para 'result.rows'
+    const resultGrupo = await connection.execute(sqlGrupo, [grupoId, semestrePadrao]);
 
-    // 2) Buscar dados do PROJETO vinculado a esse grupo/semestre
+    if (resultGrupo.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Grupo não encontrado para este semestre.' });
+    }
+    const grupo = resultGrupo.rows[0];
+
+    // 2) Buscar dados do PROJETO vinculado (SQL Corrigida)
     const sqlProjeto = `
       SELECT
         p.id AS projeto_id,
@@ -190,28 +202,30 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         p.data_atualizacao AS projeto_data_atualizacao
       FROM Projetos p
       JOIN Usuarios uorient ON p.orientador_id = uorient.id
-      WHERE p.grupo_id = ? AND p.semestre = ?
+      JOIN Disciplinas d ON p.disciplina_id = d.id
+      WHERE p.grupo_id = ? AND d.semestre_padrao = ?
     `;
-    const [resultProjeto] = await connection.execute(sqlProjeto, [grupoId, semestreParam]);
-    const projeto = (resultProjeto.length > 0) ? resultProjeto[0] : null;
+    // FIX 1: Alterado para 'result.rows'
+    const resultProjeto = await connection.execute(sqlProjeto, [grupoId, semestrePadrao]);
+    const projeto = (resultProjeto.rows.length > 0) ? resultProjeto.rows[0] : null;
 
-    // 3) Buscar lista de MEMBROS (detalhado)
+    // 3) Buscar lista de MEMBROS (SQL Corrigida)
     const sqlMembros = `
       SELECT
         u.nome AS membro_nome,
         u.email AS membro_email,
         ug.papel AS membro_papel,
-        u.semestre AS membro_semestre,
         ug.data_entrada AS membro_data_entrada
       FROM Usuario_Grupo ug
       JOIN Usuarios u ON ug.usuario_id = u.id
       WHERE ug.grupo_id = ?
       ORDER BY u.nome
     `;
-    const [resultMembros] = await connection.execute(sqlMembros, [grupoId]);
-    const membros = resultMembros;
+    // FIX 1: Alterado para 'result.rows'
+    const resultMembros = await connection.execute(sqlMembros, [grupoId]);
+    const membros = resultMembros.rows;
 
-    // 4) Buscar "desempenho em atividades" (entregas/avaliações) deste grupo
+    // 4) Buscar "desempenho em atividades" (SQL Corrigida)
     const sqlAtividades = `
       SELECT
         a.id AS atividade_id,
@@ -222,17 +236,24 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         e.data_entrega AS entrega_data,
         av.nota AS avaliacao_nota,
         av.comentario AS avaliacao_comentario
-      FROM Atividades a
+      FROM Disciplinas_Ofertas dof
+      JOIN Atividades a ON a.oferta_id = dof.id
       LEFT JOIN Entregas e ON a.id = e.atividade_id AND e.grupo_id = ?
       LEFT JOIN Avaliacoes av ON e.id = av.entrega_id
       LEFT JOIN Usuarios upr ON a.professor_id = upr.id
-      WHERE a.grupo_id = ?
+      WHERE dof.disciplina_id = ? AND dof.semestre_id = ?
       ORDER BY a.titulo, e.data_entrega DESC
     `;
-    const [resultAtividades] = await connection.execute(sqlAtividades, [grupoId, grupoId]);
-    const atividades = resultAtividades;
+    // FIX 1: Alterado para 'result.rows'
+    const resultAtividades = await connection.execute(sqlAtividades, [
+      grupo.grupo_id,
+      grupo.disciplina_id,
+      grupo.semestre_id
+    ]);
+    const atividades = resultAtividades.rows;
 
-    // 5) Criar arquivo Excel com formatação melhorada
+    // 5) Criar arquivo Excel...
+    // ... (Toda a sua lógica de criação do Excel (ExcelJS) continua aqui) ...
     const workbook = new ExcelJS.Workbook();
     const safeGrupoNome = grupo.grupo_nome.replace(/[^a-zA-Z0-9]/g, '_');
     const worksheetName = `Relatorio_${safeGrupoNome}`;
@@ -269,7 +290,7 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     // Dados do grupo
     const grupoData = [
       ['Nome do Grupo', grupo.grupo_nome],
-      ['Semestre', grupo.grupo_semestre],
+      ['Semestre', `${grupo.grupo_semestre}º Semestre`], // (ex: 1º Semestre)
       ['Descrição', grupo.grupo_descricao || 'Não informado'],
       ['Relatório gerado em', formatDate(new Date())]
     ];
@@ -335,8 +356,8 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     currentRow += 1;
 
     // Cabeçalho da tabela de membros
-    const membrosHeaders = ['Nome', 'E-mail', 'Papel', 'Semestre', 'Data de Entrada'];
-    const membrosColumns = ['A', 'B', 'C', 'D', 'E'];
+    const membrosHeaders = ['Nome', 'E-mail', 'Papel', 'Data de Entrada']; // Removido 'Semestre'
+    const membrosColumns = ['A', 'B', 'C', 'D']; // Removido 'E'
     
     membrosColumns.forEach((col, idx) => {
       const cell = sheet.getCell(`${col}${currentRow}`);
@@ -355,7 +376,6 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         membro.membro_nome,
         membro.membro_email,
         membro.membro_papel,
-        membro.membro_semestre,
         membro.membro_data_entrada ? formatDate(membro.membro_data_entrada) : 'Não informado'
       ];
 
@@ -395,7 +415,7 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     if (atividades.length === 0) {
       sheet.mergeCells(`A${currentRow}:G${currentRow}`);
       const noDataCell = sheet.getCell(`A${currentRow}`);
-      noDataCell.value = 'Nenhuma atividade encontrada para este grupo.';
+      noDataCell.value = 'Nenhuma atividade encontrada para a disciplina deste grupo.';
       Object.assign(noDataCell, {
         ...styles.valueStyle,
         alignment: { vertical: 'middle', horizontal: 'center' },
@@ -450,7 +470,7 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     });
 
     // 6) Enviar o arquivo Excel
-    const fileName = `Relatorio_${safeGrupoNome}_${grupo.grupo_semestre}.xlsx`;
+    const fileName = `Relatorio_${safeGrupoNome}_${grupo.grupo_semestre}S.xlsx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
@@ -459,17 +479,24 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
 
   } catch (err) {
     console.error('Erro ao gerar relatório do grupo:', err.stack || err);
-    return res.status(500).json({ success: false, message: 'Erro ao gerar relatório.' });
+    if (!res.headersSent) {
+      return res.status(500).json({ success: false, message: 'Erro ao gerar relatório.' });
+    }
   } finally {
     if (connection) {
-      try { await connection.close(); } catch (_) { /**/ }
+      // FIX 2: Alterado de .end() para .release()
+      try { await connection.release(); } catch (_) { /**/ }
     }
   }
 });
 
+/**
+ * Rota: GET /coordenador/grupos/:semestre/relatorioGeral
+ * Descrição: Gera um relatório geral com todos os grupos e membros do semestre.
+ */
 router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
-  const semestreParam = String(req.params.semestre || '').trim();
-  if (!semestreParam) {
+  const semestrePadrao = Number(req.params.semestre);
+  if (isNaN(semestrePadrao)) {
     return res.status(400).json({ success: false, message: 'Semestre não informado.' });
   }
 
@@ -477,7 +504,7 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
   try {
     connection = await getConnection();
 
-    // 1) Buscar todos os grupos do semestre com lista de membros
+    // 1) Buscar todos os grupos do semestre (SQL Corrigida)
     const sqlConsolidado = `
       SELECT
         g.nome AS grupo_nome,
@@ -487,15 +514,19 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
       FROM Grupos g
       JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
       JOIN Usuarios u ON ug.usuario_id = u.id
-      WHERE g.semestre = ?
+      JOIN Disciplinas d ON g.disciplina_id = d.id
+      WHERE d.semestre_padrao = ?
       ORDER BY g.nome, u.nome
     `;
-    
-    const [rows] = await connection.execute(sqlConsolidado, [semestreParam]);
+
+    // FIX 1: Alterado de const [rows] para 'const result' e pegar 'result.rows'
+    const result = await connection.execute(sqlConsolidado, [semestrePadrao]);
+    const rows = result.rows; // O resto do código usa a variável 'rows'
 
     // 2) Criar o workbook estilizado
+    // ... (Sua lógica de criação de Excel (ExcelJS) continua aqui) ...
     const workbook = new ExcelJS.Workbook();
-    const safeNomePlanilha = `Grupos_${semestreParam.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const safeNomePlanilha = `Grupos_${semestrePadrao}S`;
     const sheet = workbook.addWorksheet(safeNomePlanilha);
 
     // === CONFIGURAÇÕES DE ESTILO ===
@@ -520,7 +551,7 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
     // Título principal (linha 1-2)
     sheet.mergeCells('A1:C2');
     const tituloCell = sheet.getCell('A1');
-    tituloCell.value = `RELATÓRIO GERAL DE GRUPOS\nSemestre ${semestreParam}`;
+    tituloCell.value = `RELATÓRIO GERAL DE GRUPOS\n${semestrePadrao}º Semestre`;
     tituloCell.font = { 
       bold: true, 
       size: 18, 
@@ -539,7 +570,7 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
     };
     tituloCell.border = {
       top: { style: 'thick', color: { argb: cores.azulPrimario } },
-      left: { style: 'thick', color: { argb: cores.azulPrimario } },
+      left: { style: 'thick', color: { argb: cores.azulPrimido } },
       bottom: { style: 'thick', color: { argb: cores.azulPrimario } },
       right: { style: 'thick', color: { argb: cores.azulPrimario } }
     };
@@ -720,7 +751,7 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
     };
 
     // 3) Enviar o arquivo Excel estilizado
-    const fileName = `Relatorio_Grupos_${semestreParam}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    const fileName = `Relatorio_Grupos_${semestrePadrao}S_${new Date().toISOString().split('T')[0]}.xlsx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     
@@ -729,14 +760,17 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
     
   } catch (err) {
     console.error('Erro ao gerar relatório geral de grupos:', err.stack || err);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Erro interno ao gerar relatório. Tente novamente.' 
-    });
+    if (!res.headersSent) {
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Erro interno ao gerar relatório. Tente novamente.' 
+      });
+    }
   } finally {
     if (connection) {
+      // FIX 2: Alterado de .end() para .release()
       try { 
-        await connection.close(); 
+        await connection.release(); 
       } catch (closeErr) { 
         console.warn('Aviso: Erro ao fechar conexão:', closeErr.message);
       }

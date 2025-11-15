@@ -80,6 +80,7 @@ const perfilDashboard = require( './routes/perfilDashboard.js');
 const professoresDiciplinas = require('./routes/professoresDiciplinas.js')
 const semestreRoutes = require('./routes/semestres.js');
 const atividadesProfessorRoutes = require ('./routes/atividadesProfessorRoutes.js')
+const configRoutes = require('./routes/configRoutes');
 
 
 //importar as rotas de tratamento de erros
@@ -120,7 +121,7 @@ app.use('/', redefinirSenha);
 app.use('/aluno', authPerfil, alunoAtividadesRoutes);
 app.use('/', entregas);
 app.use('/',projetos);
-
+app.use('/config', configRoutes);
 
 
 app.use('/coordenador',ListaProjetos);

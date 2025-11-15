@@ -1,211 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Painel de Controle</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/alerts.css">
+    
     <style>
-/* Estilos básicos para o card */
-.card-visualizar-grupo {
-  position: relative; /* Para o botão "X" */
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 400px;
-  font-family: Arial, sans-serif;
-  overflow: hidden; /* Para o rodapé se encaixar bem */
-}
-
-/* Cabeçalho */
-.card-header {
-  padding: 24px 24px 16px 24px;
-}
-.card-header .label {
-  font-size: 0.9rem;
-  color: #6c757d;
-  text-transform: uppercase;
-}
-.card-header .titulo-grupo {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #212529;
-  margin: 4px 0 0 0;
-}
-
-/* Corpo */
-.card-body {
-  padding: 0 24px 16px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.info-item {
-  font-size: 0.95rem;
-  color: #495057;
-}
-.info-item strong {
-  color: #212529;
-}
-
-.divisor {
-  border: none;
-  border-top: 1px solid #e9ecef;
-  margin: 8px 0;
-}
-
-/* Seção de Membros */
-.secao-membros h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-.lista-membros {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.lista-membros li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f8f9fa;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-.tag-funcao {
-  font-size: 0.8rem;
-  background-color: #e0e0e0;
-  color: #555;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-weight: 500;
-}
-
-/* Rodapé e Botões */
-.card-footer {
-  background-color: #f8f9fa;
-  padding: 16px 24px;
-  text-align: right;
-  border-top: 1px solid #e9ecef;
-}
-
-.btn-fechar-secundario {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.btn-fechar-secundario:hover {
-  background-color: #5a6268;
-}
-
-.btn-fechar-icone {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  background: none;
-  border: none;
-  font-size: 1.75rem;
-  color: #aaa;
-  cursor: pointer;
-  line-height: 1;
-}
-.btn-fechar-icone:hover {
-  color: #333;
-}
+        .config-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .config-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .config-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        .config-header p {
+            margin: 0.25rem 0 0;
+            font-size: 0.95rem;
+            color: #666;
+        }
+        .config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            background: #f9f9f9;
+        }
+        .config-item-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #444;
+        }
+        .config-item-label small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        /* Estilo do Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        #btn-salvar-config {
+            /* Use seu estilo de botão principal */
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #btn-salvar-config:hover {
+            background-color: #0056b3;
+        }
     </style>
+    <link rel="stylesheet" href="../css/alerts.css">
 </head>
 <body>
-    
+    <div class="container">
+        <main class="perfil-content"> <div class="config-container">
+                <div class="config-header">
+                    <h2>Controle de Matrículas</h2>
+                    <p>Ative ou desative os períodos de matrícula e vínculo de disciplinas.</p>
+                </div>
 
-  <div class="card-visualizar-grupo">
-  
-    <button class="btn-fechar-icone">&times;</button> 
-  
-    <div class="card-header">
-      <span class="label">Grupo</span>
-      <h2 class="titulo-grupo">asdasd</h2>
+                <div id="loading-config" style="display: none;">Carregando...</div>
+
+                <div class="config-item">
+                    <div class="config-item-label">
+                        Matrícula de Alunos
+                        <small>Permite que alunos se matriculem em disciplinas.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-aluno-matricula">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-item-label">
+                        Vínculo de Professores
+                        <small>Permite que professores e orientadores se vinculem a disciplinas.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-professor-matricula">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button id="btn-salvar-config">Salvar Alterações</button>
+            </div>
+        </main>
     </div>
-  
-    <div class="card-body">
-      <div class="info-item">
-        <strong>Semestre:</strong>
-        <span>1º Sem</span>
-      </div>
-      <div class="info-item">
-        <strong>Data de Criação:</strong>
-        <span>28/10/2025, 21:20</span>
-      </div>
-  
-      <hr class="divisor">
-  
-      <div class="secao-membros">
-        <h3>Membros:</h3>
-        <ul class="lista-membros">
-          <li>
-            <span class="nome-membro">Aluno Teste 07</span>
-            <span class="tag-funcao">Membro</span>
-          </li>
-          </ul>
-      </div>
-    </div>
-  
-    <div class="card-footer">
-      <button class="btn-fechar-secundario">Fechar</button> 
-    </div>
-  </div>
-      <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Encontra todos os elementos que têm a classe 'password-toggle-icon'
-  const toggleIcons = document.querySelectorAll('.password-toggle-icon');
 
-  toggleIcons.forEach(toggleIcon => {
-    // Para cada ícone, precisamos encontrar o input de senha correspondente
-    // Ele será o input com a classe 'password-toggle-input' dentro do mesmo 'password-field-wrapper'
-    const passwordWrapper = toggleIcon.closest('.password-field-wrapper');
-    const passwordInput = passwordWrapper ? passwordWrapper.querySelector('.password-toggle-input') : null;
-
-    const eyeOpenIcon = toggleIcon.querySelector('.feather-eye');
-    const eyeOffIcon = toggleIcon.querySelector('.feather-eye-off');
-
-    // Se encontramos o input e os ícones, configuramos o listener
-    if (passwordInput && eyeOpenIcon && eyeOffIcon) {
-      // Configura atributos de acessibilidade iniciais
-      toggleIcon.setAttribute('role', 'button');
-      toggleIcon.setAttribute('aria-label', 'Mostrar senha');
-      // Usar o ID do input para aria-controls (se o input tiver ID)
-      if (passwordInput.id) {
-          toggleIcon.setAttribute('aria-controls', passwordInput.id);
-      }
-      toggleIcon.setAttribute('aria-pressed', 'false');
-
-      toggleIcon.addEventListener('click', function() {
-        // Alterna o tipo do input
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-
-        // Alterna a visibilidade dos ícones
-        eyeOpenIcon.classList.toggle('hidden');
-        eyeOffIcon.classList.toggle('hidden');
-
-        // Atualiza atributos de acessibilidade
-        toggleIcon.setAttribute('aria-label', type === 'password' ? 'Mostrar senha' : 'Ocultar senha');
-        toggleIcon.setAttribute('aria-pressed', type === 'text' ? 'true' : 'false');
-
-        // Opcional: foca no input após a alternância
-        passwordInput.focus();
-      });
-    }
-  });
-});
-
-      </script>
-</body>
+    <script type="module" src="../javaScript/front_end/painelControle.js"></script> </body>
 </html>

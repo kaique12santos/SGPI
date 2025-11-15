@@ -104,6 +104,7 @@ function getItensMenu() {
     { texto: 'Monitoramento Geral', link: '/listaProjetos'},
     { texto: 'Controle de Chaves', link: '/palavraChave'},
     {texto: 'Meu Perfil', link: '/perfil'},
+    {texto: 'Meu teste', link: '/teste'},
     {texto: 'Sair', id:'logout-button'}
     ],
     professor: [

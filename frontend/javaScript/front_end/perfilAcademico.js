@@ -5,8 +5,21 @@ import { getMinhasDisciplinas, getMeusGrupos, getMeusProjetos, getDisciplinasDis
 import { getDisciplinasDisponiveis, vincularDisciplinasProfessor, desvincularDisciplinasProfessor } from "../services/disciplinaService.js";
 import { getDisciplinasDisponiveisAluno, atualizarDisciplinasAluno } from "../services/alunoDisciplinaService.js";
 import { confirmarAcao } from "../utils/confirmDialog.js";
+import { getConfigMatriculas } from "../services/configService.js";
+document.addEventListener("DOMContentLoaded",async () => {
 
-document.addEventListener("DOMContentLoaded", () => {
+  let config = { alunoMatricula: false, professorMatricula: false }; // Padrão é 'false'
+  try {
+    const data = await getConfigMatriculas();
+    if (data?.success) {
+      config = data.settings; // Ex: { alunoMatricula: true, professorMatricula: false }
+    } else {
+      console.warn("Não foi possível carregar as configurações de matrícula.");
+    }
+  } catch (e) {
+    console.error("Erro ao buscar configurações de matrícula:", e);
+    // Segue com o padrão 'false'
+  }
   // ============================================
   // VARIÁVEIS GLOBAIS DO ESCOPO
   // ============================================
@@ -66,7 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================
   if (isProfessor) {
     // Professor logado:
-    btnDisciplinas?.classList?.add("visible");
+    if (config.professorMatricula) {
+      btnDisciplinas?.classList?.add("visible");  
+    }
+    
     if (sectionGerenciar) sectionGerenciar.style.display = "none"; // Esconde a seção do ALUNO
   } else {
     // Aluno logado:
@@ -471,11 +487,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Listener que MOSTRA a seção do aluno (usa a variável global `btnGerenciar`)
   if (userRole === "aluno") {
-    if (btnGerenciar) btnGerenciar.style.display = "flex";
-    btnGerenciar?.addEventListener("click", () => {
-      showSection(sectionGerenciar);
-      carregarDisciplinasAluno(); // Apenas chama a função de carregar
-    });
+    if (config.alunoMatricula) {
+      if (btnGerenciar) btnGerenciar.style.display = "flex";
+      btnGerenciar?.addEventListener("click", () => {
+        showSection(sectionGerenciar);
+        carregarDisciplinasAluno(); // Apenas chama a função de carregar
+      });
+    }
   }
 
   async function carregarDisciplinas() {
@@ -570,10 +588,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // NAVEGAÇÃO POR CLIQUE (CORRIGIDO)
   // ============================================
   
-  btnDisciplinas?.addEventListener("click", () => {
-    showSection(sectionDisciplinas);
-    carregarDisciplinasDisponiveis();
-  });
+  if (isProfessor && config.professorMatricula) {
+    btnDisciplinas?.addEventListener("click", () => {
+      showSection(sectionDisciplinas);
+      carregarDisciplinasDisponiveis();
+    });
+  }
 
   document.getElementById("btn-minhas-disciplinas")?.addEventListener("click", () => {
     const sec = document.getElementById("section-minhas-disciplinas");
