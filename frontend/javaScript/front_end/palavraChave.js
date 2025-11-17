@@ -1,5 +1,6 @@
 import { ativar as mostrarAlerta } from '../utils/alerts.js';
 import { PalavraChaveService } from '../services/palavraChaveServices.js';
+import { confirmarAcao } from "../utils/confirmDialog.js";
 
 /**
  * Classe responsável pela manipulação do DOM do painel de palavras-chave
@@ -151,7 +152,14 @@ class PalavraChaveDOM {
         }
 
         const botaoSalvar = this.elementos[`salvar${this.capitalize(tipo)}`];
-
+        const confirmar = await confirmarAcao(
+            "Confirmar Criação?",
+            "Deseja realmente salvar a nova chave gerada?",
+            "Salvar",
+            "Cancelar"
+        );
+        
+        if (!confirmar) return;
         try {
             this.setLoadingState(botaoSalvar, true);
             

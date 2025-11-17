@@ -22,7 +22,7 @@ router.get('/grupos/:semestre', async (req, res) => {
       SELECT
         g.id AS GRUPO_ID,
         g.nome AS GRUPO_NOME,
-        GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS NOMES_MEMBRO
+        GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS NOMES_MEMBROS
       FROM Grupos g
       JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
       JOIN Usuarios u ON ug.usuario_id = u.id

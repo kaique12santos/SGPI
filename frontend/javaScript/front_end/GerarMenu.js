@@ -103,8 +103,9 @@ function getItensMenu() {
     { texto: 'Gerar Relatorios', link: '/listaGruposCoordenador' },
     { texto: 'Monitoramento Geral', link: '/listaProjetos'},
     { texto: 'Controle de Chaves', link: '/palavraChave'},
+    {texto: 'Painel de Matrículas', link: '/painel_controle_diciplinas'},
     {texto: 'Meu Perfil', link: '/perfil'},
-    {texto: 'Meu teste', link: '/teste'},
+    
     {texto: 'Sair', id:'logout-button'}
     ],
     professor: [

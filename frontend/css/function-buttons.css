@@ -1,59 +1,80 @@
-.page-links{
+.page-links {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     padding: 10px;
-    background-color: #ffff;
-
+    background-color: #fff;
 }
 
-.button-link{
+/* CARD LINK */
+.button-link {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 300px;
-    background-color: 
-#dedcdc;
+    width: 280px;
+    background: #b9b9b957;
     border: none;
-    justify-content: space-around;
+    justify-content: center;
     margin: 2%;
     padding: 20px;
-    min-height: 120px;
-    gap: 10px;
+    min-height: 140px;
+    gap: 12px;
     cursor: pointer;
-    font-size: 1.02rem;
-    transition: background-color 0.3s ease;
-    border-radius: 5px;
-    border-bottom: 2px solid rgb(119, 119, 119);
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border-left: 4px solid transparent;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.644); 
+
+    /* NOVO */
+    transition: 
+        background 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-left-color 0.25s ease;
 }
 
-.page-links a{
+/* LINK sem estilizar texto */
+.page-links a {
     text-decoration: none;
     color: inherit;
 }
 
-.link-icon{
-    background-color: transparent;
-    color: 
-#696969;
-    height: 100%;
-    width: 100%;
-}
-.button-icon{
-    width: 20%;
-}
-.button-link:hover{
-    background-color: 
-#c2c2c2;
+/* ÍCONES */
+.link-icon {
+    color: #696969;
+    width: 45px;
+    height: 45px;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
+/* Ícone fica em um container para centralização */
+.button-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* HOVER MELHORADO */
+.button-link:hover {
+    background: #d4d4d4;
+    transform: translateY(-4px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.719);
+    border-left-color: #970000; 
+}
+
+/* Ícone ganha leve zoom */
+.button-link:hover .link-icon {
+    transform: scale(1.15);
+    color: #555;
+}
+
+/* BOTÃO DE LOGOUT (mantido) */
 .logout-btn {
     display: flex;
     align-items: center;
     gap: 5px;
     padding: 8px 12px;
-    background-color: 
-#f44336;
+    background-color: #f44336;
     color: white;
     border: none;
     border-radius: 4px;
@@ -63,8 +84,7 @@
 }
 
 .logout-btn:hover {
-    background-color: 
-#d32f2f;
+    background-color: #d32f2f;
 }
 
 .logout-btn svg {

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPI</title>
+
+    <!--__________LINKS AQUI__________-->
+    <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/footer-estrutura.css">
+    <link rel="stylesheet" href="../css/function-buttons.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/alertConfirm.css">
+    <link rel="stylesheet" href="../css/alerts.css">
+    <link rel="stylesheet" href="../css/painel_controle_diciplinas.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=contrast" />
+    <!--______________________________-->
+</head>
+
+<header>
+    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
+        <!-- Div da esquerda com logos e SGPI -->
+        <div class="header-left">
+            <img src="/imagens/logo_cps.png" alt="logo do centro paula souza" class="logo-image">
+            
+            <h1>SGPI</h1>
+        </div>
+        
+        <!-- Div da direita com mensagem de usuário e perfil -->
+        <div class="header-right">
+                
+            <img src="/imagens/logo_fatec_br.png" alt="logo da fatec Zona Leste" class="logo-image">
+            <div class="perfil-container">
+                <div id="user-profile-pic" class="profile-pic " >
+                    <a href="/TelaPrincipal" >
+                    <img class="profile-image" src="https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="" width="100%">
+                    </a>
+                </div>
+                </div>
+        </div>
+    
+</header>
+
+<body>
+    <div class="container" style="height: stretch"> <!--Div container para facilitar configurações globais-->
+        <div class="wrapper">
+            <nav class="menu-desktop">
+                <div class="menu-desktop-nav" id="menu-desktop">
+                    <!-- Links gerados pelo JavaScript -->
+                </div>
+            </nav>
+        <div class="menu-dropdown"> 
+            <button class="dropbutton" aria-expanded="false" id="menuToggleButton">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                </svg>
+            </button>
+            <div id="menu-itens" class="menu-content">
+                <a href=""></a>
+                <a href=""></a>
+                <a href=""></a>
+                <a href=""></a>
+            </div>
+        </div>
+        
+        </div>
+            
+
+
+        <div class="content"> <!--Div com o conteúdo principal da página-->
+            <div class="page-name">
+                <h2>Painel Matrículas</h2>
+            </div>
+            <main class="perfil-content"> <div class="config-container">
+                   
+                    <div class="config-header">
+                        <h2>Controle de Matrículas</h2>
+                        <p>Ative ou desative os períodos de matrícula e vínculo de disciplinas.</p>
+                    </div>
+    
+                    <div id="loading-config" style="display: none;">Carregando...</div>
+    
+                    <div class="config-item">
+                        <div class="config-item-label">
+                            Matrícula de Alunos
+                            <small>Permite que alunos se matriculem em disciplinas.</small>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-aluno-matricula">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+    
+                    <div class="config-item">
+                        <div class="config-item-label">
+                            Vínculo de Professores
+                            <small>Permite que professores e orientadores se vinculem a disciplinas.</small>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-professor-matricula">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+    
+                    <button id="btn-salvar-config">Salvar Alterações</button>
+                </div>
+            </main>
+            
+
+        </div>
+    </div>
+    
+    <footer class="sgpi-footer">
+        <div class="footer-container">
+            <span class="footer-text">© 2024 SGPI - Sistema de Gestão de Projetos Integrado. </span>
+            <span class="footer-text">Desenvolvido para o curso de DSM - FATEC Zona Leste</span>
+            
+            <div class="footer-links">
+                <span class="footer-separator">|</span>
+                <a href="/manual">Manual do Usuário</a>
+                <span class="footer-separator">|</span>
+                <a href="/termos_uso">Termos de Uso</a>
+                <span class="footer-separator">|</span>
+                <a href="/politica-privacidade">Política de Privacidade</a>
+                <span class="footer-separator">|</span>
+                <a href="/sobre">Sobre</a>
+            </div>
+        </div>
+    </footer>
+
+    
+    <script src="../javaScript/front_end/menuPerfil.js"></script>
+    <script type="module" src="../javaScript/front_end/painelControle.js"></script>
+    <script src="../javaScript/utils/navigation-buttons.js"></script>
+    <script type="module" src="../javaScript/front_end/GerarMenu.js"></script>
+    <script type="module" src="../javaScript/front_end/notificacoes-flutuante.js" defer></script>
+    <script type="module" src="../javaScript/front_end/imagemPerfil.js"></script>
+    <script defer src="../javaScript/utils/efeitoMenu.js"></script>
+    <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
+</body>
+</html>

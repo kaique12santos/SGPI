@@ -1,62 +1,116 @@
-/* alert de confirmaçao */
+/* ----------- CONFIRM DIALOG MODERNO ----------- */
+
 .confirm-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+
+  /* Animação de fade */
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.confirm-dialog {
+  width: 380px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+  text-align: center;
+  transform: scale(0.85);
+  opacity: 0;
+
+  /* Animação de scale */
+  animation: popupShow 0.25s ease forwards;
+  position: relative;
+}
+
+/* Barra no topo (alerta crítico) */
+.confirm-dialog::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, #ff4d4d, #ff1a1a);
+}
+
+.confirm-dialog h3 {
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.confirm-dialog p {
+  margin-top: 4px;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Botões */
+.confirm-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 25px;
+}
+
+.btn-sim, .btn-nao {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Botão SIM (ação crítica) */
+.btn-sim {
+  background: #ff3b3b;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(255, 0, 0, 0.3);
+}
+.btn-sim:hover {
+  background: #ff1f1f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 0, 0, 0.45);
+}
+
+/* Botão NÃO */
+.btn-nao {
+  background: #e0e0e0;
+  color: #333;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.btn-nao:hover {
+  background: #d5d5d5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+
+/* ------ Animações ------ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupShow {
+  from {
+      transform: scale(0.85);
+      opacity: 0;
   }
-  
-  .confirm-dialog {
-    background: #ffffff;
-    padding: 20px 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    text-align: center;
-    width: 350px;
+  to {
+      transform: scale(1);
+      opacity: 1;
   }
-  
-  .confirm-dialog h3 {
-    margin-bottom: 10px;
-    color: var(--cor-principal);
-  }
-  
-  .confirm-buttons {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-  }
-  .btn-nao,.btn-sim{
-    font-weight: 500;
-  }
-  
-  .btn-sim {
-    background: #ff0000;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  .btn-sim:hover {
-    background: linear-gradient(135deg, #ff2828, #ff1515);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  }
-  
-  .btn-nao {
-    background: #707070;
-    border: none;
-    color: #ffffff;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  .btn-nao:hover {
-    background: linear-gradient(135deg, #857979, #707070);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  }
-  /* fim do alert de confirmaçao */
+}

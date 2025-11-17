@@ -1,0 +1,132 @@
+.config-container {
+    max-width: 60%;
+    margin: 2rem auto;
+    padding: 2rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.config-header {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.config-header h2 {
+    margin: 0;
+    color: #333;
+}
+.config-header p {
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+    color: #666;
+}
+.config-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    background: #f9f9f9;
+    transition: all 0.25s ease-in-out;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.config-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: #4a74ff;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.25s ease-out;
+}
+
+/* Hover com barra crescendo */
+.config-item:hover::before {
+    transform: scaleY(1);
+}
+
+/* Efeito de elevação ao passar o mouse */
+.config-item:hover {
+    background: #f4f7ff;
+    border-color: #adc3ff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transform: translateX(4px);
+}
+
+.config-item-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #444;
+}
+.config-item-label small {
+    display: block;
+    font-weight: 400;
+    font-size: 1rem;
+    color: #777;
+}
+
+/* Estilo do Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: #2196F3;
+}
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+#btn-salvar-config {
+    /* Use seu estilo de botão principal */
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#btn-salvar-config:hover {
+    background-color: #0056b3;
+}
