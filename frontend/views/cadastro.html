@@ -3,339 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro</title>
+    <title>Cadastro - SGPI</title>
 
-    <!-- Estilos -->
-    <link rel="stylesheet" href="css/alertConfirm.css">
-    <link rel="stylesheet" href="./css/signup.css">
-    <link rel="stylesheet" href="./css/alerts.css">
-    <link rel="stylesheet" href="./css/modal_termos.css">
-    <link rel="stylesheet" href="./css/visibilidade.css">
     <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
+    
+    <link rel="stylesheet" href="../css/login-singup.css">
+    <link rel="stylesheet" href="./css/alerts.css">
+    
+    <link rel="stylesheet" href="./css/signup.css">
+    <link rel="stylesheet" href="./css/modal_termos.css">
+    <link rel="stylesheet" href="css/alertConfirm.css">
 </head>
 
-<header>
-    <div class="header-content">
-        <div class="wrapper">
-            <img src="./imagens/logo-sgpi.png" alt="" class="logo-image">
-            <h1>SGPI</h1>
-        </div>
-    </div>
-</header>
-
 <body>
-<div class="container">
-    <div class="signup-box">
-        <!-- Etapa 1: Dados do Cadastro -->
-        <form class="signup-info" id="formCadastro">
-            <div class="signup-form">
-                <label for="nome">Nome</label>
-                <input type="text" id="nome" name="nome" placeholder="Digite aqui" class="signup-input" required autocomplete="off">
-            </div>
-
-            <div class="signup-form">
-                <label for="email">E-mail institucional</label>
-                <input type="email" id="email" name="email" placeholder="Digite aqui" class="signup-input" required autocomplete="off">
-                <span id="emailError"></span>
-            </div>
-
-            <div class="signup-form">
-                <label>Perfil</label>
-                <div>
-                    <input type="radio" id="perfilAluno" name="perfil" value="aluno" required>
-                    <label for="perfilAluno">Aluno</label>
-                    <input type="radio" id="perfilProfessor" name="perfil" value="professor">
-                    <label for="perfilProfessor">Professor</label>
-                </div>
-            </div>
-
-            <div class="signup-form" id="materiasBox">
-                <label>Matérias</label>
-                <div class="materias-list">
-                    <fieldset>
-                        <legend>1º Semestre</legend>
-                        <label><input type="checkbox" name="materias" value="DD101"> Design Digital</label>
-                        <label><input type="checkbox" name="materias" value="DW101"> Desenvolvimento Web I</label>
-                        <label><input type="checkbox" name="materias" value="ES101"> Engenharia de Software I</label>
-                    </fieldset>
-            
-                    <fieldset>
-                        <legend>2º Semestre</legend>
-                        <label><input type="checkbox" name="materias" value="DW102"> Desenvolvimento Web II</label>
-                        <label><input type="checkbox" name="materias" value="ES102"> Engenharia de Software II</label>
-                        <label><input type="checkbox" name="materias" value="BD101"> Banco de Dados Relacional</label>
-                    </fieldset>
-            
-                    <fieldset>
-                        <legend>3º Semestre</legend>
-                        <label><input type="checkbox" name="materias" value="DW103"> Desenvolvimento Web III</label>
-                        <label><input type="checkbox" name="materias" value="BD102"> Banco de Dados Não Relacional</label>
-                        <label><input type="checkbox" name="materias" value="IHC101"> Interação Humano Computador</label>
-                        <label><input type="checkbox" name="materias" value="GP101"> Gestão Ágil de Projetos de Software</label>
-                    </fieldset>
-            
-                    <fieldset>
-                        <legend>4º Semestre</legend>
-                        <label><input type="checkbox" name="materias" value="LDW101"> Laboratório de Desenvolvimento Web</label>
-                        <label><input type="checkbox" name="materias" value="UX101"> Experiência do Usuário</label>
-                    </fieldset>
+    <div class="container">
         
-                    <fieldset>
-                        <legend>5º Semestre</legend>
-                        <label><input type="checkbox" name="materias" value="LDM101"> Laboratório de Desenvolvimento Mobile</label>
-                        <label><input type="checkbox" name="materias" value="PM201"> Programação para Dispositivos Móveis II</label>
-                    </fieldset>
+        <div class="header-content">
+            <div class="wrapper">
+                <img src="./imagens/logo-sgpi.png" alt="logo do SGPI" class="logo-image">
+                <h1>SGPI</h1>
+            </div>
+            <p class="system-name">Sistema Gerenciador de<br>Projetos Interdisciplinares</p>
+        </div>
+
+        <div class="login-box">
             
-                    <fieldset>
-                        <legend>6º Semestre</legend>
-                        <label><input type="checkbox" name="materias" value="QT101"> Qualidade e Testes de Software</label>
-                        <label><input type="checkbox" name="materias" value="LDM201"> Laboratório de Desenvolvimento Multiplataforma</label>
-                    </fieldset>
+            <div class="greeting">
+                <p>Crie sua conta</p>
+                <p class="greeting-paragraph">Preencha os dados abaixo para começar.</p>
+            </div>
+
+            <div class="login-info">
+                <form id="formCadastro" class="login-info signup-info">
+                    
+                    <div class="login-form">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" placeholder="Seu nome completo" class="login-input" required autocomplete="off">
+                    </div>
+
+                    <div class="login-form">
+                        <label for="email">E-mail institucional</label>
+                        <input type="email" id="email" name="email" placeholder="seu.email@fatec.sp.gov.br" class="login-input" required autocomplete="off">
+                        <span id="emailError"></span>
+                    </div>
+
+                    <div class="login-form">
+                        <label>Perfil de Acesso</label>
+                        <div class="radio-group">
+                            <div>
+                                <input type="radio" id="perfilAluno" name="perfil" value="aluno" required>
+                                <label for="perfilAluno">Aluno</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="perfilProfessor" name="perfil" value="professor">
+                                <label for="perfilProfessor">Professor</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="materiasBox" style="display: none; width: 100%;">
+                        <div class="login-form">
+                            <label>Selecione suas Matérias</label>
+                            <div class="materias-list">
+                                <fieldset>
+                                    <legend>1º Semestre</legend>
+                                    <label><input type="checkbox" name="materias" value="DD101"> Design Digital</label>
+                                    <label><input type="checkbox" name="materias" value="DW101"> Desenvolvimento Web I</label>
+                                    <label><input type="checkbox" name="materias" value="ES101"> Engenharia de Software I</label>
+                                </fieldset>
+                        
+                                <fieldset>
+                                    <legend>2º Semestre</legend>
+                                    <label><input type="checkbox" name="materias" value="DW102"> Desenvolvimento Web II</label>
+                                    <label><input type="checkbox" name="materias" value="ES102"> Engenharia de Software II</label>
+                                    <label><input type="checkbox" name="materias" value="BD101"> Banco de Dados Relacional</label>
+                                </fieldset>
+                        
+                                <fieldset>
+                                    <legend>3º Semestre</legend>
+                                    <label><input type="checkbox" name="materias" value="DW103"> Desenvolvimento Web III</label>
+                                    <label><input type="checkbox" name="materias" value="BD102"> Banco de Dados Não Relacional</label>
+                                    <label><input type="checkbox" name="materias" value="IHC101"> Interação Humano Computador</label>
+                                    <label><input type="checkbox" name="materias" value="GP101"> Gestão Ágil de Projetos de Software</label>
+                                </fieldset>
+                        
+                                <fieldset>
+                                    <legend>4º Semestre</legend>
+                                    <label><input type="checkbox" name="materias" value="LDW101"> Laboratório de Desenvolvimento Web</label>
+                                    <label><input type="checkbox" name="materias" value="UX101"> Experiência do Usuário</label>
+                                </fieldset>
+                    
+                                <fieldset>
+                                    <legend>5º Semestre</legend>
+                                    <label><input type="checkbox" name="materias" value="LDM101"> Laboratório de Desenvolvimento Mobile</label>
+                                    <label><input type="checkbox" name="materias" value="PM201"> Programação para Dispositivos Móveis II</label>
+                                </fieldset>
+                        
+                                <fieldset>
+                                    <legend>6º Semestre</legend>
+                                    <label><input type="checkbox" name="materias" value="QT101"> Qualidade e Testes de Software</label>
+                                    <label><input type="checkbox" name="materias" value="LDM201"> Laboratório de Desenvolvimento Multiplataforma</label>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="chaveProfessorBox" style="display:none; width: 100%;">
+                        <div class="login-form">
+                            <label for="chaveProfessor">Palavra-chave</label>
+                            <input type="text" id="chaveProfessor" name="chaveProfessor" class="login-input" placeholder="Chave da coordenação">
+                        </div>
+                    </div>
+
+                    <div class="login-form">
+                        <label for="senha">Senha</label>
+                        <div class="password-field-wrapper">
+                            <input 
+                                type="password" 
+                                id="senha" 
+                                name="senha" 
+                                placeholder="Digite aqui" 
+                                class="login-input password-toggle-input"
+                                required 
+                                autocomplete="new-password"
+                            >
+                            <span class="password-toggle-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="login-form">
+                        <label for="confirmar-senha">Confirme a Senha</label>
+                        <div class="password-field-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirmar-senha" 
+                                name="confirmar-senha" 
+                                placeholder="Digite novamente" 
+                                class="login-input password-toggle-input"
+                                required 
+                                autocomplete="new-password"
+                            >
+                            <span class="password-toggle-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </span>
+                        </div>
+                        <span id="passwordError"></span> 
+                    </div>
+
+                    <div class="login-actions">
+                        <button type="button" class="login-button" id="cadastrarBtn">Cadastrar</button>
+                    </div>
+                </form>
+
+                <form class="login-info" id="formValidacaoEmail" style="display:none;">
+                    <div class="login-form">
+                        <p style="text-align: center; color: #4a5568; font-size: 0.9rem;">
+                            Enviamos um código de validação para seu e-mail institucional.
+                        </p>
+                    </div>
+
+                    <div class="login-form">
+                        <label for="codigoValidacao">Código de Validação</label>
+                        <input type="text" id="codigoValidacao" name="codigoValidacao" class="login-input" maxlength="8" placeholder="Ex: ABC12345" required>
+                        <span id="codigoError"></span>
+                    </div>
+
+                    <div class="login-actions" style="gap: 10px;">
+                        <button type="button" class="login-button" id="btnValidarCodigo">Validar Código</button>
+                        <button type="button" class="login-button" id="btnReenviarEmail" style="background-color: #718096;">Reenviar Email</button>
+                    </div>
+                </form>
+
+                <div class="register-section">
+                    <p class="greeting-paragraph">Já tem uma conta? <a href="/index">Entre aqui</a></p>
                 </div>
             </div>
-
-            <div class="signup-form" id="chaveProfessorBox" style="display:none;">
-                <label for="chaveProfessor">Palavra-chave</label>
-                <input type="text" id="chaveProfessor" name="chaveProfessor" class="signup-input" placeholder="Digite a chave fornecida pelo coordenador">
-            </div>
-
-            <!-- Campo de Senha no Cadastro -->
-            <div class="signup-form">
-                <label for="senha">Senha</label>
-                <div class="password-field-wrapper"> <!-- Wrapper para o campo de senha -->
-                    <input 
-                        type="password" 
-                        id="senha" 
-                        name="senha" 
-                        placeholder="Digite aqui" 
-                        class="signup-input password-toggle-input"
-                        required 
-                        autocomplete="new-password"
-                    >
-                    <span class="password-toggle-icon"> <!-- Ícone para o campo de senha -->
-                        <!-- Ícone de olho aberto (visível por padrão) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <!-- Ícone de olho fechado (oculto por padrão) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                            <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </svg>
-                    </span>
-                </div>
-                <!-- <span id="passwordError"></span> --> <!-- Você pode ter um span de erro aqui se quiser -->
-            </div>
-                
-            <!-- Campo de Confirmação de Senha no Cadastro -->
-            <div class="signup-form">
-                <label for="confirmar-senha">Digite a senha novamente</label>
-                <div class="password-field-wrapper"> <!-- Wrapper para o campo de confirmação de senha -->
-                    <input 
-                        type="password" 
-                        id="confirmar-senha" 
-                        name="confirmar-senha" 
-                        placeholder="Digite aqui" 
-                        class="signup-input password-toggle-input"
-                        required 
-                        autocomplete="new-password"
-                    >
-                    <span class="password-toggle-icon"> <!-- Ícone para o campo de confirmação de senha -->
-                        <!-- Ícone de olho aberto (visível por padrão) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <!-- Ícone de olho fechado (oculto por padrão) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                            <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </svg>
-                    </span>
-                </div>
-                <span id="passwordError"></span> 
-            </div>
-
-            <div class="signup-actions">
-                <button type="button" class="signup-button" id="cadastrarBtn">Cadastrar</button>
-            </div>
-        </form>
-
-        <!-- Etapa 2: Validação do e-mail (inicialmente escondida) -->
-        <form class="signup-info" id="formValidacaoEmail" style="display:none;">
-            <div class="signup-form">
-                <p>Enviamos um código de validação para seu e-mail institucional. Digite o código abaixo para confirmar seu cadastro.</p>
-            </div>
-
-            <div class="signup-form">
-                <label for="codigoValidacao">Código de Validação</label>
-                <input type="text" id="codigoValidacao" name="codigoValidacao" class="signup-input" maxlength="8" placeholder="Ex: ABC12345" required>
-                <span id="codigoError"></span>
-            </div>
-
-            <div class="signup-actions">
-                <button type="button" class="signup-button" id="btnValidarCodigo">Validar Código</button>
-                <button type="button" class="signup-button" id="btnReenviarEmail">Reenviar Email</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="greeting">
-        <h3>Bem vindo ao Sistema Gerenciador de Projetos Interdisciplinares</h3>
-        <br>
-        <p class="greeting-paragraph">Já tem uma conta? <a href="./index">Entre aqui</a></p>
-    </div>
-</div>
-
-<!-- Modal de Termos de Uso e Política de Privacidade -->
-<div id="termosModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Termos de Uso e Política de Privacidade - SGPI</h2>
-            <button class="modal-close" id="closeModal">&times;</button>
         </div>
+    </div>
 
-        <div class="modal-body" id="modalBody">
-            <div class="termos-content">
-                <h3>1. ACEITAÇÃO DOS TERMOS</h3>
-                <p>Ao utilizar o Sistema Gerenciador de Projetos Interdisciplinares (SGPI), você concorda em cumprir e estar vinculado aos presentes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deve utilizar o sistema.</p>
+    <div id="termosModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Termos de Uso e Política de Privacidade - SGPI</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
 
-                <h3>2. DESCRIÇÃO DO SERVIÇO</h3>
-                <p>O SGPI é uma plataforma educacional destinada ao gerenciamento de projetos interdisciplinares no ambiente acadêmico, facilitando a colaboração entre alunos e professores, o acompanhamento de atividades e a organização de projetos educacionais.</p>
+            <div class="modal-body" id="modalBody">
+                <div class="termos-content">
+                    <h3>1. ACEITAÇÃO DOS TERMOS</h3>
+                    <p>Ao utilizar o Sistema Gerenciador de Projetos Interdisciplinares (SGPI), você concorda em cumprir e estar vinculado aos presentes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deve utilizar o sistema.</p>
 
-                <h3>3. CADASTRO E CONTA DE USUÁRIO</h3>
-                <p>3.1. Para utilizar o SGPI, é necessário criar uma conta fornecendo informações precisas e atualizadas.</p>
-                <p>3.2. Você é responsável por manter a confidencialidade de sua senha e por todas as atividades realizadas em sua conta.</p>
-                <p>3.3. O cadastro é restrito a membros da comunidade acadêmica com e-mail institucional válido.</p>
-                <p>3.4. Professores devem utilizar a palavra-chave fornecida pela coordenação para validar seu perfil.</p>
+                    <h3>2. DESCRIÇÃO DO SERVIÇO</h3>
+                    <p>O SGPI é uma plataforma educacional destinada ao gerenciamento de projetos interdisciplinares no ambiente acadêmico, facilitando a colaboração entre alunos e professores, o acompanhamento de atividades e a organização de projetos educacionais.</p>
 
-                <h3>4. USO ADEQUADO DO SISTEMA</h3>
-                <p>4.1. O SGPI deve ser utilizado exclusivamente para fins educacionais e acadêmicos.</p>
-                <p>4.2. É proibido utilizar o sistema para:</p>
-                <ul>
-                    <li>Atividades ilegais ou não autorizadas</li>
-                    <li>Compartilhamento de conteúdo ofensivo, discriminatório ou inadequado</li>
-                    <li>Violação de direitos autorais ou propriedade intelectual</li>
-                    <li>Interferência no funcionamento do sistema ou tentativas de acesso não autorizado</li>
-                </ul>
+                    <h3>3. CADASTRO E CONTA DE USUÁRIO</h3>
+                    <p>3.1. Para utilizar o SGPI, é necessário criar uma conta fornecendo informações precisas e atualizadas.</p>
+                    <p>3.2. Você é responsável por manter a confidencialidade de sua senha e por todas as atividades realizadas em sua conta.</p>
+                    <p>3.3. O cadastro é restrito a membros da comunidade acadêmica com e-mail institucional válido.</p>
+                    <p>3.4. Professores devem utilizar a palavra-chave fornecida pela coordenação para validar seu perfil.</p>
 
-                <h3>5. PROPRIEDADE INTELECTUAL</h3>
-                <p>5.1. O conteúdo criado pelos usuários permanece de sua propriedade.</p>
-                <p>5.2. O sistema SGPI e sua interface são protegidos por direitos autorais.</p>
-                <p>5.3. Ao utilizar o sistema, você concede permissão para que o conteúdo seja exibido e compartilhado dentro do ambiente acadêmico conforme necessário para o funcionamento dos projetos.</p>
-
-                <h3>6. PRIVACIDADE E PROTEÇÃO DE DADOS</h3>
-                <p>6.1. Coletamos apenas as informações necessárias para o funcionamento do sistema.</p>
-                <p>6.2. Seus dados pessoais são protegidos conforme a Lei Geral de Proteção de Dados (LGPD).</p>
-                <p>6.3. As informações não serão compartilhadas com terceiros sem seu consentimento, exceto quando exigido por lei.</p>
-
-                <h3>7. RESPONSABILIDADES DO USUÁRIO</h3>
-                <p>7.1. Manter suas informações de cadastro atualizadas.</p>
-                <p>7.2. Utilizar o sistema de forma responsável e ética.</p>
-                <p>7.3. Respeitar os prazos e diretrizes dos projetos.</p>
-                <p>7.4. Comunicar imediatamente qualquer uso não autorizado de sua conta.</p>
-
-                <h3>8. LIMITAÇÕES DE RESPONSABILIDADE</h3>
-                <p>8.1. O SGPI é fornecido "como está", sem garantias expressas ou implícitas.</p>
-                <p>8.2. Não nos responsabilizamos por perdas de dados, interrupções do serviço ou danos decorrentes do uso do sistema.</p>
-                <p>8.3. É responsabilidade do usuário manter backups de seus trabalhos importantes.</p>
-
-                <h3>9. MODIFICAÇÕES DO SERVIÇO</h3>
-                <p>9.1. Reservamo-nos o direito de modificar, suspender ou descontinuar o serviço a qualquer momento.</p>
-                <p>9.2. Alterações significativas serão comunicadas aos usuários com antecedência razoável.</p>
-
-                <h3>10. VIOLAÇÕES E PENALIDADES</h3>
-                <p>10.1. O descumprimento destes termos pode resultar na suspensão ou cancelamento da conta.</p>
-                <p>10.2. Casos graves podem ser reportados às autoridades competentes da instituição.</p>
-
-                <h3>11. ALTERAÇÕES DOS TERMOS</h3>
-                <p>11.1. Estes termos podem ser atualizados periodicamente.</p>
-                <p>11.2. Usuários serão notificados sobre mudanças significativas.</p>
-                <p>11.3. O uso continuado do sistema após as alterações constitui aceitação dos novos termos.</p>
-
-                <h3>12. CONTATO</h3>
-                <p>Para dúvidas sobre estes termos ou sobre o SGPI, entre em contato através dos canais oficiais da instituição.</p>
-
-                <h3>13. DISPOSIÇÕES GERAIS</h3>
-                <p>13.1. Estes termos são regidos pela legislação brasileira.</p>
-                <p>13.2. Eventuais disputas serão resolvidas no foro da comarca da instituição.</p>
-
-                <p class="data-atualizacao"><strong>Última atualização:</strong> Setembro de 2024</p>
-
-                <div class="politica-content">
-                    <h2>Política de Privacidade - SGPI</h2>
-                    <p><strong>Última atualização:</strong> 16 de outubro de 2025</p>
-    
-                    <p>Esta Política explica como o Sistema de Gestão de Projetos Integradores (SGPI) coleta, usa, protege e descarta os dados de coordenadores, professores, orientadores e alunos, conforme a Lei Geral de Proteção de Dados (LGPD).</p>
-    
-                    <h3>1. Dados Coletados</h3>
+                    <h3>4. USO ADEQUADO DO SISTEMA</h3>
+                    <p>4.1. O SGPI deve ser utilizado exclusivamente para fins educacionais e acadêmicos.</p>
+                    <p>4.2. É proibido utilizar o sistema para:</p>
                     <ul>
-                        <li><strong>Coordenadores, Professores e Orientadores:</strong> nome, e-mail institucional, cargo, foto (opcional), registros de log e identificação de acesso.</li>
-                        <li><strong>Alunos:</strong> nome, e-mail institucional, turma, notas, documentos enviados, foto (opcional) e registros de acesso.</li>
-                        <li><strong>Dados técnicos:</strong> endereço IP, data/hora, tipo de dispositivo e registros de auditoria.</li>
+                        <li>Atividades ilegais ou não autorizadas</li>
+                        <li>Compartilhamento de conteúdo ofensivo, discriminatório ou inadequado</li>
+                        <li>Violação de direitos autorais ou propriedade intelectual</li>
+                        <li>Interferência no funcionamento do sistema ou tentativas de acesso não autorizado</li>
                     </ul>
-    
-                    <h3>2. Finalidades</h3>
-                    <p>Os dados são utilizados para gestão acadêmica, comunicação institucional, acompanhamento de projetos, segurança e melhoria do sistema.</p>
-    
-                    <h3>3. Base Legal</h3>
-                    <p>Os dados são tratados com base na execução de contrato educacional, obrigação legal, legítimo interesse e consentimento para funcionalidades opcionais.</p>
-    
-                    <h3>4. Segurança e Armazenamento</h3>
-                    <p>Os dados ficam em servidores da instituição e são protegidos com criptografia, controle de acesso e backups regulares.</p>
-    
-                    <h3>5. Compartilhamento</h3>
-                    <p>O SGPI compartilha dados apenas quando necessário e nunca com fins comerciais. Todo compartilhamento é feito de forma segura e registrada.</p>
-    
-                    <h3>6. Retenção e Descarte</h3>
-                    <p>Os dados são mantidos durante o vínculo acadêmico e excluídos ou anonimizados após o prazo legal.</p>
-    
-                    <h3>7. Contato</h3>
-                    <p>Para dúvidas ou solicitações sobre seus dados pessoais, acesse: 
-                        <a href="https://fateczl.cps.sp.gov.br" target="_blank">https://fateczl.cps.sp.gov.br</a>
-                    </p>
-    
-                    <p class="data-atualizacao"><strong>Versão 1.0 — 16/10/2025</strong></p>
+
+                    <h3>5. PROPRIEDADE INTELECTUAL</h3>
+                    <p>5.1. O conteúdo criado pelos usuários permanece de sua propriedade.</p>
+                    <p>5.2. O sistema SGPI e sua interface são protegidos por direitos autorais.</p>
+                    <p>5.3. Ao utilizar o sistema, você concede permissão para que o conteúdo seja exibido e compartilhado dentro do ambiente acadêmico conforme necessário para o funcionamento dos projetos.</p>
+
+                    <h3>6. PRIVACIDADE E PROTEÇÃO DE DADOS</h3>
+                    <p>6.1. Coletamos apenas as informações necessárias para o funcionamento do sistema.</p>
+                    <p>6.2. Seus dados pessoais são protegidos conforme a Lei Geral de Proteção de Dados (LGPD).</p>
+                    <p>6.3. As informações não serão compartilhadas com terceiros sem seu consentimento, exceto quando exigido por lei.</p>
+
+                    <h3>7. RESPONSABILIDADES DO USUÁRIO</h3>
+                    <p>7.1. Manter suas informações de cadastro atualizadas.</p>
+                    <p>7.2. Utilizar o sistema de forma responsável e ética.</p>
+                    <p>7.3. Respeitar os prazos e diretrizes dos projetos.</p>
+                    <p>7.4. Comunicar imediatamente qualquer uso não autorizado de sua conta.</p>
+
+                    <h3>8. LIMITAÇÕES DE RESPONSABILIDADE</h3>
+                    <p>8.1. O SGPI é fornecido "como está", sem garantias expressas ou implícitas.</p>
+                    <p>8.2. Não nos responsabilizamos por perdas de dados, interrupções do serviço ou danos decorrentes do uso do sistema.</p>
+                    <p>8.3. É responsabilidade do usuário manter backups de seus trabalhos importantes.</p>
+
+                    <h3>9. MODIFICAÇÕES DO SERVIÇO</h3>
+                    <p>9.1. Reservamo-nos o direito de modificar, suspender ou descontinuar o serviço a qualquer momento.</p>
+                    <p>9.2. Alterações significativas serão comunicadas aos usuários com antecedência razoável.</p>
+
+                    <h3>10. VIOLAÇÕES E PENALIDADES</h3>
+                    <p>10.1. O descumprimento destes termos pode resultar na suspensão ou cancelamento da conta.</p>
+                    <p>10.2. Casos graves podem ser reportados às autoridades competentes da instituição.</p>
+
+                    <h3>11. ALTERAÇÕES DOS TERMOS</h3>
+                    <p>11.1. Estes termos podem ser atualizados periodicamente.</p>
+                    <p>11.2. Usuários serão notificados sobre mudanças significativas.</p>
+                    <p>11.3. O uso continuado do sistema após as alterações constitui aceitação dos novos termos.</p>
+
+                    <h3>12. CONTATO</h3>
+                    <p>Para dúvidas sobre estes termos ou sobre o SGPI, entre em contato através dos canais oficiais da instituição.</p>
+
+                    <h3>13. DISPOSIÇÕES GERAIS</h3>
+                    <p>13.1. Estes termos são regidos pela legislação brasileira.</p>
+                    <p>13.2. Eventuais disputas serão resolvidas no foro da comarca da instituição.</p>
+
+                    <p class="data-atualizacao"><strong>Última atualização:</strong> Setembro de 2024</p>
+
+                    <div class="politica-content">
+                        <h2>Política de Privacidade - SGPI</h2>
+                        <p><strong>Última atualização:</strong> 16 de outubro de 2025</p>
+        
+                        <p>Esta Política explica como o Sistema de Gestão de Projetos Integradores (SGPI) coleta, usa, protege e descarta os dados de coordenadores, professores, orientadores e alunos, conforme a Lei Geral de Proteção de Dados (LGPD).</p>
+        
+                        <h3>1. Dados Coletados</h3>
+                        <ul>
+                            <li><strong>Coordenadores, Professores e Orientadores:</strong> nome, e-mail institucional, cargo, foto (opcional), registros de log e identificação de acesso.</li>
+                            <li><strong>Alunos:</strong> nome, e-mail institucional, turma, notas, documentos enviados, foto (opcional) e registros de acesso.</li>
+                            <li><strong>Dados técnicos:</strong> endereço IP, data/hora, tipo de dispositivo e registros de auditoria.</li>
+                        </ul>
+        
+                        <h3>2. Finalidades</h3>
+                        <p>Os dados são utilizados para gestão acadêmica, comunicação institucional, acompanhamento de projetos, segurança e melhoria do sistema.</p>
+        
+                        <h3>3. Base Legal</h3>
+                        <p>Os dados são tratados com base na execução de contrato educacional, obrigação legal, legítimo interesse e consentimento para funcionalidades opcionais.</p>
+        
+                        <h3>4. Segurança e Armazenamento</h3>
+                        <p>Os dados ficam em servidores da instituição e são protegidos com criptografia, controle de acesso e backups regulares.</p>
+        
+                        <h3>5. Compartilhamento</h3>
+                        <p>O SGPI compartilha dados apenas quando necessário e nunca com fins comerciais. Todo compartilhamento é feito de forma segura e registrada.</p>
+        
+                        <h3>6. Retenção e Descarte</h3>
+                        <p>Os dados são mantidos durante o vínculo acadêmico e excluídos ou anonimizados após o prazo legal.</p>
+        
+                        <h3>7. Contato</h3>
+                        <p>Para dúvidas ou solicitações sobre seus dados pessoais, acesse: 
+                            <a href="https://fateczl.cps.sp.gov.br" target="_blank">https://fateczl.cps.sp.gov.br</a>
+                        </p>
+        
+                        <p class="data-atualizacao"><strong>Versão 1.0 — 16/10/2025</strong></p>
+                    </div>
                 </div>
             </div>
-            </div>
 
-           
+            <div class="modal-footer">
+                <div class="scroll-indicator" id="scrollIndicator">Role até o final para aceitar os termos</div>
 
-        <!-- Rodapé do modal com os checkboxes e botões -->
-        <div class="modal-footer">
-            <div class="scroll-indicator" id="scrollIndicator">Role até o final para aceitar os termos</div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="aceiteTermos" name="aceiteTermos" required>
+                    <label for="aceiteTermos">
+                        Li e aceito os 
+                        <a href="./uploads/termos_e_politica/termos_de_uso.pdf" target="_blank">Termos de Uso</a>.
+                    </label>
+                    <div id="erroTermos" class="error-message"></div>
+                </div>
 
-            <div class="checkbox-group">
-                <input type="checkbox" id="aceiteTermos" name="aceiteTermos" required>
-                <label for="aceiteTermos">
-                    Li e aceito os 
-                    <a href="./uploads/termos_e_politica/termos_de_uso.pdf" target="_blank">Termos de Uso</a>.
-                </label>
-                <div id="erroTermos" class="error-message"></div>
-            </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="aceitePolitica" name="aceitePolitica" required>
+                    <label for="aceitePolitica">
+                        Li e aceito a 
+                        <a href="./uploads/termos_e_politica/Politica_Privacidade_SGPI_Completa.pdf" target="_blank">Política de Privacidade</a>.
+                    </label>
+                    <div id="erroPolitica" class="error-message"></div>
+                </div>
 
-            <div class="checkbox-group">
-                <input type="checkbox" id="aceitePolitica" name="aceitePolitica" required>
-                <label for="aceitePolitica">
-                    Li e aceito a 
-                    <a href="./uploads/termos_e_politica/Politica_Privacidade_SGPI_Completa.pdf" target="_blank">Política de Privacidade</a>.
-                </label>
-                <div id="erroPolitica" class="error-message"></div>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn-cancelar" id="cancelarTermos">Cancelar</button>
-                <button class="btn-aceitar" id="aceitarTermos" disabled>Aceitar e Cadastrar</button>
+                <div class="modal-actions">
+                    <button class="btn-cancelar" id="cancelarTermos">Cancelar</button>
+                    <button class="btn-aceitar" id="aceitarTermos" disabled>Aceitar e Cadastrar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-
-<script type="module" src="./javaScript/front_end/Cadastro.js"></script>
-<script src="./javaScript/utils/visibilidade_senhas.js"></script>
+    <script type="module" src="./javaScript/front_end/Cadastro.js"></script>
+    <script src="./javaScript/utils/visibilidade_senhas.js"></script>
 </body>
 </html>

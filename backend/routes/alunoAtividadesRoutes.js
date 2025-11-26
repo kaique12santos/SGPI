@@ -44,8 +44,7 @@ const upload = multer({
 });
 
 // ====================================================================
-// ROTA 1: Listar Atividades (Para a página 'Minhas Atividades')
-// Migração do `GET /atividades/:semestreId`
+// ROTA 1: Listar Atividades (CORRIGIDA - SEM DUPLICIDADE)
 // ====================================================================
 router.get('/atividades', async (req, res) => {
   const alunoId = req.user?.id; 
@@ -58,7 +57,7 @@ router.get('/atividades', async (req, res) => {
   try {
     connection = await getConnection();
     
-
+    // 1. Busca o semestre ativo
     const [semestreRows] = await connection.query(`
       SELECT id FROM Semestres WHERE ativo = 1 LIMIT 1
     `);
@@ -68,7 +67,9 @@ router.get('/atividades', async (req, res) => {
     }
     const semestreAtivoId = semestreRows[0].id;
 
-    // Esta é a query migrada que fizemos para a lista de tarefas
+    // 2. Query Otimizada
+    // Substituímos os joins soltos de Grupo por um JOIN específico 'g_atual'
+    // que garante que só pegamos o grupo do aluno QUE PERTENCE ao mesmo semestre da atividade.
     const [atividades] = await connection.query(`
       SELECT 
         a.id AS atividade_id,
@@ -79,8 +80,8 @@ router.get('/atividades', async (req, res) => {
         a.nota_maxima,
         d.nome AS disciplina_nome,
         prof.nome AS professor_nome,
-        g.id AS grupo_id,
-        g.nome AS grupo_nome,
+        g_atual.id AS grupo_id,
+        g_atual.nome AS grupo_nome,
         e.id AS entrega_id,
         e.status AS entrega_status,
         e.data_entrega AS entrega_data,
@@ -90,14 +91,19 @@ router.get('/atividades', async (req, res) => {
       JOIN Aluno_Oferta ao ON do_tbl.id = ao.oferta_id
       JOIN Disciplinas d ON do_tbl.disciplina_id = d.id
       LEFT JOIN Usuarios prof ON a.professor_id = prof.id
-     LEFT JOIN Usuario_Grupo ug ON ao.aluno_id = ug.usuario_id
-      LEFT JOIN Grupos g ON ug.grupo_id = g.id 
-            AND g.semestre_id = do_tbl.semestre_id 
-      -- A LINHA "AND g.disciplina_id = do_tbl.disciplina_id" FOI REMOVIDA
-      -- =======================
-            
-      LEFT JOIN Entregas e ON e.atividade_id = a.id AND e.grupo_id = g.id
+      
+      -- CORREÇÃO: Join Blindado para o Grupo
+      -- Cria uma tabela virtual apenas com os grupos deste semestre/aluno
+      LEFT JOIN (
+          SELECT ug.usuario_id, g.id, g.nome, g.semestre_id
+          FROM Grupos g
+          JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      ) g_atual ON g_atual.usuario_id = ao.aluno_id 
+                AND g_atual.semestre_id = do_tbl.semestre_id
+
+      LEFT JOIN Entregas e ON e.atividade_id = a.id AND e.grupo_id = g_atual.id
       LEFT JOIN Avaliacoes av ON e.id = av.entrega_id
+      
       WHERE 
         ao.aluno_id = ? 
         AND do_tbl.semestre_id = ?
@@ -117,8 +123,7 @@ router.get('/atividades', async (req, res) => {
 });
 
 // ====================================================================
-// ROTA 2: Obter Detalhes da Atividade (Para a página 'Entrega')
-// Migração do `GET /atividades/:atividadeId/detalhes`
+// ROTA 2: Obter Detalhes da Atividade (CORRIGIDA - COM SUBQUERY DE GRUPO)
 // ====================================================================
 router.get('/atividade/:id/detalhes', async (req, res) => {
   const atividadeId = parseInt(req.params.id, 10);
@@ -132,36 +137,43 @@ router.get('/atividade/:id/detalhes', async (req, res) => {
   try {
     connection = await getConnection();
 
-    // Esta é a query migrada que fizemos para a página de entrega
     const [rows] = await connection.query(`
       SELECT 
         a.id, a.titulo, a.descricao, a.nota_maxima, a.prazo_entrega,
         prof.nome AS professor_nome,
-        g.id AS grupo_id,
-        g.nome AS grupo_nome,
+        g_atual.id AS grupo_id,      -- Vindo da subquery
+        g_atual.nome AS grupo_nome,  -- Vindo da subquery
         e.id AS entrega_id,
         e.caminho_arquivo,
         e.nome_arquivo_original,
         e.data_entrega,
-        resp.nome AS aluno_responsavel_nome
+        resp.nome AS aluno_responsavel_nome,
+        s.ativo AS semestre_ativo
       FROM Atividades a
       JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id
+      JOIN Semestres s ON do_tbl.semestre_id = s.id
       JOIN Aluno_Oferta ao ON do_tbl.id = ao.oferta_id
       LEFT JOIN Usuarios prof ON a.professor_id = prof.id
-      -- ==== CORREÇÃO AQUI ====
-      LEFT JOIN Usuario_Grupo ug ON ao.aluno_id = ug.usuario_id
-      LEFT JOIN Grupos g ON ug.grupo_id = g.id 
-            AND g.semestre_id = do_tbl.semestre_id
-      -- A LINHA "AND g.disciplina_id = do_tbl.disciplina_id" FOI REMOVIDA
-      -- =======================
+      
+      -- CORREÇÃO: Join Blindado para o Grupo (Igual à rota de listagem)
+      LEFT JOIN (
+          SELECT ug.usuario_id, g.id, g.nome, g.semestre_id
+          FROM Grupos g
+          JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+      ) g_atual ON g_atual.usuario_id = ao.aluno_id 
+                AND g_atual.semestre_id = do_tbl.semestre_id
 
-      LEFT JOIN Entregas e ON e.atividade_id = a.id AND e.grupo_id = g.id
+      -- Vincula a entrega ao grupo atual encontrado
+      LEFT JOIN Entregas e ON e.atividade_id = a.id AND e.grupo_id = g_atual.id
       LEFT JOIN Usuarios resp ON e.aluno_responsavel_id = resp.id
-      WHERE a.id = ? AND ao.aluno_id = ? AND ao.status = 'Matriculado'
+      
+      WHERE a.id = ? 
+        AND ao.aluno_id = ? 
+        AND ao.status = 'Matriculado'
     `, [atividadeId, alunoId]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Atividade não encontrada ou você não está matriculado nela.' });
+      return res.status(404).json({ success: false, message: 'Atividade não encontrada ou você não está matriculado.' });
     }
 
     const atividade = rows[0];
@@ -174,7 +186,8 @@ router.get('/atividade/:id/detalhes', async (req, res) => {
         prazo_entrega: atividade.prazo_entrega,
         professor_nome: atividade.professor_nome,
         grupo_id: atividade.grupo_id,
-        grupo_nome: atividade.grupo_nome
+        grupo_nome: atividade.grupo_nome, // Agora virá 'grupo2' corretamente
+        semestre_ativo: atividade.semestre_ativo
       },
       entrega_existente: null
     };
@@ -203,11 +216,12 @@ router.get('/atividade/:id/detalhes', async (req, res) => {
 // ROTA 3: Enviar/Atualizar Entrega
 // Migração do `POST /atividades/:atividadeId/entregar`
 // ====================================================================
+
 router.post('/entregas', upload.single('arquivo'), async (req, res) => {
   const atividadeId = parseInt(req.body.atividade_id, 10);
   const alunoId = req.user?.id; 
-  const caminhoArquivo = req.file.path;
-  const nomeOriginal = req.file.originalname;
+  const caminhoArquivo = req.file?.path;
+  const nomeOriginal = req.file?.originalname;
 
   if (!caminhoArquivo) {
     return res.status(400).json({ success: false, message: 'Nenhum arquivo enviado.' });
@@ -217,34 +231,40 @@ router.post('/entregas', upload.single('arquivo'), async (req, res) => {
   try {
     connection = await getConnection();
 
+    // Verifica grupo e se o semestre está ATIVO
     const [grupoRows] = await connection.query(`
-      SELECT g.id as grupo_id
+      SELECT g.id as grupo_id, s.ativo
       FROM Atividades a
       JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id
+      JOIN Semestres s ON do_tbl.semestre_id = s.id -- JOIN com Semestres
       JOIN Aluno_Oferta ao ON do_tbl.id = ao.oferta_id
       JOIN Usuario_Grupo ug ON ao.aluno_id = ug.usuario_id
-
-      -- ==== CORREÇÃO AQUI ====
       JOIN Grupos g ON ug.grupo_id = g.id 
             AND g.semestre_id = do_tbl.semestre_id
-      -- A LINHA "AND g.disciplina_id = do_tbl.disciplina_id" FOI REMOVIDA
-      -- =======================
-
       WHERE a.id = ? AND ao.aluno_id = ?
     `, [atividadeId, alunoId]);
 
+    // Validação rigorosa
     if (grupoRows.length === 0 || !grupoRows[0].grupo_id) {
       fs.unlinkSync(caminhoArquivo);
       return res.status(403).json({ success: false, message: 'Você não está em um grupo válido para esta atividade.' });
     }
+
+    if (grupoRows[0].ativo !== 1) {
+        fs.unlinkSync(caminhoArquivo);
+        return res.status(403).json({ success: false, message: 'Este semestre foi encerrado. Não é possível enviar entregas.' });
+    }
+
     const grupoId = grupoRows[0].grupo_id;
 
+    // Validação de Prazo
     const [prazoRows] = await connection.query(`SELECT prazo_entrega FROM Atividades WHERE id = ?`, [atividadeId]);
     if (new Date(prazoRows[0].prazo_entrega) < new Date()) {
       fs.unlinkSync(caminhoArquivo);
       return res.status(400).json({ success: false, message: 'O prazo para esta atividade já encerrou.' });
     }
 
+    // Processo de Upsert (Insert ou Update)
     const [entregaRows] = await connection.query(
       `SELECT id, caminho_arquivo FROM Entregas WHERE atividade_id = ? AND grupo_id = ?`,
       [atividadeId, grupoId]
@@ -271,9 +291,9 @@ router.post('/entregas', upload.single('arquivo'), async (req, res) => {
     } else {
       await connection.query(
         `INSERT INTO Entregas 
-           (atividade_id, grupo_id, aluno_responsavel_id, caminho_arquivo,nome_arquivo_original, status, data_entrega)
-         VALUES (?, ?, ?, ?,?, 'Entregue', NOW())`,
-        [atividadeId, grupoId, alunoId, caminhoArquivo, nomeOriginal,'Entregue', new Date()]
+           (atividade_id, grupo_id, aluno_responsavel_id, caminho_arquivo, nome_arquivo_original, status, data_entrega)
+         VALUES (?, ?, ?, ?, ?, 'Entregue', NOW())`,
+        [atividadeId, grupoId, alunoId, caminhoArquivo, nomeOriginal]
       );
       res.json({ success: true, message: 'Entrega enviada com sucesso!' });
     }

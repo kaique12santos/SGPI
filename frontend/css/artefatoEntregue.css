@@ -1,70 +1,131 @@
-.entrega-card {
+/* artefatoEntregue.css - RESPONSIVO */
 
+#entregas-container {
+  word-break: break-word;
+  width: 95%;              /* Mudado de 95dvw para evitar rolagem horizontal acidental */
+  max-width: 1400px;       /* Limite para não ficar esticado demais em monitores 4k */
+  margin: 20px auto;       /* Centraliza o container na tela */
+  margin-bottom: 60px;    /* Empurra o rodapé para longe do conteúdo */
+  padding-bottom: 40px;
+  display: grid;
+  /* Padrão Desktop: 3 colunas */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 1.5rem;             /* Aumentei um pouco o espaço para "respirar" */
+  padding-bottom: 20px;    /* Espaço extra no final antes do footer */
+}
+
+.entrega-card {
   background-color: #f5deb3;
   border: 1px solid #b88a36;
   border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-left: 3px solid #928121;
+  padding: 1.5rem;         /* Padding interno um pouco maior */
+  border-left: 5px solid #928121; /* Borda lateral mais visível */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  
+  display: flex;           /* Flex para organizar conteúdo verticalmente */
+  flex-direction: column;
+  justify-content: space-between; /* Garante que os botões fiquem no final */
+}
+
+.entrega-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.entrega-info {
+  margin-bottom: 15px;
+}
+
+.entrega-info span {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 5px;
+}
+
+
+
+.entrega-acoes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap; /* Se tiver muitos botões, eles quebram linha */
+  margin-top: auto; /* Empurra os botões para o rodapé do card */
+}
+
+.botao-avaliar {
+  background-color: #970000;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+.botao-avaliar:hover {
+  background-color: #a60000;
+}
+
+.botao-avaliar[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #ff0000; /* Cinza visualmente mais claro para disabled */
+}
+
+.link-arquivo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #10b981; /* Verde */
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.link-arquivo:hover {
+  text-decoration: underline;
+  color: #059669; /* Verde mais escuro no hover */
+}
+
+.container {
+  min-height: 100vh; /* Melhor que 'stretch' para compatibilidade */
+}
+
+/* ==== RESPONSIVIDADE (MEDIA QUERIES) ==== */
+
+/* Notebooks e Tablets Grandes (até 1024px) */
+@media (max-width: 1024px) {
+  #entregas-container {
+    grid-template-columns: repeat(2, 1fr); /* Muda para 2 colunas */
+    width: 90%;
   }
-  .entrega-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* Tablets Pequenos e Celulares (até 768px) */
+@media (max-width: 768px) {
+  #entregas-container {
+    grid-template-columns: 1fr; /* Muda para 1 coluna (pilha) */
+    gap: 1rem;
+    width: 95%;
+    margin-bottom: 80px;
   }
 
-  .entrega-info {
-    margin-bottom: 10px;
+  .entrega-card {
+    padding: 1rem; /* Padding ligeiramente menor no mobile */
   }
 
-  .entrega-info span {
-    display: block;
-    font-size: 14px;
-  }
-
+  /* No celular, botões ocupam largura total para facilitar o clique */
   .entrega-acoes {
-    display: flex;
-    gap: 10px;
+    flex-direction: column;
+    width: 100%;
   }
 
   .botao-avaliar {
-    background-color: #970000;
-    color: white;
-    padding: 6px 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1rem;
+    width: 100%;
+    text-align: center;
+    padding: 12px; /* Área de toque maior */
   }
-
-  .botao-avaliar:hover {
-    background-color: #a60000;
-  }
-
-  .botao-avaliar[disabled] {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-
-  .link-arquivo {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #10b981;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  #entregas-container{
-    word-break: break-word;
-    width: 95dvw;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  .container{
-    height: stretch;
-  }
+}

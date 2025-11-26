@@ -105,6 +105,7 @@ router.get('/entregas-para-avaliar', async (req, res) => {
         do_tbl.professor_responsavel = ? 
         AND e.status IN ('Entregue', 'Vencida')
         AND NOT EXISTS (SELECT 1 FROM Avaliacoes av WHERE av.entrega_id = e.id)
+        AND s.ativo = 1
       ORDER BY e.data_entrega DESC
     `;
 
@@ -245,6 +246,24 @@ router.post('/atividades', async (req, res) => {
   let connection; // Definido fora para o finally
   try {
     connection = await getConnection();
+
+    // 1. VERIFICAÇÃO DE SEGURANÇA: A oferta é do semestre ativo?
+    const [ofertaCheck] = await connection.query(
+      `SELECT s.ativo 
+       FROM Disciplinas_Ofertas do_tbl 
+       JOIN Semestres s ON do_tbl.semestre_id = s.id 
+       WHERE do_tbl.id = ?`, 
+       [oferta_id]
+    );
+
+    if (ofertaCheck.length === 0 || ofertaCheck[0].ativo !== 1) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Não é possível criar atividades para disciplinas de semestres arquivados.' 
+        });
+    }
+
+
     // 2. Verifica se há alunos matriculados na oferta
     const [alunosCheck] = await connection.query(
       `SELECT COUNT(DISTINCT u.id) as total_alunos
@@ -378,6 +397,7 @@ router.get('/atividades', async (req, res) => {
       LEFT JOIN Disciplinas d ON do.disciplina_id = d.id
       LEFT JOIN Semestres s ON do.semestre_id = s.id
       WHERE a.professor_id = ?
+      AND s.ativo = 1
       ORDER BY a.data_criacao DESC`,
       [professorId]
     );
@@ -595,10 +615,12 @@ router.get('/reconsideracoes', async (req, res) => {
       JOIN Entregas e ON av.entrega_id = e.id
       JOIN Atividades a ON e.atividade_id = a.id
       JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id
+      JOIN Semestres s ON do_tbl.semestre_id = s.id
       JOIN Usuarios u ON r.aluno_id = u.id
       WHERE 
         do_tbl.professor_responsavel = ?
         AND r.status = 'Pendente'
+        AND s.ativo = 1
       ORDER BY r.data_solicitacao ASC
     `, [professorId]);
 

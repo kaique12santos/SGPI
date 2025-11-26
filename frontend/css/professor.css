@@ -167,29 +167,32 @@
 }
 
 .atividades-criadas {
-  
   word-break: break-word;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem; 
-  width: 90%; 
-  margin-left: auto;
-  margin-right: auto;
-    
+  grid-template-columns: repeat(3, 1fr); /* Padrão Desktop */
+  gap: 1.5rem; 
+  width: 95%; 
+  max-width: 1200px; /* Limite para monitores grandes */
+  margin: 20px auto 60px auto; /* Margem inferior para não colar no rodapé */
 }
 
 .atividade-card {
-    background-color: #f5deb3;
-    border: 1px solid #b88a36;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-left: 3px solid #922b21;
-    transition: transform 0.2s, box-shadow 0.2s;
+  background-color: #f5deb3;
+  border: 1px solid #b88a36;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border-left: 5px solid #922b21;
+  
+  /* Garante altura igual para cards na mesma linha */
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-between; /* Empurra os botões para baixo */
+  
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .atividade-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .textarea-tamanho{
@@ -276,23 +279,26 @@
 
 /* Ajuste na classe .btn base para os cards */
 .atividade-card .btn {
-  padding: 0.5rem 0.9rem; /* Aumenta o "respiro" interno */
-  font-size: 0.8rem; /* Levemente menor e mais nítido */
-  font-weight: 600; /* Mais forte */
-  border-radius: 6px; /* Um pouco menos arredondado */
-  border: none; /* Remove qualquer borda padrão */
-  letter-spacing: 0.5px; /* Espaçamento entre letras */
-  text-transform: uppercase; /* Caixa alta dá um ar mais "botão" */
-  margin: 3px; /* Espaçamento entre eles */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra mais sutil */
+  display: block;      /* Comporta-se como bloco */
+  width: 100%;         /* Ocupa 100% da largura do card */
+  margin: 5px 0;       /* Espaçamento vertical entre eles */
+  text-align: center;
+  box-sizing: border-box; /* Garante que padding não estoure a largura */
+  
+  padding: 10px;       /* Área de toque maior */
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  text-transform: uppercase;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-
-
-/* Garantindo que o primeiro botão não tenha margem esquerda desnecessária */
+/* Removemos margens laterais antigas que atrapalham */
 .btn-Ver {
   margin-left: 0;
 }
+
 
 .content{
   border-bottom: 1px solid red;
@@ -370,6 +376,31 @@
     .div-mostrar {
       padding: 1.5rem;
       max-width: 90%;
+    }
+  }
+  @media (max-width: 1024px) {
+    .atividades-criadas {
+      grid-template-columns: repeat(2, 1fr); /* 2 Colunas */
+      width: 90%;
+    }
+  }
+  
+  /* Mobile (até 700px) */
+  @media (max-width: 700px) {
+    .atividades-criadas {
+      grid-template-columns: 1fr; /* 1 Coluna (Empilhado) */
+      gap: 1rem;
+    }
+  
+    .atividade-card {
+      padding: 1rem;
+    }
+    
+    /* Ajuste do formulário de criação também */
+    #create-task {
+      width: 100%;
+      margin: 0;
+      box-shadow: none;
     }
   }
   

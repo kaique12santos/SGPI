@@ -1,53 +1,205 @@
+/* listaProjetos.css - RESPONSIVO */
+
+/* ==== ESTILOS GERAIS ==== */
+.container {
+  width: 100%;
+  
+  margin: 0 auto;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 label, select, button {
-  font-size: 16px;
+font-size: 16px;
+font-family: inherit;
 }
-table {
-  border-collapse: collapse;
+
+/* ==== BARRA DE PESQUISA (Semestre) ==== */
+.semestre {
+  display: flex;
+  flex-wrap: wrap; /* Permite quebrar linha no mobile */
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
   width: 90%;
-  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+ 
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-th, td {
-  border: 1px solid #ccc;
+
+.semestre select {
   padding: 8px;
-  text-align: left;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 200px;
 }
-th {
-  background-color: #f2f2f2;
-}
-tr:hover {
-  background-color: #e9e9e9;
-}
-.status-em-andamento {
-  color: green;
-  background-color: #d6ffec;
-  border-color: #bbf7d0;
+
+.semestre button {
+  background-color: #970000;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s;
+}
+
+.semestre button:hover {
+  background-color: #6f0000;
+}
+
+/* ==== TABELA (VERSÃO DESKTOP) ==== */
+table {
+border-collapse: collapse;
+width: 98%; /* Ocupa largura total disponível */
+margin-top: 20px;
+background-color: #fff;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+border-radius: 8px;
+overflow: hidden; /* Para arredondar cantos da tabela */
+}
+
+th, td {
+border: 1px solid #e0e0e0;
+padding: 12px 15px;
+text-align: left;
+}
+
+th {
+background-color: #970000; /* Cabeçalho vinho para combinar com o site */
+color: #fff;
+font-weight: 600;
+text-transform: uppercase;
+font-size: 0.9rem;
+}
+
+tr:hover {
+background-color: #fff8f8; /* Hover levemente avermelhado */
+}
+
+/* Status Badges */
+.status-badge {
+display: inline-block;
+padding: 6px 12px;
+border-radius: 20px;
+font-size: 12px;
+font-weight: 600;
+text-align: center;
+white-space: nowrap; /* Não deixa o texto do status quebrar */
+}
+
+.status-em-andamento {
+color: #065f46;
+background-color: #d1fae5;
+border: 1px solid #34d399;
 }
 .status-em-proposta {
-  color: orange;
-  background-color: #fff7d5;
-  border-color: #fed7aa;
-  font-weight: bold;
+color: #92400e;
+background-color: #fef3c7;
+border: 1px solid #fcd34d;
 }
 .status-aguardando {
-  color: blue;
-  background-color: #d1e5ff;
-  border-color: #bfdbfe;
-  font-weight: bold;
+color: #1e40af;
+background-color: #dbeafe;
+border: 1px solid #60a5fa;
 }
 .status-concluido {
-  color: gray;
-  background-color: #f9fafb;
-  border-color: #d1d5db;
-  font-weight: bold;
+color: #374151;
+background-color: #f3f4f6;
+border: 1px solid #9ca3af;
 }
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid;
+
+/* ==== RESPONSIVIDADE (TABLE TO CARDS) ==== */
+
+@media (max-width: 768px) {
+  /* 1. Ajuste da Busca */
+  .semestre {
+      flex-direction: column; /* Empilha label, select e botão */
+      align-items: stretch; /* Estica para largura total */
+  }
+  
+  .semestre select, .semestre button {
+      width: 100%;
+  }
+
+  /* 2. Transformação da Tabela */
+  table, thead, tbody, th, td, tr {
+      display: block; /* Tira comportamento de tabela */
+  }
+
+  /* Esconde o cabeçalho da tabela (mas mantém acessível se precisar) */
+  thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+  }
+
+  /* Cada linha vira um Card */
+  tr {
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 10px;
+  }
+
+  /* As células viram linhas do card */
+  td {
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 40%; /* Espaço para o rótulo à esquerda */
+      padding-top: 10px;
+      padding-bottom: 10px;
+      text-align: right; /* Conteúdo alinhado à direita */
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+  }
+
+  td:last-child {
+      border-bottom: none;
+  }
+
+  /* INSERINDO OS RÓTULOS VIA CSS (Para não mexer no JS) */
+  td::before {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%); /* Centraliza verticalmente */
+      width: 35%;
+      padding-right: 10px;
+      white-space: nowrap;
+      text-align: left;
+      font-weight: bold;
+      color: #970000;
+  }
+
+  /* Define o texto do rótulo baseado na ordem das colunas */
+  td:nth-of-type(1)::before { content: "Projeto:"; }
+  td:nth-of-type(2)::before { content: "Membros:"; }
+  td:nth-of-type(3)::before { content: "Status:"; }
+  td:nth-of-type(4)::before { content: "Encerramento:"; }
+
+  /* Destaque especial para o Título do Projeto (Primeira célula) */
+  td:nth-of-type(1) {
+      background-color: #f9f9f9;
+      font-weight: bold;
+      color: #333;
+      text-align: right;
+      border-bottom: 2px solid #ddd;
+  }
+  
+  /* Ajuste para links dentro da tabela não quebrarem layout */
+  td a {
+      word-break: break-word;
+      text-align: right;
+  }
 }

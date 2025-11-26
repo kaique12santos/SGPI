@@ -1,4 +1,4 @@
-/* ===== SGPI FOOTER - UMA LINHA COM QUEBRA DE TEXTO ===== */
+/* ===== SGPI FOOTER - RESPONSIVO ===== */
 
 .sgpi-footer {
     background-color: #970000;
@@ -7,6 +7,9 @@
     margin-top: auto;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     border-top: 2px solid #6f0000;
+    width: 100%;
+    position: relative;
+    z-index: 10; /* Garante que fique acima de elementos flutuantes se necessário */
 }
 
 .footer-container {
@@ -14,10 +17,10 @@
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* Espalha: Texto na esquerda, Links na direita */
     align-items: center;
     gap: 20px;
-    text-align: center;
+    text-align: left;
     min-height: 40px;
 }
 
@@ -26,17 +29,15 @@
     font-size: 13px;
     font-weight: 500;
     flex: 1;
-    max-width: 60%;
-    line-height: 1.3;
-    /* REMOVE white-space: nowrap para permitir quebra */
+    line-height: 1.4;
 }
 
+/* Agrupamento dos links */
 .footer-links {
     display: flex;
     align-items: center;
-
     gap: 15px;
-    flex-shrink: 0; /* Impede que os links encolham */
+    flex-shrink: 0;
 }
 
 .footer-links a {
@@ -45,7 +46,7 @@
     transition: color 0.3s ease;
     font-size: 13px;
     font-weight: 500;
-    white-space: nowrap; /* Links não quebram */
+    white-space: nowrap;
 }
 
 .footer-links a:hover {
@@ -57,52 +58,55 @@
     color: #6f0000;
     font-weight: bold;
     font-size: 14px;
+    opacity: 0.7;
 }
 
-/* Responsividade */
-@media (max-width: 1024px) {
-    .footer-text {
-        max-width: 50%;
-        font-size: 12px;
-    }
-    
-    .footer-links a {
-        font-size: 12px;
-    }
-}
+/* ==== RESPONSIVIDADE (AQUI ESTÁ A MÁGICA) ==== */
 
-@media (max-width: 768px) {
+/* Tablet e Mobile (Telas menores que 900px) */
+@media (max-width: 900px) {
     .footer-container {
+        flex-direction: column; /* Empilha: Texto em cima, Links embaixo */
+        text-align: center;
         gap: 15px;
-        padding: 0 15px;
+        padding: 20px;
     }
-    
+
     .footer-text {
-        max-width: 45%;
-        font-size: 11px;
+        text-align: center;
+        max-width: 100%; /* Permite usar a largura total */
+        font-size: 12px;
     }
-    
+
     .footer-links {
-        gap: 12px;
-    }
-    
-    .footer-links a {
-        font-size: 11px;
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap; /* Permite que os links quebrem linha se necessário */
     }
 }
 
+/* Mobile Pequeno (Celulares estreitos) */
 @media (max-width: 480px) {
-    .footer-text {
-        max-width: 40%;
-        font-size: 10px;
-    }
-    
     .footer-links {
-        gap: 10px;
+        gap: 10px 15px; /* Gap vertical 10px, horizontal 15px */
+    }
+
+    .footer-links a {
+        font-size: 12px;
+        padding: 5px 0; /* Aumenta área de toque */
     }
     
+    /* Opcional: Esconder os separadores '|' em telas muito pequenas para limpar o visual */
+    .footer-separator {
+        display: none; 
+    }
+    
+    /* Adiciona margem entre os links já que tiramos o separador */
     .footer-links a {
-        font-size: 10px;
+        margin: 0 5px;
+        background-color: rgba(0,0,0,0.1); /* Leve fundo para parecer botão */
+        padding: 4px 8px;
+        border-radius: 4px;
     }
 }
 
@@ -113,5 +117,5 @@ body.dark-mode .sgpi-footer {
 }
 
 body.dark-mode .footer-separator {
-    color: #6f0000;
+    color: #970000;
 }

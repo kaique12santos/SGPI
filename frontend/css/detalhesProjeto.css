@@ -1,21 +1,142 @@
+/* detalhesProjeto.css - RESPONSIVO */
+
+/* ==== ESTILOS GERAIS DO CONTAINER ==== */
+.container {
+  width: 100%; /* Garante margem segura em mobile */
+ /* Não deixa esticar demais em monitores grandes */
+   /* Centraliza */
+  padding-bottom: 40px; /* Espaço antes do rodapé */
+}
+
+/* ==== TABELA (Visual Desktop Melhorado) ==== */
 table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
+  border-collapse: collapse;
+  width: 98%;
+  margin-top: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave */
+  border-radius: 8px; /* Cantos arredondados */
+  overflow: hidden; /* Necessário para ver os cantos arredondados */
+}
+
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background-color: #970000; /* Vinho padrão do sistema */
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+tr:hover {
+  background-color: #fff5f5; /* Leve destaque avermelhado ao passar o mouse */
+}
+
+/* Tratamento para células vazias ou texto simples */
+td {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* Mensagem de "Sem Atividade" */
+.sem-atividade {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+/* ==== RESPONSIVIDADE (Transforma Tabela em Cards) ==== */
+@media (max-width: 768px) {
+  
+  /* 1. Esconde o cabeçalho original da tabela */
+  thead {
+      display: none;
   }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
+
+  /* 2. Transforma a tabela em blocos */
+  table, tbody, tr, td {
+      display: block;
+      width: 98%;
   }
-  th {
-    background-color: #f2f2f2;
+
+  /* 3. Estiliza cada linha (tr) como um CARD */
+  tr {
+      margin-bottom: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 0; /* O padding vai nos tds */
+      overflow: hidden;
   }
-  tr:hover {
-    background-color: #e9e9e9;
+
+  /* 4. Estiliza as células (td) */
+  td {
+      display: flex;
+      
+      align-items: center;
+      text-align: right;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      border-right: none;
+      border-left: none;
+      min-height: 40px;
+      font-size: 14px;
   }
-  .sem-atividade {
-    text-align: center;
-    font-style: italic;
-    color: #555;
+
+  /* Remove a borda da última célula do card */
+  td:last-child {
+      border-bottom: none;
   }
+
+  /* 5. CRIAÇÃO DOS RÓTULOS (Labels) VIA CSS */
+  td::before {
+      content: attr(data-label); /* Fallback se usar atributo data-label no HTML */
+      font-weight: bold;
+      color: #970000;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-right: 15px;
+      text-align: left;
+  }
+
+  /* Definição manual dos rótulos baseada na ordem das colunas */
+  /* Coluna 1: Título da Atividade */
+  td:nth-of-type(1)::before { content: "Atividade:"; }
+  
+  /* Coluna 2: Professor Orientador */
+  td:nth-of-type(2)::before { content: "Orientador:"; }
+  
+  /* Coluna 3: Nota */
+  td:nth-of-type(3)::before { content: "Nota:"; }
+  
+  /* Coluna 4: Comentário */
+  td:nth-of-type(4)::before { content: "Comentário:"; }
+  
+  /* Coluna 5: Data de Avaliação */
+  td:nth-of-type(5)::before { content: "Data:"; }
+
+
+  /* --- ESTILO ESPECIAL PARA O TÍTULO (Primeira linha do card) --- */
+  td:nth-of-type(1) {
+      background-color: #970000;
+      color: #fff;
+      font-weight: bold;
+      justify-content: center; /* Centraliza o título */
+      text-align: center;
+  }
+
+  /* Ajuste na cor do rótulo apenas para o cabeçalho do card */
+  td:nth-of-type(1)::before {
+      color: #ffcccc; /* Um tom mais claro para ler sobre o vermelho */
+      display: none; /* Opcional: Remova essa linha se quiser mostrar "Atividade: Nome" */
+  }
+}

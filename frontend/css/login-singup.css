@@ -1,144 +1,252 @@
-*{
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+
+.login-input:focus{
+    outline: none;
+    border-color: #970000;
 }
 
-body{
-    width: 100%;
+* {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-span{
+body {
+    background-color: #EFDEDE;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+span {
     color: #ff0000;
 }
 
-button{
+button {
     cursor: pointer;
 }
 
-html { 
-    background-color: #EFDEDE; 
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.header-content{
-    background-color: #970000;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1%;
-    padding-left: 1%;
-    color:#ffff;
-    font-size: larger;
-    
-}
-
-.logo-image{
-    width: 10%;
-    height: 10dvh;
-}
-
+/* Container centralizado */
 .container {
+    background-color: #ffffff;
     width: 100%;
-    height: stretch;
-    display: flex;
-    flex-direction: row;  
-    justify-content: right;
-}
-
-.login-box{
-    background-color: #f3f3f3;
-    width: 100%;
-    height: 85dvh;
-    display: flex;
-    align-items: center;
-}
-
-.login-info{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 30px;
-    background-color: #f3f3f3;
-    width: 100%;
-    color: #000000;
-}
-
-.login-actions{
-    display: flex;
-    justify-content: space-between;
-    font-size: smaller;
-    padding: 10px;
-}
-.login-actions a {
-    font-weight: 500;
-}
-
-.login-form{
-    display: flex;
-    flex-direction: column;
-    background-color: #f3f3f3;
-    padding: 10px;
-}
-
-.login-input{
-    border-radius: 5px;
-    padding: 5px;
-    border: none;
-    border-bottom: solid #7e7e7e 1px;
-    background-color: #e6e6e6;
-    height: 20px;
-    margin-top: 5px;
-}
-
-.login-button{
-    background-color: #970000;
-    border: none;
-    font-weight: 500;
+    max-width: 500px;
     border-radius: 15px;
-    padding: 5px;
-    width: 22%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.301);
+    overflow: hidden;
+}
+
+/* Header integrado no card */
+.header-content {
+    background-color: #970000;
+    padding: 40px 30px;
+    text-align: center;
     color: #ffff;
-    font-size: 1rem;
-}
-
-.login-button:hover{
-    background-color: #7f0000;
-}
-
-.greeting{
-    background-color: #EFDEDE;
-    padding:10px;
-    text-align: right;
-    width: 100%;
-    height: 97%;
-    font-size: x-large;
-    color: #A32025;
-    font-weight: 800;
-}
-
-.greeting-paragraph{
-    font-size: medium;
-    color: #000000;
-    font-weight: 100;
-}
-
-.greeting-paragraph a{
-    color: #000000;
-}
-
-.theme{
-    background-color: transparent;
-    border: none;
-    cursor: pointer;  
 }
 
 .wrapper {
     display: flex;
-    justify-content: left;
-    align-items: center; 
-    width: 100%; 
-    max-width: 100%;  
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.logo-image {
+    width: 60px;
+    height: auto;
+}
+
+.wrapper h1 {
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.system-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+/* Área de login */
+.login-box {
+    background-color: #ffffff;
+    padding: 40px 30px;
+}
+
+.greeting {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.greeting p:first-child {
+    color: #2d3748;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.greeting-paragraph {
+    color: #718096;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.greeting-paragraph a {
+    color: #970000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.greeting-paragraph a:hover {
+    text-decoration: underline;
+}
+
+/* Formulário */
+.login-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    font-weight: bold;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form > label,
+.login-form > :first-child {
+    display: block;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 8px;
+}
+
+.password-field-wrapper {
+    position: relative;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    height: 45px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.login-input:focus {
+    border-color: #970000;
+    box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1);
+}
+
+.password-toggle-input {
+    padding-right: 45px;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #a0aec0;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-icon:hover {
+    color: #4a5568;
+}
+
+.password-toggle-icon .hidden {
+    display: none;
+}
+
+/* Ações do login */
+.login-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.login-actions a {
+    color: #970000;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+}
+
+.login-actions a:hover {
+    text-decoration: underline;
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #970000;
+    color: #ffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(151, 0, 0, 0.3);
+}
+
+.login-button:hover {
+    background-color: #7f0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(151, 0, 0, 0.4);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+/* Seção de cadastro */
+.register-section {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        border-radius: 10px;
+    }
+
+    .header-content {
+        padding: 30px 20px;
+    }
+
+    .wrapper h1 {
+        font-size: 30px;
+    }
+
+    .login-box {
+        padding: 30px 20px;
+    }
+
+    .greeting p:first-child {
+        font-size: 20px;
+    }
 }

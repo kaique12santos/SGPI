@@ -24,10 +24,12 @@ router.get('/grupos/:semestre', async (req, res) => {
         g.nome AS GRUPO_NOME,
         GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS NOMES_MEMBROS
       FROM Grupos g
+      JOIN Semestres s ON g.semestre_id = s.id    -- << JOIN NOVO
       JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
       JOIN Usuarios u ON ug.usuario_id = u.id
       JOIN Disciplinas d ON g.disciplina_id = d.id
       WHERE d.semestre_padrao = ?
+      AND s.ativo = 1                             -- << FILTRO NOVO
       GROUP BY g.id, g.nome
       ORDER BY g.nome
     `;
@@ -179,8 +181,10 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         g.disciplina_id,
         g.semestre_id
       FROM Grupos g
+      JOIN Semestres s ON g.semestre_id = s.id
       JOIN Disciplinas d ON g.disciplina_id = d.id
       WHERE g.id = ? AND d.semestre_padrao = ?
+      AND s.ativo = 1
     `;
     // FIX 1: Alterado para 'result.rows'
     const resultGrupo = await connection.execute(sqlGrupo, [grupoId, semestrePadrao]);
@@ -190,7 +194,6 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     }
     const grupo = resultGrupo.rows[0];
 
-    // 2) Buscar dados do PROJETO vinculado (SQL Corrigida)
     const sqlProjeto = `
       SELECT
         p.id AS projeto_id,
@@ -202,11 +205,10 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
         p.data_atualizacao AS projeto_data_atualizacao
       FROM Projetos p
       JOIN Usuarios uorient ON p.orientador_id = uorient.id
-      JOIN Disciplinas d ON p.disciplina_id = d.id
-      WHERE p.grupo_id = ? AND d.semestre_padrao = ?
+      WHERE p.grupo_id = ?
     `;
     // FIX 1: Alterado para 'result.rows'
-    const resultProjeto = await connection.execute(sqlProjeto, [grupoId, semestrePadrao]);
+    const resultProjeto = await connection.execute(sqlProjeto, [grupoId]);
     const projeto = (resultProjeto.rows.length > 0) ? resultProjeto.rows[0] : null;
 
     // 3) Buscar lista de MEMBROS (SQL Corrigida)
@@ -291,7 +293,6 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
     const grupoData = [
       ['Nome do Grupo', grupo.grupo_nome],
       ['Semestre', `${grupo.grupo_semestre}º Semestre`], // (ex: 1º Semestre)
-      ['Descrição', grupo.grupo_descricao || 'Não informado'],
       ['Relatório gerado em', formatDate(new Date())]
     ];
 
@@ -334,12 +335,68 @@ router.get('/grupos/:grupoId/relatorio', async (req, res) => {
       const labelCell = sheet.getCell(`A${currentRow}`);
       const valueCell = sheet.getCell(`B${currentRow}`);
       
+      // 1. Configura o Label
       labelCell.value = label;
       Object.assign(labelCell, styles.labelStyle);
       
+      // 2. Configura o Valor com o Estilo PADRÃO (IMPORTANTE: Fazer isso ANTES do if)
       valueCell.value = value;
       Object.assign(valueCell, styles.valueStyle);
+      
+      // 3. Mescla as células
       sheet.mergeCells(`B${currentRow}:G${currentRow}`);
+
+      // 4. AGORA aplica a formatação condicional (Sobrescrevendo o padrão quando necessário)
+      if (label === 'Status') {
+        let estiloStatus = null;
+
+        switch (value) {
+          case 'Em Proposta':
+            estiloStatus = {
+              fill: 'FF666666', // Cinza Escuro
+              font: 'FFFFFFFF'  // Branco
+            };
+            break;
+            
+          case 'Em Andamento':
+            estiloStatus = {
+              fill: 'FF203764', // Azul Marinho
+              font: 'FFFFFFFF'  // Branco
+            };
+            break;
+            
+          case 'Aguardando Avaliação':
+            estiloStatus = {
+              fill: 'FFFFC000', // Laranja/Ouro
+              font: 'FF000000'  // Preto
+            };
+            break;
+            
+          case 'Concluído':
+            estiloStatus = {
+              fill: 'FF385723', // Verde Escuro
+              font: 'FFFFFFFF'  // Branco
+            };
+            break;
+        }
+
+        if (estiloStatus) {
+          // Aplica o preenchimento
+          valueCell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: estiloStatus.fill }
+          };
+
+          // Aplica a fonte (Força o negrito e a cor)
+          valueCell.font = { 
+            name: 'Arial', 
+            size: 11, 
+            bold: true, 
+            color: { argb: estiloStatus.font }
+          };
+        }
+      }
       
       sheet.getRow(currentRow).height = 20;
       currentRow++;
@@ -512,10 +569,12 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
         u.email AS membro_email,
         COUNT(*) OVER (PARTITION BY g.id) AS total_membros
       FROM Grupos g
+      JOIN Semestres s ON g.semestre_id = s.id
       JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
       JOIN Usuarios u ON ug.usuario_id = u.id
       JOIN Disciplinas d ON g.disciplina_id = d.id
       WHERE d.semestre_padrao = ?
+      AND s.ativo = 1
       ORDER BY g.nome, u.nome
     `;
 
@@ -556,7 +615,7 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
       bold: true, 
       size: 18, 
       color: { argb: 'FFFFFFFF' },
-      name: 'Calibri'
+      name: 'Arial'
     };
     tituloCell.alignment = { 
       horizontal: 'center', 
@@ -570,7 +629,7 @@ router.get('/grupos/:semestre/relatorioGeral', async (req, res) => {
     };
     tituloCell.border = {
       top: { style: 'thick', color: { argb: cores.azulPrimario } },
-      left: { style: 'thick', color: { argb: cores.azulPrimido } },
+      left: { style: 'thick', color: { argb: cores.azulSecundario } },
       bottom: { style: 'thick', color: { argb: cores.azulPrimario } },
       right: { style: 'thick', color: { argb: cores.azulPrimario } }
     };

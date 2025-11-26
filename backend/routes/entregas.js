@@ -14,21 +14,50 @@ router.get('/api/entregas/recebidas', async (req, res) => {
 
     connection = await getConnection();
 
+    // const sql = `
+    //   SELECT 
+    //     e.id AS entrega_id,
+    //     u.nome AS aluno_nome,
+    //     g.nome AS grupo_nome,
+    //     a.titulo AS atividade_titulo,
+    //     a.semestre_id AS atividade_semestre,
+    //     e.caminho_arquivo,
+    //     DATE_FORMAT(e.data_entrega, '%Y-%m-%dT%H:%i:%s') AS data_entrega,
+    //     DATE_FORMAT(a.prazo_entrega, '%Y-%m-%dT%H:%i:%s') AS prazo_entrega
+    //   FROM Entregas e
+    //   JOIN Atividades a ON e.atividade_id = a.id
+    //   JOIN Grupos g ON e.grupo_id = g.id
+    //   JOIN Usuarios u ON e.aluno_id = u.id
+    //   WHERE a.professor_id = ?
+    //   AND e.id IN (
+    //     SELECT MIN(id)
+    //     FROM Entregas
+    //     WHERE id NOT IN (
+    //       SELECT entrega_id FROM Avaliacoes
+    //     )
+    //     GROUP BY grupo_id, atividade_id
+    //   )
+    //   ORDER BY e.data_entrega DESC
+    // `;
     const sql = `
       SELECT 
         e.id AS entrega_id,
         u.nome AS aluno_nome,
         g.nome AS grupo_nome,
         a.titulo AS atividade_titulo,
-        a.semestre_id AS atividade_semestre,
+        s.periodo,
+        s.ano,
         e.caminho_arquivo,
         DATE_FORMAT(e.data_entrega, '%Y-%m-%dT%H:%i:%s') AS data_entrega,
         DATE_FORMAT(a.prazo_entrega, '%Y-%m-%dT%H:%i:%s') AS prazo_entrega
       FROM Entregas e
       JOIN Atividades a ON e.atividade_id = a.id
+      JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id -- JOIN NOVO
+      JOIN Semestres s ON do_tbl.semestre_id = s.id              -- JOIN NOVO
       JOIN Grupos g ON e.grupo_id = g.id
-      JOIN Usuarios u ON e.aluno_id = u.id
+      JOIN Usuarios u ON e.aluno_responsavel_id = u.id           -- COLUNA CORRIGIDA
       WHERE a.professor_id = ?
+      AND s.ativo = 1                                            -- FILTRO NOVO
       AND e.id IN (
         SELECT MIN(id)
         FROM Entregas

@@ -150,6 +150,10 @@ router.post('/grupos', async (req, res) => {
  * GET /grupos
  * Listar todos os grupos
  */
+/**
+ * GET /grupos
+ * Listar todos os grupos (APENAS DO SEMESTRE ATIVO)
+ */
 router.get('/grupos', async (req, res) => {
   let connection;
   try {
@@ -166,13 +170,14 @@ router.get('/grupos', async (req, res) => {
         g.data_criacao, 
         g.data_atualizacao,
         COUNT(DISTINCT ug.usuario_id) as total_membros,
-        d.nome as disciplina_nome, -- BÔNUS: Já trazendo o nome da disciplina
-        u.nome as orientador_nome -- BÔNUS: Já trazendo o nome do orientador
+        d.nome as disciplina_nome,
+        u.nome as orientador_nome
       FROM Grupos g
       JOIN Semestres s ON g.semestre_id = s.id
       LEFT JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
-      LEFT JOIN Disciplinas d ON g.disciplina_id = d.id -- BÔNUS
-      LEFT JOIN Usuarios u ON g.orientador_id = u.id -- BÔNUS
+      LEFT JOIN Disciplinas d ON g.disciplina_id = d.id
+      LEFT JOIN Usuarios u ON g.orientador_id = u.id
+      WHERE s.ativo = 1  -- << O FILTRO MÁGICO: Só traz grupos do semestre atual
       GROUP BY g.id, g.nome, g.semestre_id, s.periodo, s.ano, g.data_criacao, g.data_atualizacao, d.nome, u.nome
       ORDER BY g.data_criacao DESC
     `;
@@ -180,7 +185,7 @@ router.get('/grupos', async (req, res) => {
     // CORREÇÃO: Trocado 'execute' por 'query'
     const [grupos] = await connection.query(sql, []);
 
-    res.json(grupos); // 'grupos' já é o array de resultados
+    res.json(grupos);
 
   } catch (error) {
     console.error('Erro ao listar grupos:', error);

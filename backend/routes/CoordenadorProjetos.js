@@ -22,23 +22,27 @@ router.get('/projetos/:semestre', async (req, res) => {
 
     // SQL CORRIGIDA
     const sqlListarProjetos = `
-      SELECT
-        p.id AS PROJETO_ID,
-        p.titulo AS TITULO_PROJETO,
-        p.status AS STATUS_PROJETO,
-        GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS NOMES_MEMBROS,
-        h.data_alteracao AS DATA_ENCERRAMENTO
-      FROM Projetos p
-      JOIN Grupos g ON p.grupo_id = g.id
-      JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
-      JOIN Usuarios u ON ug.usuario_id = u.id
-      LEFT JOIN Disciplinas d ON p.disciplina_id = d.id
-      LEFT JOIN Historico_Status_Projeto h
-        ON p.id = h.projeto_id AND h.status_novo = 'Concluído'
-      WHERE d.semestre_padrao = ? 
-      GROUP BY p.id, p.titulo, p.status, h.data_alteracao
-      ORDER BY 
-        CASE WHEN p.status = 'Concluído' THEN 2 ELSE 1 END
+    SELECT
+      p.id AS PROJETO_ID,
+      p.titulo AS TITULO_PROJETO,
+      p.status AS STATUS_PROJETO,
+      GROUP_CONCAT(u.nome ORDER BY u.nome SEPARATOR ', ') AS NOMES_MEMBROS,
+      h.data_alteracao AS DATA_ENCERRAMENTO,
+      s.periodo,
+      s.ano
+    FROM Projetos p
+    JOIN Semestres s ON p.semestre_id = s.id  -- << JOIN NOVO
+    JOIN Grupos g ON p.grupo_id = g.id
+    JOIN Usuario_Grupo ug ON g.id = ug.grupo_id
+    JOIN Usuarios u ON ug.usuario_id = u.id
+    LEFT JOIN Disciplinas d ON p.disciplina_id = d.id
+    LEFT JOIN Historico_Status_Projeto h
+      ON p.id = h.projeto_id AND h.status_novo = 'Concluído'
+    WHERE d.semestre_padrao = ? 
+    AND s.ativo = 1                           -- << FILTRO NOVO (Remove o histórico)
+    GROUP BY p.id, p.titulo, p.status, h.data_alteracao, s.periodo, s.ano
+    ORDER BY 
+      CASE WHEN p.status = 'Concluído' THEN 2 ELSE 1 END
     `;
 
     const result = await connection.execute(sqlListarProjetos, [semestreEscolhido]);

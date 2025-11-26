@@ -80,6 +80,7 @@ router.get("/disciplinas-disponiveis/:tipoUsuario", async (req, res) => {
 
 
 // 🔹 Vincular professor às disciplinas selecionadas
+// 🔹 Vincular professor às disciplinas selecionadas
 router.post("/vincular-disciplinas", async (req, res) => {
   const { professor_id, disciplinas } = req.body;
 
@@ -87,14 +88,26 @@ router.post("/vincular-disciplinas", async (req, res) => {
     return res.status(400).json({ success: false, message: "Dados inválidos." });
   }
 
-  const connection = await getConnection();
+  let conn;
   try {
+    conn = await getConnection();
+    
+    // 1. Busca Semestre Ativo para segurança
+    const [semestreResult] = await conn.query(`SELECT id FROM Semestres WHERE ativo = 1 LIMIT 1`);
+    if (!semestreResult.length) {
+        return res.status(400).json({ success: false, message: "Não há semestre ativo para realizar vinculações." });
+    }
+    const semestreId = semestreResult[0].id;
+
     for (const ofertaId of disciplinas) {
-      await connection.execute(
+      // CORREÇÃO: Adicionado 'AND semestre_id = ?' para evitar alterar histórico
+      await conn.query(
         `UPDATE Disciplinas_Ofertas
          SET professor_responsavel = ?
-         WHERE id = ? AND professor_responsavel IS NULL`,
-        [professor_id, ofertaId]
+         WHERE id = ? 
+           AND semestre_id = ? 
+           AND professor_responsavel IS NULL`,
+        [professor_id, ofertaId, semestreId]
       );
     }
 
@@ -103,158 +116,204 @@ router.post("/vincular-disciplinas", async (req, res) => {
     console.error("Erro ao vincular disciplinas:", error);
     res.status(500).json({ success: false, message: "Erro interno ao vincular disciplinas." });
   } finally {
-    await connection.close();
+    safeRelease(conn);
   }
 });
 
-router.post("/desvincular-disciplinas", async (req, res) => {
-  console.log("\n========================================");
-  console.log("📥 NOVA REQUISIÇÃO: /desvincular-disciplinas");
-  console.log("========================================");
-  console.log("📦 req.body completo:", JSON.stringify(req.body, null, 2));
-  console.log("📦 req.body.professor_id:", req.body.professor_id, "| tipo:", typeof req.body.professor_id);
-  console.log("📦 req.body.disciplinas:", req.body.disciplinas, "| tipo:", typeof req.body.disciplinas);
+// router.post("/desvincular-disciplinas", async (req, res) => {
+//   console.log("\n========================================");
+//   console.log("📥 NOVA REQUISIÇÃO: /desvincular-disciplinas");
+//   console.log("========================================");
+//   console.log("📦 req.body completo:", JSON.stringify(req.body, null, 2));
+//   console.log("📦 req.body.professor_id:", req.body.professor_id, "| tipo:", typeof req.body.professor_id);
+//   console.log("📦 req.body.disciplinas:", req.body.disciplinas, "| tipo:", typeof req.body.disciplinas);
   
+//   const { professor_id, disciplinas } = req.body;
+
+//   // ✅ Validação Passo a Passo
+//   if (!professor_id) {
+//     console.error("❌ ERRO: professor_id não fornecido ou é null/undefined");
+//     return res.status(400).json({ 
+//       success: false, 
+//       message: "ID do professor é obrigatório." 
+//     });
+//   }
+
+//   if (!Array.isArray(disciplinas)) {
+//     console.error("❌ ERRO: disciplinas não é um array, é:", typeof disciplinas);
+//     return res.status(400).json({ 
+//       success: false, 
+//       message: "Lista de disciplinas deve ser um array." 
+//     });
+//   }
+
+//   if (disciplinas.length === 0) {
+//     console.error("❌ ERRO: disciplinas está vazio");
+//     return res.status(400).json({ 
+//       success: false, 
+//       message: "Selecione pelo menos uma disciplina para desvincular." 
+//     });
+//   }
+
+//   console.log("✅ Validações iniciais OK");
+//   console.log(`🎯 Professor ID: ${professor_id}`);
+//   console.log(`🎯 Disciplinas: [${disciplinas.join(', ')}]`);
+
+//   let conn;
+//   try {
+//     console.log("🔌 Tentando obter conexão...");
+//     conn = await getConnection();
+//     console.log("✅ Conexão obtida:", conn ? "OK" : "FALHOU");
+    
+//     if (!conn || typeof conn.execute !== 'function') {
+//       console.error('❌ ERRO CRÍTICO: Conexão inválida');
+//       console.error('conn:', conn);
+//       console.error('conn.execute:', typeof conn?.execute);
+//       return res.status(500).json({ 
+//         success: false, 
+//         message: 'Erro de conexão com o banco de dados' 
+//       });
+//     }
+    
+//     console.log("✅ Conexão válida, iniciando updates...\n");
+    
+//     let removidas = 0;
+//     let erros = [];
+    
+//     for (let i = 0; i < disciplinas.length; i++) {
+//       const ofertaId = disciplinas[i];
+//       console.log(`\n--- Processando ${i + 1}/${disciplinas.length} ---`);
+//       console.log(`🔄 Oferta ID: ${ofertaId} | Professor ID: ${professor_id}`);
+      
+//       try {
+//         // ✅ Query SQL com log
+//         const query = `
+//           UPDATE Disciplinas_Ofertas
+//           SET professor_responsavel = NULL
+//           WHERE id = ? AND professor_responsavel = ?
+//         `;
+//         const params = [Number(ofertaId), Number(professor_id)];
+        
+//         console.log("📝 SQL:", query.trim().replace(/\s+/g, ' '));
+//         console.log("📝 Params:", params);
+        
+//         const [result] = await conn.execute(query, params);
+        
+//         console.log("📊 Resultado:", {
+//           affectedRows: result.affectedRows,
+//           changedRows: result.changedRows,
+//           warningCount: result.warningCount
+//         });
+        
+//         if (result.affectedRows > 0) {
+//           removidas++;
+//           console.log(`✅ Oferta ${ofertaId} desvinculada com sucesso`);
+//         } else {
+//           const msg = `Oferta ${ofertaId} não encontrada ou já estava desvinculada`;
+//           erros.push(msg);
+//           console.warn(`⚠️ ${msg}`);
+          
+//           // ✅ Verifica se a oferta existe
+//           const [checkOferta] = await conn.execute(
+//             `SELECT id, professor_responsavel FROM Disciplinas_Ofertas WHERE id = ?`,
+//             [Number(ofertaId)]
+//           );
+//           console.log(`🔍 Verificação da oferta ${ofertaId}:`, checkOferta);
+//         }
+//       } catch (updateError) {
+//         const errorMsg = `Erro na oferta ${ofertaId}: ${updateError.message}`;
+//         console.error(`❌ ${errorMsg}`);
+//         console.error("Stack:", updateError.stack);
+//         erros.push(errorMsg);
+//       }
+//     }
+
+//     console.log("\n========================================");
+//     console.log(`✅ PROCESSAMENTO CONCLUÍDO`);
+//     console.log(`📊 Removidas: ${removidas}/${disciplinas.length}`);
+//     if (erros.length > 0) {
+//       console.log(`⚠️ Erros: ${erros.length}`);
+//       erros.forEach((err, idx) => console.log(`  ${idx + 1}. ${err}`));
+//     }
+//     console.log("========================================\n");
+
+//     res.json({ 
+//       success: true, 
+//       message: `${removidas} disciplina(s) desvinculada(s) com sucesso.`,
+//       detalhes: {
+//         removidas,
+//         total: disciplinas.length,
+//         erros: erros.length > 0 ? erros : undefined
+//       }
+//     });
+    
+//   } catch (error) {
+//     console.error("\n❌❌❌ ERRO CRÍTICO ❌❌❌");
+//     console.error("Mensagem:", error.message);
+//     console.error("Stack completo:", error.stack);
+//     console.error("Tipo:", error.constructor.name);
+//     console.error("Código SQL:", error.code);
+//     console.error("SQL State:", error.sqlState);
+//     console.error("SQL Message:", error.sqlMessage);
+//     console.error("❌❌❌❌❌❌❌❌❌❌❌❌❌\n");
+    
+//     res.status(500).json({ 
+//       success: false, 
+//       message: "Erro interno ao desvincular disciplinas.",
+//       error: error.message,
+//       code: error.code,
+//       sqlMessage: error.sqlMessage
+//     });
+//   } finally {
+//     console.log("🔌 Liberando conexão...");
+//     safeRelease(conn);
+//     console.log("✅ Conexão liberada\n");
+//   }
+// });
+router.post("/desvincular-disciplinas", async (req, res) => {
   const { professor_id, disciplinas } = req.body;
 
-  // ✅ Validação Passo a Passo
-  if (!professor_id) {
-    console.error("❌ ERRO: professor_id não fornecido ou é null/undefined");
-    return res.status(400).json({ 
-      success: false, 
-      message: "ID do professor é obrigatório." 
-    });
+  if (!professor_id || !Array.isArray(disciplinas) || disciplinas.length === 0) {
+    return res.status(400).json({ success: false, message: "Dados inválidos." });
   }
-
-  if (!Array.isArray(disciplinas)) {
-    console.error("❌ ERRO: disciplinas não é um array, é:", typeof disciplinas);
-    return res.status(400).json({ 
-      success: false, 
-      message: "Lista de disciplinas deve ser um array." 
-    });
-  }
-
-  if (disciplinas.length === 0) {
-    console.error("❌ ERRO: disciplinas está vazio");
-    return res.status(400).json({ 
-      success: false, 
-      message: "Selecione pelo menos uma disciplina para desvincular." 
-    });
-  }
-
-  console.log("✅ Validações iniciais OK");
-  console.log(`🎯 Professor ID: ${professor_id}`);
-  console.log(`🎯 Disciplinas: [${disciplinas.join(', ')}]`);
 
   let conn;
   try {
-    console.log("🔌 Tentando obter conexão...");
     conn = await getConnection();
-    console.log("✅ Conexão obtida:", conn ? "OK" : "FALHOU");
-    
-    if (!conn || typeof conn.execute !== 'function') {
-      console.error('❌ ERRO CRÍTICO: Conexão inválida');
-      console.error('conn:', conn);
-      console.error('conn.execute:', typeof conn?.execute);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Erro de conexão com o banco de dados' 
-      });
-    }
-    
-    console.log("✅ Conexão válida, iniciando updates...\n");
-    
-    let removidas = 0;
-    let erros = [];
-    
-    for (let i = 0; i < disciplinas.length; i++) {
-      const ofertaId = disciplinas[i];
-      console.log(`\n--- Processando ${i + 1}/${disciplinas.length} ---`);
-      console.log(`🔄 Oferta ID: ${ofertaId} | Professor ID: ${professor_id}`);
-      
-      try {
-        // ✅ Query SQL com log
-        const query = `
-          UPDATE Disciplinas_Ofertas
-          SET professor_responsavel = NULL
-          WHERE id = ? AND professor_responsavel = ?
-        `;
-        const params = [Number(ofertaId), Number(professor_id)];
-        
-        console.log("📝 SQL:", query.trim().replace(/\s+/g, ' '));
-        console.log("📝 Params:", params);
-        
-        const [result] = await conn.execute(query, params);
-        
-        console.log("📊 Resultado:", {
-          affectedRows: result.affectedRows,
-          changedRows: result.changedRows,
-          warningCount: result.warningCount
-        });
-        
-        if (result.affectedRows > 0) {
-          removidas++;
-          console.log(`✅ Oferta ${ofertaId} desvinculada com sucesso`);
-        } else {
-          const msg = `Oferta ${ofertaId} não encontrada ou já estava desvinculada`;
-          erros.push(msg);
-          console.warn(`⚠️ ${msg}`);
-          
-          // ✅ Verifica se a oferta existe
-          const [checkOferta] = await conn.execute(
-            `SELECT id, professor_responsavel FROM Disciplinas_Ofertas WHERE id = ?`,
-            [Number(ofertaId)]
-          );
-          console.log(`🔍 Verificação da oferta ${ofertaId}:`, checkOferta);
-        }
-      } catch (updateError) {
-        const errorMsg = `Erro na oferta ${ofertaId}: ${updateError.message}`;
-        console.error(`❌ ${errorMsg}`);
-        console.error("Stack:", updateError.stack);
-        erros.push(errorMsg);
-      }
-    }
 
-    console.log("\n========================================");
-    console.log(`✅ PROCESSAMENTO CONCLUÍDO`);
-    console.log(`📊 Removidas: ${removidas}/${disciplinas.length}`);
-    if (erros.length > 0) {
-      console.log(`⚠️ Erros: ${erros.length}`);
-      erros.forEach((err, idx) => console.log(`  ${idx + 1}. ${err}`));
+    // 1. Busca Semestre Ativo para segurança
+    const [semestreResult] = await conn.query(`SELECT id FROM Semestres WHERE ativo = 1 LIMIT 1`);
+    if (!semestreResult.length) {
+        return res.status(400).json({ success: false, message: "Não há semestre ativo." });
     }
-    console.log("========================================\n");
+    const semestreId = semestreResult[0].id;
+
+    let removidas = 0;
+    
+    for (const ofertaId of disciplinas) {
+       // CORREÇÃO: Adicionado 'AND semestre_id = ?'
+       const [result] = await conn.query(
+         `UPDATE Disciplinas_Ofertas
+          SET professor_responsavel = NULL
+          WHERE id = ? 
+            AND professor_responsavel = ?
+            AND semestre_id = ?`, // Trava de segurança
+         [ofertaId, professor_id, semestreId]
+       );
+       
+       if (result.affectedRows > 0) removidas++;
+    }
 
     res.json({ 
       success: true, 
-      message: `${removidas} disciplina(s) desvinculada(s) com sucesso.`,
-      detalhes: {
-        removidas,
-        total: disciplinas.length,
-        erros: erros.length > 0 ? erros : undefined
-      }
+      message: `${removidas} disciplina(s) desvinculada(s) com sucesso.`
     });
     
   } catch (error) {
-    console.error("\n❌❌❌ ERRO CRÍTICO ❌❌❌");
-    console.error("Mensagem:", error.message);
-    console.error("Stack completo:", error.stack);
-    console.error("Tipo:", error.constructor.name);
-    console.error("Código SQL:", error.code);
-    console.error("SQL State:", error.sqlState);
-    console.error("SQL Message:", error.sqlMessage);
-    console.error("❌❌❌❌❌❌❌❌❌❌❌❌❌\n");
-    
-    res.status(500).json({ 
-      success: false, 
-      message: "Erro interno ao desvincular disciplinas.",
-      error: error.message,
-      code: error.code,
-      sqlMessage: error.sqlMessage
-    });
+    console.error("Erro ao desvincular:", error);
+    res.status(500).json({ success: false, message: "Erro interno ao desvincular disciplinas." });
   } finally {
-    console.log("🔌 Liberando conexão...");
     safeRelease(conn);
-    console.log("✅ Conexão liberada\n");
   }
 });
 console.log("📋 Rotas registradas em professoresDisciplinas:");

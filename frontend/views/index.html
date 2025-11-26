@@ -3,33 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Login</title>
-
-    <!--__________LINKS AQUI__________-->
-    <link rel="stylesheet" href="./css/login-singup.css">
-    <link rel="stylesheet" href="./css/alerts.css">
-    <link rel="stylesheet" href="./css/visibilidade.css">
-    
     <link rel="shortcut icon" href="./imagens/favicon-32x32.png" type="image/x-icon">
-    <!--______________________________-->
-
+    <link rel="stylesheet" href="../css/login-singup.css">
+    <link rel="stylesheet" href="/css/alerts.css"> 
 </head>
 
-<header>
-    <div class="header-content"> <!--Todo conteúdo da HEADER está dentro de uma div-->
-        <div class="wrapper">
-            <img src="./imagens/logo-sgpi.png" alt="logo do SGPI" class="logo-image">
-            <h1>SGPI</h1>
-        </div>
-        
-    </div>
-</header>
-
 <body>
-    <div class="container"> <!--Div container para facilitar configurações globais-->
-        <div class="login-box"> <!--Div que abriga todo espaço de login-->
-            <div class="login-info"> <!--Div contendo todas as informações de login-->
+    <div class="container">
+        <!-- Header integrado no card -->
+        <div class="header-content">
+            <div class="wrapper">
+                <img src="./imagens/logo-sgpi.png" alt="logo do SGPI" class="logo-image">
+                <h1>SGPI</h1>
+            </div>
+            <p class="system-name">Sistema Gerenciador de<br>Projetos Interdisciplinares</p>
+        </div>
+
+        <!-- Área de login -->
+        <div class="login-box">
+            <div class="greeting">
+                <p>Bem-vindo de volta!</p>
+                <p class="greeting-paragraph">Entre com suas credenciais para continuar</p>
+            </div>
+
+            <div class="login-info">
                 <form id="loginForm" class="login-info">  
                     
                     <div class="login-form">
@@ -40,7 +38,7 @@
 
                     <div class="login-form">
                         Senha
-                        <div class="password-field-wrapper"> <!-- Wrapper para o campo de senha do login -->
+                        <div class="password-field-wrapper">
                             <input 
                                 type="password" 
                                 id="password" 
@@ -50,13 +48,11 @@
                                 required
                                 autocomplete="current-password" 
                             >
-                            <span class="password-toggle-icon"> <!-- Ícone para o campo de senha do login -->
-                                <!-- Ícone de olho aberto (visível por padrão) -->
+                            <span class="password-toggle-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
-                                <!-- Ícone de olho fechado (oculto por padrão) -->
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off hidden">
                                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.91 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -68,25 +64,20 @@
 
                     <div class="login-actions alert">
                         <a href="./forget-password">Esqueci a senha</a>
-                        <span id="formError"></span> <div id="formError"></div>
+                        <span id="formError"></span>
                         <button type="submit" class="login-button">Entrar</button>  
                     </div>
                 </form>
+
+                <div class="register-section">
+                    <p class="greeting-paragraph">Não tem conta? <a href="./cadastro">Cadastre-se</a></p>
+                </div>
             </div>
         </div>
-
-        <div class="greeting"> <!--Div para dividir o formulário e o banner de boas vindas-->
-            <p>Bem vindo ao Sistema Gerenciador de Projetos Interdisciplinares</p>
-            <p class="greeting-paragraph">Não tem conta? <a href="./cadastro">Cadastre-se</a></p>
-        </div>
-       
-
     </div>
     
-    <script type="module"  src="./javaScript/front_end/Login.js"></script>
-    <script  src="./javaScript/utils/visibilidade_senhas.js"></script>
+    <script type="module" src="./javaScript/front_end/Login.js"></script>
+    <script src="./javaScript/utils/visibilidade_senhas.js"></script>
     <script src="https://cdn.userway.org/widget.js" data-account="6gTjstshf2"></script>
-    
-   
 </body>
 </html>

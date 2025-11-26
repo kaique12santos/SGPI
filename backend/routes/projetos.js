@@ -53,8 +53,10 @@ router.get('/api/disciplinas', async (req, res) => {
       SELECT DISTINCT d.id, d.nome 
       FROM Disciplinas d
       JOIN Disciplinas_Ofertas do_tbl ON d.id = do_tbl.disciplina_id
+      JOIN Semestres s ON do_tbl.semestre_id = s.id
       WHERE do_tbl.professor_responsavel = ?
       AND d.nome LIKE 'Orientação%'
+      AND s.ativo = 1
       ORDER BY d.nome`;
     
     // MUDANÇA: Trocado execute por query e voltado para [rows]
@@ -87,7 +89,10 @@ router.get('/api/grupos', async (req, res) => {
       querySql = `
         SELECT g.id, g.nome
         FROM Grupos g
-        WHERE g.disciplina_id = ? AND g.orientador_id = ?
+        JOIN Semestres s ON g.semestre_id = s.id  -- JOIN NOVO
+        WHERE g.disciplina_id = ? 
+          AND g.orientador_id = ?
+          AND s.ativo = 1                         -- FILTRO NOVO
         ORDER BY g.nome`;
       params = [disciplinaId, orientadorId];
     } else {
@@ -134,6 +139,7 @@ router.get('/api/projetos', async (req, res) => {
       LEFT JOIN Semestres s ON p.semestre_id = s.id
       LEFT JOIN Disciplinas d ON p.disciplina_id = d.id
       WHERE p.orientador_id = ?
+      AND s.ativo = 1
       ORDER BY p.data_criacao DESC`;
       
     // MUDANÇA: Trocado execute por query e voltado para [rows]

@@ -130,6 +130,8 @@ app.use('/api', palavraChaveRoutes);
 app.use('/',professoresDiciplinas)
 app.use('/semestres', semestreRoutes);
 
+
+
 // ROTA DINÂMICA PARA SERVIR OUTRAS PÁGINAS HTML DA PASTA 'views'
 // Ex: /avaliar vai servir frontend/views/avaliar.html
 // Ex: /TelaPrincipal vai servir frontend/views/TelaPrincipal.html

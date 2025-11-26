@@ -1,198 +1,99 @@
-*{
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-}
+/* =========================================
+   ESTILOS ESPECÍFICOS DO CADASTRO (signup.css)
+   ========================================= */
 
-html { 
-    background-color: #EFDEDE; 
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-
-body{
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.header-content{
-    background-color: #970000;
+/* Ajuste do grupo de seleção de perfil (Aluno/Professor) */
+.radio-group {
     display: flex;
-    flex-direction: row;
+    gap: 20px;
     align-items: center;
-    gap: 1%;
-    padding-left: 1%;
-    color:#ffff;
-    font-size: larger;
+    margin-top: 5px;
 }
 
-.logo-image{
-    width: 10%;
-    height: 10dvh;
-}
-
-.container{
-    width: 100%;
-    height: 650px;
-    display: flex;
-    flex-direction: row;
-}
-
-#semestre {
-    height: 35px;
-}
-
-.signup-form #passwordError{
-    color: #ff0000;
-}
-
-.signup-box{
-    background-color: #f3f3f3;
-    width: 100%;
-    height: 90dvh;
+.radio-group div {
     display: flex;
     align-items: center;
+    gap: 8px;
 }
 
-.signup-info{
+.radio-group input[type="radio"] {
+    accent-color: #970000; /* Mantém a identidade visual vermelha */
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.radio-group label {
+    margin: 0 !important; /* Remove margens padrões do label global */
+    cursor: pointer;
+}
+
+/* =========================================
+   ÁREA DE MATÉRIAS (CHECKBOXES)
+   ========================================= */
+
+/* Container das matérias com scroll suave se ficar muito grande */
+.materias-list {
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 20px;
-    background-color: #f3f3f3;
-    padding: 10px;
-    width: 100%;
-    max-height: 80vh;   /* limite de altura */
-    overflow-y: auto;   /* ativa scroll vertical */
-    scrollbar-width: thin;
+    gap: 12px;
+    max-height: 400px; /* Limita altura para não esticar demais o card */
+    overflow-y: auto;  /* Adiciona scroll se necessário */
+    padding-right: 5px; /* Espaço para o scroll */
 }
 
-.signup-info::-webkit-scrollbar {
-    width: 8px;  /* largura da barra */
+/* Estilização dos Fieldsets (Caixas dos semestres) */
+.materias-list fieldset {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #fafbfc;
 }
 
-.signup-info::-webkit-scrollbar-thumb {
-    background-color: #bbb; 
+.materias-list legend {
+    font-size: 0.85rem;
+    color: #970000;
+    font-weight: bold;
+    padding: 0 8px;
+    background-color: #fff; /* Para o texto não ficar sobre a linha */
     border-radius: 4px;
 }
 
-.signup-info::-webkit-scrollbar-track {
-    background: #f3f3f3;
-}
-
-.signup-actions{
+/* Estilo de cada item de matéria */
+.materias-list label {
     display: flex;
-    justify-content: space-between;
-    font-size: smaller;
-    padding: 10px;
-}
-
-.signup-form{
-    display: flex;
-    flex-direction: column;
-    background-color: #f3f3f3;
-    padding: 0px;
-    color: #000000;
-}
-
-.signup-input{
-    border-radius: 5px;
-    padding: 5px;
-    margin-top: 5px;
-    border: solid #7e7e7e 0.5px;
-    background-color: #ffffff;
-    height: 20px;
-}
-
-.signup-button{
-    background-color: #970000;
-    border: none;
-    border-radius: 15px;
-    padding: 5px;
-    width: 30%;
-    color: #ffff;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.greeting{
-    background-color: #EFDEDE;
-    padding:10px;
-    text-align: right;
-    width: 100%;
-    height: 97%;
-    font-size: x-large;
-    color: #A32025;
-    font-weight: 800;
-}
-
-.greeting-paragraph{
-    font-size: medium;
-    color: #000000;
-    font-weight: 100;
-}
-
-.greeting-paragraph a{
-    color: #000000;
-}
-
-.div_theme{
-    display: flex;
-    justify-content: right;
-    align-items: flex-end;
-}
-
-.wrapper {
-    display: flex;
-    justify-content: left;
-    align-items: center; 
-    width: 100%; 
-    max-width: 100%;  
-}
-
-.theme{
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#materias, #chaveProfessor {
-    width: 100dvh;
-    margin-top: 5px;
-}
-
-#materias {
-    height: auto; /* lista expandida */
-}
-#materiasBox{
-    display: none;
-}
-.materias-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 colunas */
+    align-items: center;
     gap: 8px;
-    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: color 0.2s;
 }
 
-.materias-list label {
-    font-size: 0.9rem;
-    color: #000;
+.materias-list label:hover {
+    color: #970000;
 }
 
-fieldset {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
+.materias-list input[type="checkbox"] {
+    accent-color: #970000;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
 }
 
-legend {
-    padding: 0 10px;
-    color: #333;
+/* Scrollbar personalizada (opcional, para ficar bonito no Chrome/Edge) */
+.materias-list::-webkit-scrollbar {
+    width: 6px;
 }
-
-.materias-list label {
-    display: block; /* Para cada checkbox ficar em uma linha */
-    margin-bottom: 5px;
+.materias-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.materias-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+.materias-list::-webkit-scrollbar-thumb:hover {
+    background: #970000;
 }

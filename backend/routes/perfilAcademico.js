@@ -14,25 +14,30 @@ router.get('/disciplinas/:id', async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    if (!conn || typeof conn.execute !== 'function') {
-      console.error('Erro: conexão inválida obtida em /disciplinas', conn);
+    if (!conn) {
       return res.status(500).json({ success: false, message: 'Erro de conexão com o banco' });
     }
 
+    // SQL CORRIGIDA:
+    // 1. JOIN com Semestres para acessar o status 'ativo'
+    // 2. Filtro 's.ativo = 1' para pegar só o semestre atual
+    // 3. Filtro 'ao.status = Matriculado' para garantir que está cursando
     const sql = `
       SELECT d.id, d.nome, d.codigo, d.descricao
       FROM Aluno_Oferta ao
       JOIN Disciplinas_Ofertas dof ON ao.oferta_id = dof.id
+      JOIN Semestres s ON dof.semestre_id = s.id   -- JOIN NOVO
       JOIN Disciplinas d ON dof.disciplina_id = d.id
       WHERE ao.aluno_id = ?
+        AND s.ativo = 1                            -- FILTRO DO SEMESTRE NOVO
+        AND ao.status = 'Matriculado'              -- FILTRO DE STATUS
+      ORDER BY d.nome
     `;
-    const result = await conn.execute(sql, [usuarioId]);
 
-    const disciplinas = extractRows(result);
-    if (!Array.isArray(disciplinas)) {
-      console.error('disciplinas: formato inesperado do resultado', result);
-    }
-    return res.json({ success: true, disciplinas });
+    // Padronização para .query() e [rows] para evitar erros de driver
+    const [rows] = await conn.query(sql, [usuarioId]);
+
+    return res.json({ success: true, disciplinas: rows });
 
   } catch (err) {
     console.error('Erro na rota GET /perfilAcademico/disciplinas/:id ->', err);
@@ -365,7 +370,7 @@ router.get('/disciplinas-disponiveis-professor/:id', async (req, res) => {
       if (!a.minha && b.minha) return 1;
       return a.semestre_padrao - b.semestre_padrao;
     });
-
+    console.log(disciplinas)
     res.json({ success: true, disciplinas });
   } catch (err) {
     console.error("Erro ao buscar disciplinas disponíveis para professor:", err);

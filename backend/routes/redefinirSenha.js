@@ -109,7 +109,7 @@ router.post('/recuperar-senha', async (req, res) => {
     console.error('❌ Erro ao recuperar senha:', error);
     return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
   } finally {
-    if (connection) await connection.end();
+    if (connection) await connection.release();
   }
 });
 
@@ -192,7 +192,7 @@ router.post('/redefinir-senha', async (req, res) => {
     console.error('❌ Erro ao redefinir senha:', error);
     return res.status(500).json({ success: false, message: 'Erro no servidor.', error: error.message });
   } finally {
-    if (connection) await connection.end();
+    if (connection) await connection.release();
   }
 });
 
