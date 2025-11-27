@@ -1,8 +1,4 @@
-/* ===============================
-   PADRÃO VISUAL - TERMOS E POLÍTICA SGPI
-   =============================== */
 
-/* Container principal */
 .termos-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -11,7 +7,7 @@
     min-height: calc(100vh - 200px);
 }
 
-/* Cabeçalho */
+
 .termos-header {
     text-align: center;
     margin-bottom: 40px;
@@ -63,7 +59,7 @@
     padding-bottom: 10px;
 }
 
-/* Texto de parágrafos */
+
 .termo-section p,
 .politica-section p {
     margin-bottom: 15px;
@@ -158,9 +154,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* ===============================
-   RESPONSIVIDADE
-   =============================== */
+
 @media (max-width: 768px) {
     .termos-container {
         padding: 15px;

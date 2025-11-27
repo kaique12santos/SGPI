@@ -116,7 +116,6 @@ input:checked + .slider:before {
 }
 
 #btn-salvar-config {
-    /* Use seu estilo de botão principal */
     background-color: #007bff;
     color: white;
     padding: 12px 20px;

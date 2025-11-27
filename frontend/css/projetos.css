@@ -1,14 +1,14 @@
 :root {
-  --cor-primaria: #db3434;     /* Azul que você usou no .btn-salvar */
+  --cor-primaria: #db3434;     
   --cor-primaria-hover: #2980b9;
-  --cor-perigo: #dc2626;       /* Vermelho que você usou no .btn-deletar */
+  --cor-perigo: #dc2626;       
   --cor-perigo-hover: #b60b0b;
-  --cor-sucesso: #2ecc71;      /* Adicionando um verde para sucesso */
+  --cor-sucesso: #2ecc71;      
   --cor-sucesso-hover: #27ae60;
 
-  --cor-fundo: #f8f9fa;       /* Um cinza muito claro para o body (se desejar) */
-  --cor-fundo-card: #ffffff;   /* Fundo branco para elementos */
-  --cor-fundo-input: #f1f3f5; /* Fundo leve para inputs */
+  --cor-fundo: #f8f9fa;      
+  --cor-fundo-card: #ffffff;   
+  --cor-fundo-input: #f1f3f5; 
   
   --cor-texto: #212529;
   --cor-texto-secundario: #6c757d;
@@ -17,7 +17,7 @@
   --sombra-padrao: 0 4px 12px rgba(0, 0, 0, 0.08);
   --sombra-hover: 0 7px 14px rgba(0, 0, 0, 0.1);
   
-  --raio-borda: 8px; /* Unificando o raio de borda */
+  --raio-borda: 8px; 
   --fonte-padrao: 'Inter', sans-serif;
 }
   .projeto-form {
@@ -71,8 +71,7 @@
 }
 
   
-  /*estilo do Modal */
-/* Substitua ou adicione estes estilos no seu projetos.css */
+
 
 /* Overlay do Modal */
 .modal-overlay {
@@ -376,7 +375,7 @@
     border-top: 2px groove rgb(255, 0, 0);
   }
   
-  /* Adicione isso ao seu projetos.css */
+
 
 /* Container do status */
 .status-badge {
@@ -417,7 +416,7 @@
   border: 1.5px solid #81c784;
 }
 
-/* Efeito hover nos badges (opcional) */
+
 .status-badge:hover {
   transform: scale(1.05);
   transition: transform 0.2s ease;

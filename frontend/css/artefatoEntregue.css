@@ -107,17 +107,16 @@
 /* Tablets Pequenos e Celulares (até 768px) */
 @media (max-width: 768px) {
   #entregas-container {
-    grid-template-columns: 1fr; /* Muda para 1 coluna (pilha) */
+    grid-template-columns: 1fr; 
     gap: 1rem;
     width: 95%;
     margin-bottom: 80px;
   }
 
   .entrega-card {
-    padding: 1rem; /* Padding ligeiramente menor no mobile */
+    padding: 1rem; 
   }
 
-  /* No celular, botões ocupam largura total para facilitar o clique */
   .entrega-acoes {
     flex-direction: column;
     width: 100%;
@@ -126,6 +125,6 @@
   .botao-avaliar {
     width: 100%;
     text-align: center;
-    padding: 12px; /* Área de toque maior */
+    padding: 12px; 
   }
 }

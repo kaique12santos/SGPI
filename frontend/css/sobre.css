@@ -1,7 +1,4 @@
-/* Estilos específicos para a página Sobre o SGPI */
-/* Evitando conflitos com main.css */
 
-/* Container específico da página sobre */
 .sobre-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -10,13 +7,13 @@
     min-height: calc(100vh - 200px);
 }
 
-/* Header específico da página sobre */
+
 .page-name{
     margin-bottom: 50px;
 }
 
 
-/* Content específico da página sobre */
+
 .sobre-content-page {
     line-height: 1.8;
     color: #333;
@@ -25,7 +22,7 @@
     width: 90%;
 }
 
-/* Seções específicas da página sobre */
+
 .sobre-section {
     margin-bottom: 40px;
     padding: 30px;
@@ -238,7 +235,7 @@
     text-indent: 0;
 }
 
-/* Container de botão voltar específico da página sobre */
+
 .sobre-voltar-container {
     text-align: center;
     margin: 40px 0;

@@ -8,7 +8,7 @@
 .btn-cancelar {
   background-color: #7a7a7a;
   border-left: 3px solid #b0b0b0;
-  color: #ffffff; /* Texto escuro para fundo claro */
+  color: #ffffff; 
 }
 .btn-cancelar:hover {
   background: #acacac;
@@ -18,11 +18,10 @@
 
 
 #create-task {
-  background-color: #ffffff; /* Fundo branco para destacar */
- 
-  border-radius: 8px; /* Cantos arredondados */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave */
-  padding: 0.5rem; /* Mais preenchimento interno */
+  background-color: #ffffff; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+  padding: 0.5rem; 
   width: 95%;
 
   margin: 5px;
@@ -32,61 +31,53 @@
 #create-task label {
   font-weight: 600;
   color: #333;
-  margin-bottom: 5px; /* Espaço entre o label e o input */
+  margin-bottom: 5px; 
 }
 
-/*Inputs e Textareas do formulário principal */
+
 .form-task .input-atividade {
-  background-color: #ffffff; /* Fundo branco */
-  border: 1px solid #cccccc; /* Borda visível */
+  background-color: #ffffff; 
+  border: 1px solid #cccccc; 
   border-radius: 5px;
-  padding: 10px; /* Mais preenchimento */
+  padding: 10px; 
   font-size: 1rem;
   color: #111111;
   width: 100%;
   margin: 5px 0 5px 0;
-  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+  box-sizing: border-box; 
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Efeito de Foco para os inputs */
 .form-task .input-atividade:focus {
-  border-color: #970000; /* Cor do tema ao focar */
-  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1); /* "Brilho" de foco */
-  outline: none; /* Remove o contorno padrão */
+  border-color: #970000; 
+  box-shadow: 0 0 0 3px rgba(151, 0, 0, 0.1); 
+  outline: none; 
 }
 
-/* Ajuste no botão Enviar */
 .form-task .send-button {
-  
-  min-width: 150px; /* Largura mínima */
-  padding: 6px 10px; /* Mais robusto */
+  min-width: 150px; 
+  padding: 6px 10px; 
   font-size: 1.1rem;
   font-weight: 600;
-  margin-top: 15px; /* Espaço acima do botão */
+  margin-top: 15px; 
   transition: background-color 0.2s, transform 0.2s;
 }
 
 .form-task .send-button:hover {
   background-color: #a60000;
-  transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
+  transform: translateY(-2px); 
 }
 
-/* Estilizando a mensagem de erro do select */
 #ofertaError {
-  margin-top: -4px; /* Puxa para mais perto do select */
+  margin-top: -4px; 
   margin-bottom: 8px;
 }
 
-/* ==============================================
-   2. ESTILOS DO MODAL DE EDIÇÃO
-   ============================================== */
-
 /* Container do modal */
 .modal-edicao {
-  max-width: 600px; /* Um modal um pouco mais largo */
-  padding: 2rem; /* Preenchimento padronizado */
-  animation: slideUp 0.3s ease-out; /* Já estava no seu div-mostrar, mas garantindo */
+  max-width: 600px; 
+  padding: 2rem; 
+  animation: slideUp 0.3s ease-out; 
 }
 
 .modal-edicao h2 {
@@ -97,23 +88,21 @@
   padding-bottom: 0.5rem;
 }
 
-/* Formulário dentro do modal */
 .modal-edicao #editar-atividade {
   display: flex;
   flex-direction: column;
-  gap: 15px; /* Espaçamento entre os labels/inputs */
+  gap: 15px; 
 }
 
-/* Labels dentro do modal */
 .modal-edicao #editar-atividade label {
   font-weight: 600;
   color: #333;
   display: flex;
-  flex-direction: column; /* Coloca o input abaixo do label */
+  flex-direction: column; 
   gap: 5px;
 }
 
-/* Inputs, Textareas e Selects DENTRO DO MODAL */
+
 .modal-edicao .input-atividade {
   background-color: #ffffff;
   border: 1px solid #cccccc;
@@ -127,20 +116,19 @@
 }
 
 .modal-edicao .input-atividade:focus {
-  border-color: #970000; /* Foco azul, para diferenciar da criação */
+  border-color: #970000; 
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
   outline: none;
 }
 
 .modal-edicao .textarea-tamanho {
-  min-height: 120px; /* Um pouco menor para o modal */
-  resize: vertical; /* Permite que o usuário redimensione verticalmente */
+  min-height: 120px; 
+  resize: vertical; 
 }
 
-/* Grupo de botões no final do modal */
 .modal-edicao .btn-group {
   display: flex;
-  justify-content: flex-end; /* Alinha botões à direita */
+  justify-content: flex-end; 
   gap: 10px;
   margin-top: 1.5rem;
   border-top: 1px solid #eee;
@@ -169,11 +157,11 @@
 .atividades-criadas {
   word-break: break-word;
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Padrão Desktop */
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem; 
   width: 95%; 
-  max-width: 1200px; /* Limite para monitores grandes */
-  margin: 20px auto 60px auto; /* Margem inferior para não colar no rodapé */
+  max-width: 1200px; 
+  margin: 20px auto 60px auto; 
 }
 
 .atividade-card {
@@ -182,11 +170,9 @@
   border-radius: 8px;
   padding: 1.5rem;
   border-left: 5px solid #922b21;
-  
-  /* Garante altura igual para cards na mesma linha */
   display: flex;
   flex-direction: column; 
-  justify-content: space-between; /* Empurra os botões para baixo */
+  justify-content: space-between; 
   
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -273,19 +259,15 @@
   .btn-Ver:active {
     transform: translateY(-1px);
   }
-  /* ==============================================
-   3. REFINAMENTO DOS BOTÕES DOS CARDS
-   ============================================== */
 
-/* Ajuste na classe .btn base para os cards */
+
 .atividade-card .btn {
-  display: block;      /* Comporta-se como bloco */
-  width: 100%;         /* Ocupa 100% da largura do card */
-  margin: 5px 0;       /* Espaçamento vertical entre eles */
+  display: block;     
+  width: 100%;         
+  margin: 5px 0;       
   text-align: center;
-  box-sizing: border-box; /* Garante que padding não estoure a largura */
-  
-  padding: 10px;       /* Área de toque maior */
+  box-sizing: border-box; 
+  padding: 10px;       
   font-size: 0.9rem;
   font-weight: 600;
   border-radius: 6px;
@@ -294,7 +276,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Removemos margens laterais antigas que atrapalham */
 .btn-Ver {
   margin-left: 0;
 }
@@ -380,7 +361,7 @@
   }
   @media (max-width: 1024px) {
     .atividades-criadas {
-      grid-template-columns: repeat(2, 1fr); /* 2 Colunas */
+      grid-template-columns: repeat(2, 1fr); 
       width: 90%;
     }
   }
@@ -388,7 +369,7 @@
   /* Mobile (até 700px) */
   @media (max-width: 700px) {
     .atividades-criadas {
-      grid-template-columns: 1fr; /* 1 Coluna (Empilhado) */
+      grid-template-columns: 1fr; 
       gap: 1rem;
     }
   
@@ -396,7 +377,6 @@
       padding: 1rem;
     }
     
-    /* Ajuste do formulário de criação também */
     #create-task {
       width: 100%;
       margin: 0;

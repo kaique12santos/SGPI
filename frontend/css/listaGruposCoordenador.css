@@ -6,11 +6,9 @@ label, select {
 /* ==== ÁREA DE BUSCA (Usando a classe .semestre do HTML) ==== */
 .semestre {
   display: flex;
-  flex-wrap: wrap; /* Permite quebrar linha no mobile */
-  gap: 15px;       /* Espaçamento entre os elementos */
+  flex-wrap: wrap; 
+  gap: 15px;       
   align-items: center;
-  
-  /* Visual de container card */
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
@@ -32,10 +30,8 @@ label, select {
   background-color: #fff;
 }
 
-/* ESTILIZAÇÃO SEGURA DOS BOTÕES DE BUSCA */
-/* Afeta apenas botões dentro da div .semestre */
 .semestre button {
-  background-color: #970000; /* Vinho Padrão */
+  background-color: #970000; 
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -47,13 +43,13 @@ label, select {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Remove a margem inline que estava no HTML via CSS para ficar responsivo */
+
 #btnRelatorioGeral {
   margin-left: 0 !important; 
 }
 
 .semestre button:hover {
-  background-color: #b41b1b; /* Tom mais claro no hover */
+  background-color: #b41b1b; 
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
@@ -93,7 +89,7 @@ tr:hover {
 
 /* ==== BOTÃO DE AÇÃO DENTRO DA TABELA ==== */
 .btn-relatorio {
-  background-color: #970000; /* Vinho Padrão */
+  background-color: #970000; 
   color: #fff;
   padding: 8px 16px;
   border: none;
@@ -116,20 +112,18 @@ tr:hover {
 /* ==== RESPONSIVIDADE (Table to Cards) ==== */
 @media (max-width: 768px) {
   
-  /* Ajuste da área de busca */
   .semestre {
       flex-direction: column;
-      align-items: stretch; /* Botões ocupam largura total */
+      align-items: stretch; 
       gap: 15px;
   }
 
   .semestre select, 
   .semestre button {
       width: 100%;
-      margin: 0; /* Remove margens laterais */
+      margin: 0; 
   }
 
-  /* Transformação da Tabela */
   thead { display: none; }
 
   table, tbody, tr, td {

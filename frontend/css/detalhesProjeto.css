@@ -1,11 +1,7 @@
-/* detalhesProjeto.css - RESPONSIVO */
-
 /* ==== ESTILOS GERAIS DO CONTAINER ==== */
 .container {
-  width: 100%; /* Garante margem segura em mobile */
- /* Não deixa esticar demais em monitores grandes */
-   /* Centraliza */
-  padding-bottom: 40px; /* Espaço antes do rodapé */
+  width: 100%; 
+  padding-bottom: 40px; 
 }
 
 /* ==== TABELA (Visual Desktop Melhorado) ==== */
@@ -14,9 +10,9 @@ table {
   width: 98%;
   margin-top: 20px;
   background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave */
-  border-radius: 8px; /* Cantos arredondados */
-  overflow: hidden; /* Necessário para ver os cantos arredondados */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+  border-radius: 8px; 
+  overflow: hidden; 
 }
 
 th, td {
@@ -26,7 +22,7 @@ th, td {
 }
 
 th {
-  background-color: #970000; /* Vinho padrão do sistema */
+  background-color: #970000; 
   color: #ffffff;
   font-weight: 600;
   text-transform: uppercase;
@@ -35,10 +31,9 @@ th {
 }
 
 tr:hover {
-  background-color: #fff5f5; /* Leve destaque avermelhado ao passar o mouse */
+  background-color: #fff5f5; 
 }
 
-/* Tratamento para células vazias ou texto simples */
 td {
   color: #333;
   font-size: 0.95rem;
@@ -56,12 +51,10 @@ td {
 /* ==== RESPONSIVIDADE (Transforma Tabela em Cards) ==== */
 @media (max-width: 768px) {
   
-  /* 1. Esconde o cabeçalho original da tabela */
   thead {
       display: none;
   }
 
-  /* 2. Transforma a tabela em blocos */
   table, tbody, tr, td {
       display: block;
       width: 98%;
@@ -99,7 +92,7 @@ td {
 
   /* 5. CRIAÇÃO DOS RÓTULOS (Labels) VIA CSS */
   td::before {
-      content: attr(data-label); /* Fallback se usar atributo data-label no HTML */
+      content: attr(data-label); 
       font-weight: bold;
       color: #970000;
       text-transform: uppercase;
@@ -130,13 +123,13 @@ td {
       background-color: #970000;
       color: #fff;
       font-weight: bold;
-      justify-content: center; /* Centraliza o título */
+      justify-content: center; 
       text-align: center;
   }
 
   /* Ajuste na cor do rótulo apenas para o cabeçalho do card */
   td:nth-of-type(1)::before {
-      color: #ffcccc; /* Um tom mais claro para ler sobre o vermelho */
-      display: none; /* Opcional: Remova essa linha se quiser mostrar "Atividade: Nome" */
+      color: #ffcccc; 
+      display: none; 
   }
 }

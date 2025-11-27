@@ -56,12 +56,12 @@ font-family: inherit;
 /* ==== TABELA (VERSÃO DESKTOP) ==== */
 table {
 border-collapse: collapse;
-width: 98%; /* Ocupa largura total disponível */
+width: 98%; 
 margin-top: 20px;
 background-color: #fff;
 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 border-radius: 8px;
-overflow: hidden; /* Para arredondar cantos da tabela */
+overflow: hidden; 
 }
 
 th, td {
@@ -71,7 +71,7 @@ text-align: left;
 }
 
 th {
-background-color: #970000; /* Cabeçalho vinho para combinar com o site */
+background-color: #970000; 
 color: #fff;
 font-weight: 600;
 text-transform: uppercase;
@@ -79,7 +79,7 @@ font-size: 0.9rem;
 }
 
 tr:hover {
-background-color: #fff8f8; /* Hover levemente avermelhado */
+background-color: #fff8f8; 
 }
 
 /* Status Badges */
@@ -90,7 +90,7 @@ border-radius: 20px;
 font-size: 12px;
 font-weight: 600;
 text-align: center;
-white-space: nowrap; /* Não deixa o texto do status quebrar */
+white-space: nowrap; 
 }
 
 .status-em-andamento {
@@ -119,8 +119,8 @@ border: 1px solid #9ca3af;
 @media (max-width: 768px) {
   /* 1. Ajuste da Busca */
   .semestre {
-      flex-direction: column; /* Empilha label, select e botão */
-      align-items: stretch; /* Estica para largura total */
+      flex-direction: column; 
+      align-items: stretch; 
   }
   
   .semestre select, .semestre button {
@@ -129,17 +129,15 @@ border: 1px solid #9ca3af;
 
   /* 2. Transformação da Tabela */
   table, thead, tbody, th, td, tr {
-      display: block; /* Tira comportamento de tabela */
+      display: block;
   }
 
-  /* Esconde o cabeçalho da tabela (mas mantém acessível se precisar) */
   thead tr {
       position: absolute;
       top: -9999px;
       left: -9999px;
   }
 
-  /* Cada linha vira um Card */
   tr {
       margin-bottom: 20px;
       border: 1px solid #ccc;
@@ -154,10 +152,10 @@ border: 1px solid #9ca3af;
       border: none;
       border-bottom: 1px solid #eee;
       position: relative;
-      padding-left: 40%; /* Espaço para o rótulo à esquerda */
+      padding-left: 40%; 
       padding-top: 10px;
       padding-bottom: 10px;
-      text-align: right; /* Conteúdo alinhado à direita */
+      text-align: right; 
       min-height: 40px;
       display: flex;
       align-items: center;
@@ -173,7 +171,7 @@ border: 1px solid #9ca3af;
       position: absolute;
       top: 50%;
       left: 10px;
-      transform: translateY(-50%); /* Centraliza verticalmente */
+      transform: translateY(-50%); 
       width: 35%;
       padding-right: 10px;
       white-space: nowrap;
@@ -197,7 +195,6 @@ border: 1px solid #9ca3af;
       border-bottom: 2px solid #ddd;
   }
   
-  /* Ajuste para links dentro da tabela não quebrarem layout */
   td a {
       word-break: break-word;
       text-align: right;

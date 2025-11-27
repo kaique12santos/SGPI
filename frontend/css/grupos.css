@@ -856,14 +856,10 @@
   }
 }
 
-/* --- INÍCIO: Estilos do Modal de Visualização --- */
-
-/* Ajustamos seu .div-mostrar para funcionar como um container sem padding,
-   pois o header, body e footer controlarão o espaçamento interno. */
    .div-mostrar {
-    padding: 0; /* Remove o padding de 2.5rem original */
-   /* Garante que o border-radius seja aplicado nos cantos */
-    position: relative; /* Necessário para o botão "X" */
+    padding: 0; 
+  
+    position: relative; 
   }
   
   /* Botão "X" no canto */
@@ -907,7 +903,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    /* Remove a necessidade de mexer em <p> dentro do modal */
+
   }
 
 
@@ -961,7 +957,7 @@
   }
   .tag-funcao {
     font-size: 0.85rem;
-    background-color: #e2e2e2; /* Cor dos seus inputs */
+    background-color: #e2e2e2; 
     color: #555;
     padding: 4px 10px;
     border-radius: 12px;
@@ -976,7 +972,7 @@
     border-top: 1px solid #e9ecef;
   }
   
-  /* Novo estilo para o botão fechar (substitui o .send-button) */
+
   .btn-fechar-secundario {
     background-color: #970000;
     border: none;
@@ -993,23 +989,19 @@
     transform: translateY(-2px);
   }
   
-  /* --- FIM: Estilos do Modal de Visualização --- */
-  /* --- INÍCIO: Estilos do Modal de EDIÇÃO --- */
 
-/* Ajusta o .div-mostrar quando for o modal de edição */
 .div-mostrar.form-edit-modal {
-  padding: 0; /* Remove o padding antigo */
-  /* Garante o border-radius */
+  padding: 0; 
 }
 
-/* Garante que o formulário interno não tenha margens estranhas */
+
 .form-edit-modal form {
   margin: 0;
   padding: 0;
   width: 100%;
 }
 
-/* Reutiliza os estilos de header, body e footer do modal de visualização */
+
 .form-edit-modal .card-header {
   padding: 20px 24px;
   border-bottom: 1px solid #e9ecef;
@@ -1019,14 +1011,14 @@
 }
 
 .form-edit-modal .card-header .titulo-grupo {
-  font-size: 1.5rem; /* Um pouco menor que o de visualização */
+  font-size: 1.5rem; 
   font-weight: 700;
   color: #ffffff;
   margin: 0;
 }
 
 .div-mostrar .card-header .label{
-  font-size: 1.5rem; /* Um pouco menor que o de visualização */
+  font-size: 1.5rem; 
   font-weight: 700;
   color: #ffffff;
   margin: 0;
@@ -1047,7 +1039,7 @@
   border-top: 1px solid #e9ecef;
 }
 
-/* Estilo para as caixas de listagem de membros/alunos */
+
 .lista-edit-container {
   background-color: #f8f9fa;
   border: 1px solid #e0e0e0;
@@ -1061,7 +1053,7 @@
   gap: 8px;
 }
 
-/* Estilo para cada item nas listas de edição */
+
 .membro-edit-item,
 .aluno-add-item {
   display: flex;
@@ -1091,29 +1083,27 @@
   border: none;
   border-bottom: #686868 solid 1px;
   border-radius: 5px;
-  padding: 4px 8px; /* Menor que o .select-form normal */
+  padding: 4px 8px; 
   font-size: 0.9rem;
   cursor: pointer;
 }
 
-/* Nova classe para botões pequenos (Remover/Adicionar) */
+
 .btn-mini {
   padding: 0.2rem 0.6rem;
   font-size: 0.8rem;
-  box-shadow: none; /* Remove a sombra grande */
+  box-shadow: none; 
   margin: 0;
   font-weight: 500;
 }
 
-/* Ajusta o padding para os botões com ícone */
+
 .btn-mini.btn-excluir {
   padding-left: 0.4rem;
 }
 
-/* Mensagem de erro dentro das caixas */
+
 .texto-erro {
-  color: #970000; /* Vermelho escuro do seu tema */
+  color: #970000; 
   font-weight: 500;
 }
-
-/* --- FIM: Estilos do Modal de EDIÇÃO --- */

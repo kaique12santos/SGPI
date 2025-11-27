@@ -1,5 +1,4 @@
 
-  /*** Estilos para a página de Notas baseado no listaTarefas.css ***/
 .container-conteudo {
     height: 100%;
     width: 100%;
@@ -178,8 +177,8 @@ margin: 0.5rem;
 .truncate-text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3; /* Limita o texto a 3 linhas (para navegadores antigos) */
-    line-clamp: 3;         /* Limita o texto a 3 linhas (para navegadores novos) */
+    -webkit-line-clamp: 3; 
+    line-clamp: 3;      
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
@@ -204,8 +203,8 @@ margin: 0.5rem;
 
 /* ==== AJUSTES DE LAYOUT DOS CARDS ==== */
 .card-nota {
-    background-color: #fce8a8; /* Um amarelo-bege mais vibrante */
-    border: 1px solid #d4a017; /* Borda mais escura e definida */
+    background-color: #fce8a8; 
+    border: 1px solid #d4a017; 
     border-left: 3px solid #a37200; 
     border-radius: 10px;
     padding: 1rem;
@@ -215,7 +214,7 @@ margin: 0.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: relative; /* Adicione esta linha */
+    position: relative; 
 }
 .modal-backdrop {
     position: fixed;
@@ -248,7 +247,7 @@ margin: 0.5rem;
   
   .modal-conteudo p {
     color: #374151;
-    white-space: pre-wrap; /* Preserva quebras de linha do comentário */
+    white-space: pre-wrap; 
     word-break: break-word;
   }
   
@@ -291,11 +290,11 @@ margin: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute; /* Adicione esta linha */
+    position: absolute; 
     right: 20px;
     top: 15px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 10; /* Adicione esta linha para garantir que ele esteja acima do conteúdo */
+    z-index: 10; 
 }
 /* Comentário resumido */
 .comentario-resumido {

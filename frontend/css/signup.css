@@ -1,8 +1,4 @@
-/* =========================================
-   ESTILOS ESPECÍFICOS DO CADASTRO (signup.css)
-   ========================================= */
 
-/* Ajuste do grupo de seleção de perfil (Aluno/Professor) */
 .radio-group {
     display: flex;
     gap: 20px;
@@ -17,33 +13,28 @@
 }
 
 .radio-group input[type="radio"] {
-    accent-color: #970000; /* Mantém a identidade visual vermelha */
+    accent-color: #970000; 
     cursor: pointer;
     width: 16px;
     height: 16px;
 }
 
 .radio-group label {
-    margin: 0 !important; /* Remove margens padrões do label global */
+    margin: 0 !important; 
     cursor: pointer;
 }
 
-/* =========================================
-   ÁREA DE MATÉRIAS (CHECKBOXES)
-   ========================================= */
-
-/* Container das matérias com scroll suave se ficar muito grande */
 .materias-list {
     margin-top: 10px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 400px; /* Limita altura para não esticar demais o card */
-    overflow-y: auto;  /* Adiciona scroll se necessário */
-    padding-right: 5px; /* Espaço para o scroll */
+    max-height: 400px; 
+    overflow-y: auto;  
+    padding-right: 5px; 
 }
 
-/* Estilização dos Fieldsets (Caixas dos semestres) */
+
 .materias-list fieldset {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -56,7 +47,7 @@
     color: #970000;
     font-weight: bold;
     padding: 0 8px;
-    background-color: #fff; /* Para o texto não ficar sobre a linha */
+    background-color: #fff; 
     border-radius: 4px;
 }
 
@@ -83,7 +74,7 @@
     cursor: pointer;
 }
 
-/* Scrollbar personalizada (opcional, para ficar bonito no Chrome/Edge) */
+
 .materias-list::-webkit-scrollbar {
     width: 6px;
 }

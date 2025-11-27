@@ -1,5 +1,3 @@
-/* ===== SGPI FOOTER - RESPONSIVO ===== */
-
 .sgpi-footer {
     background-color: #970000;
     color: #ffffff;
@@ -9,7 +7,7 @@
     border-top: 2px solid #6f0000;
     width: 100%;
     position: relative;
-    z-index: 10; /* Garante que fique acima de elementos flutuantes se necessário */
+    z-index: 10; 
 }
 
 .footer-container {
@@ -17,7 +15,7 @@
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    justify-content: space-between; /* Espalha: Texto na esquerda, Links na direita */
+    justify-content: space-between; 
     align-items: center;
     gap: 20px;
     text-align: left;
@@ -66,7 +64,7 @@
 /* Tablet e Mobile (Telas menores que 900px) */
 @media (max-width: 900px) {
     .footer-container {
-        flex-direction: column; /* Empilha: Texto em cima, Links embaixo */
+        flex-direction: column; 
         text-align: center;
         gap: 15px;
         padding: 20px;
@@ -74,37 +72,36 @@
 
     .footer-text {
         text-align: center;
-        max-width: 100%; /* Permite usar a largura total */
+        max-width: 100%; 
         font-size: 12px;
     }
 
     .footer-links {
         justify-content: center;
         width: 100%;
-        flex-wrap: wrap; /* Permite que os links quebrem linha se necessário */
+        flex-wrap: wrap;
     }
 }
 
 /* Mobile Pequeno (Celulares estreitos) */
 @media (max-width: 480px) {
     .footer-links {
-        gap: 10px 15px; /* Gap vertical 10px, horizontal 15px */
+        gap: 10px 15px; 
     }
 
     .footer-links a {
         font-size: 12px;
-        padding: 5px 0; /* Aumenta área de toque */
+        padding: 5px 0; 
     }
     
-    /* Opcional: Esconder os separadores '|' em telas muito pequenas para limpar o visual */
     .footer-separator {
         display: none; 
     }
     
-    /* Adiciona margem entre os links já que tiramos o separador */
+    
     .footer-links a {
         margin: 0 5px;
-        background-color: rgba(0,0,0,0.1); /* Leve fundo para parecer botão */
+        background-color: rgba(0,0,0,0.1); 
         padding: 4px 8px;
         border-radius: 4px;
     }

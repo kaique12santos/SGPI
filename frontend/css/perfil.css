@@ -367,7 +367,7 @@
 /* ============================
    MEUS PROJETOS - FILTRO + LISTA
 ============================= */
-#projetos-filtro-semestre {  /* <-- ID para o filtro de semestre */
+#projetos-filtro-semestre { 
   display: inline-block;
   margin-bottom: 20px;
   padding: 8px 12px;
@@ -712,7 +712,7 @@
 .card-desc--multiline {
   white-space: pre-line; 
 }
-/* fim dos ajustes */
+
 /* Botão confirmar */
 #confirmar-disciplinas-btn,#btn-salvar-alteracoes{
   display: block;
