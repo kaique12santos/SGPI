@@ -25,13 +25,18 @@ async function processarCadastroInicial() {
       ? Array.from(document.querySelectorAll('input[name="materias"]:checked')).map(c => c.value)
       : [];
     const chaveProfessor = perfil === 'professor' ? document.getElementById('chaveProfessor').value : "";
-  
+    
     document.getElementById('passwordError').textContent = '';
     document.getElementById('emailError').textContent = '';
   
     const minLength = 6;
     const maxLength = 12;
   
+    if (perfil === 'professor' && !chaveProfessor.trim()) {
+        ativar('A chave de acesso é obrigatória para professores.', 'erro', '');
+        document.getElementById('chaveProfessor').focus(); 
+        return false;
+    }
     // ======= VALIDAÇÕES BÁSICAS =======
     if (!nome || !email || !senha || !confirmarSenha || !perfil) {
       ativar('Por favor, preencha todos os campos.', 'erro', '');
