@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const {closePool}=require ('./conexaoMysql.js');
 const path = require('path');
 const app = express();
-const port = 3000;
+require('dotenv').config();
 const frontendPath = path.join(__dirname, '..', 'frontend');
 const fs = require('fs').promises; 
 
@@ -89,7 +89,7 @@ const notFound = require('./middlewares/notFound.js');
 const errorHandler = require('./middlewares/errorHandler.js');
 
 const { AppError } = require('./helpers/response.js');
-
+const port = process.env.PORT;
 
 
 app.use(cors());

@@ -1,8 +1,8 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
+  "description": "Sistema de Gestao de Projetos Intergradores",
+  "license": "MIT",
   "author": "kaique",
   "type": "commonjs",
   "main": "server.js",
