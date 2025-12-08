@@ -8,6 +8,7 @@ const path = require('path');
 const emailTemplates = require('../utils/emailTemplates.js');
 const notificationUtils = require('../utils/notificationUtils.js');
 const multer = require('multer');
+const DriveService = require('../services/googleDriveService');
 
 // ====================================================================
 // Configuração do Upload (Multer)
@@ -16,7 +17,9 @@ const multer = require('multer');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(__dirname, '..', 'uploads');
-    fs.mkdirSync(uploadPath, { recursive: true });
+    if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+    }
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
@@ -34,32 +37,22 @@ const fileFilter = (req, file, cb) => {
   if (mimetype && extname) {
     return cb(null, true);
   }
-  cb(new Error(`Erro: O tipo de arquivo não é suportado. Apenas ${filetypes} são permitidos.`));
-};
-
-const limits = {
-  fileSize: 10 * 1024 * 1024 // 10MB
+  cb(new Error(`Erro: O tipo de arquivo não é suportado.`));
 };
 
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
-  limits: limits
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 });
 
-// Configuração do Nodemailer (mantida)
+// Configuração do Nodemailer
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT),
   secure: false,
-  auth: {
-    user: process.env.EMAIL_FROM,
-    pass: process.env.EMAIL_PASSWORD
-  }, 
-  tls: {
-    ciphers: 'SSLv3',
-    rejectUnauthorized: false
-  },
+  auth: { user: process.env.EMAIL_FROM, pass: process.env.EMAIL_PASSWORD }, 
+  tls: { ciphers: 'SSLv3', rejectUnauthorized: false },
   debug: false
 });
 
@@ -71,16 +64,10 @@ router.get('/entregas-para-avaliar', async (req, res) => {
   let connection;
   try {
     const professorId = parseInt(req.query.professor_id, 10);
-    console.log("Professor ID recebido:", professorId);
-
-    if (isNaN(professorId)) {
-      return res.status(400).json({ success: false, message: 'ID do professor inválido.' });
-    }
+    if (isNaN(professorId)) return res.status(400).json({ success: false, message: 'ID inválido.' });
 
     connection = await getConnection();
 
-    // Query Migrada: Busca entregas baseadas no professor_responsavel da OFERTA
-    // Esta lógica é baseada na sua view 'v_entregas_para_avaliar'
     const sql = `
       SELECT 
         e.id AS entrega_id,
@@ -110,20 +97,13 @@ router.get('/entregas-para-avaliar', async (req, res) => {
     `;
 
     const [rows] = await connection.query(sql, [professorId]);
-
     res.json({ success: true, entregas: rows });
 
   } catch (error) {
-    console.error('Erro ao buscar entregas recebidas:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erro ao buscar entregas recebidas.',
-      error: error.message
-    });
+    console.error('Erro ao buscar entregas:', error);
+    res.status(500).json({ success: false, message: 'Erro interno.' });
   } finally {
-    if (connection) {
-      connection.release();
-    }
+    if (connection) connection.release();
   }
 });
 
@@ -133,17 +113,12 @@ router.get('/entregas-para-avaliar', async (req, res) => {
 // ====================================================================
 router.post('/avaliacoes', upload.single('arquivo_devolutiva'), async (req, res) => {
   const professorId = req.user?.id; 
-  
-  // Dados agora vêm do req.body (FormData)
   const { entrega_id, nota, comentario } = req.body;
-  
-  // O arquivo (opcional) vem do req.file
   const arquivo = req.file;
 
   if (!entrega_id || !professorId || nota == null || comentario == null) {
-    // Se a validação falhar, deleta o arquivo que o multer salvou
     if (arquivo) fs.unlinkSync(arquivo.path);
-    return res.status(400).json({ success: false, message: 'Campos obrigatórios faltando.' });
+    return res.status(400).json({ success: false, message: 'Dados incompletos.' });
   }
 
   const notaFloat = parseFloat(nota);
@@ -152,12 +127,19 @@ router.post('/avaliacoes', upload.single('arquivo_devolutiva'), async (req, res)
   try {
     connection = await getConnection();
 
-    // ---- VALIDAÇÃO DA NOTA MÁXIMA (Lógica existente) ----
+    // 1. Busca dados para validar e para saber onde salvar no Drive
     const [rows] = await connection.query(`
-      SELECT a.nota_maxima, do_tbl.professor_responsavel
+      SELECT 
+        a.nota_maxima, 
+        do_tbl.professor_responsavel,
+        g.nome as grupo_nome,
+        s.periodo,
+        s.ano
       FROM Entregas e
       JOIN Atividades a ON e.atividade_id = a.id
       JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id
+      JOIN Grupos g ON e.grupo_id = g.id
+      JOIN Semestres s ON g.semestre_id = s.id
       WHERE e.id = ?
     `, [entrega_id]);
 
@@ -166,55 +148,75 @@ router.post('/avaliacoes', upload.single('arquivo_devolutiva'), async (req, res)
       return res.status(404).json({ success: false, message: 'Entrega não encontrada.' });
     }
 
-    const { nota_maxima, professor_responsavel } = rows[0];
+    const info = rows[0];
 
-    if (professor_responsavel !== professorId) {
+    if (info.professor_responsavel !== professorId) {
       if (arquivo) fs.unlinkSync(arquivo.path);
-      return res.status(403).json({ success: false, message: 'Você não tem permissão para avaliar esta entrega.' });
+      return res.status(403).json({ success: false, message: 'Sem permissão.' });
     }
 
-    if (notaFloat < 0 || notaFloat > nota_maxima) {
+    if (notaFloat < 0 || notaFloat > info.nota_maxima) {
       if (arquivo) fs.unlinkSync(arquivo.path);
-      return res.status(400).json({ 
-        success: false, 
-        message: `A nota deve estar entre 0 e ${nota_maxima}.` 
-      });
+      return res.status(400).json({ success: false, message: `Nota inválida (Max: ${info.nota_maxima}).` });
     }
-    // -----------------------------------
 
-    // 4. Insere a avaliação COM os novos campos de arquivo
-    const caminhoDevolutiva = arquivo ? arquivo.path : null;
-    const nomeOriginalDevolutiva = arquivo ? arquivo.originalname : null;
+    // --- LÓGICA DE UPLOAD PARA O DRIVE (FEEDBACK) ---
+    let driveLink = null;
+    let driveId = null;
+    
+    // Tratamento do nome UTF-8
+    let nomeOriginal = null;
+    if (arquivo) {
+        nomeOriginal = arquivo.originalname;
+        try {
+            nomeOriginal = Buffer.from(arquivo.originalname, 'latin1').toString('utf8');
+        } catch (e) {}
 
+        // Recria a estrutura de pastas para garantir que existe
+        // Ano > Semestre > Projetos > Grupo
+        const nomePastaSemestre = `${info.ano}_${info.periodo}`;
+        const rootId = process.env.DRIVE_ID_ACADEMIC;
+        
+        const anoFolder = await DriveService.createFolder(info.ano.toString(), rootId);
+        const semestreFolder = await DriveService.createFolder(nomePastaSemestre, anoFolder.id);
+        const categoriaFolder = await DriveService.createFolder('Projetos_Integradores', semestreFolder.id);
+        const grupoFolder = await DriveService.createFolder(info.grupo_nome, categoriaFolder.id);
+
+        // Upload do feedback na mesma pasta do grupo
+        console.log(`Enviando devolutiva para pasta do grupo: ${info.grupo_nome}`);
+        const driveFile = await DriveService.uploadFile(
+            arquivo.path, 
+            `FEEDBACK - ${nomeOriginal}`, // Prefixo para identificar fácil
+            arquivo.mimetype, 
+            grupoFolder.id
+        );
+
+        driveLink = driveFile.webViewLink;
+        driveId = driveFile.id;
+        
+        // Limpa temp
+        fs.unlinkSync(arquivo.path);
+    }
+
+    // 4. Insere a avaliação
     await connection.query(
       `INSERT INTO Avaliacoes 
          (entrega_id, professor_id, nota, comentario, data_avaliacao, 
-          caminho_arquivo_devolutiva, nome_original_devolutiva)
-       VALUES (?, ?, ?, ?, NOW(), ?, ?)`,
-      [entrega_id, professorId, notaFloat, comentario, caminhoDevolutiva, nomeOriginalDevolutiva]
+          caminho_arquivo_devolutiva, google_file_id, nome_original_devolutiva)
+       VALUES (?, ?, ?, ?, NOW(), ?, ?, ?)`,
+      [entrega_id, professorId, notaFloat, comentario, driveLink, driveId, nomeOriginal]
     );
     
     res.json({ success: true, message: 'Avaliação enviada com sucesso!' });
 
-    // (A lógica de e-mail de avaliação continua funcionando)
-    await notificarAlunosSobreAvaliacao(
-      connection, 
-      entrega_id, 
-      notaFloat, 
-      comentario
-    );
+    // Notificar alunos
+    await notificarAlunosSobreAvaliacao(connection, entrega_id, notaFloat, comentario);
 
   } catch (error) {
-    // Se der erro no banco, deleta o arquivo que o multer salvou
-    if (arquivo && fs.existsSync(arquivo.path)) {
-      fs.unlinkSync(arquivo.path);
-    }
-    
-    console.error('Erro ao salvar avaliação:', error);
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ success: false, message: 'Esta entrega já foi avaliada.' });
-    }
-    res.status(500).json({ success: false, message: 'Erro ao salvar avaliação.', error: error.message });
+    if (arquivo && fs.existsSync(arquivo.path)) fs.unlinkSync(arquivo.path);
+    console.error('Erro ao avaliar:', error);
+    if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ success: false, message: 'Já avaliada.' });
+    res.status(500).json({ success: false, message: 'Erro no servidor.' });
   } finally {
     if (connection) await connection.release();
   }
@@ -317,21 +319,20 @@ router.post('/atividades', async (req, res) => {
 // ====================================================================
 router.get('/entregas/download/:id', async (req, res) => {
   const entregaId = parseInt(req.params.id, 10);
-  const professorId = req.user?.id; // Pego do authPerfil
+  const professorId = req.user?.id;
 
-  if (!entregaId || !professorId) {
-    return res.status(400).json({ success: false, message: 'IDs inválidos.' });
-  }
+  if (!entregaId || !professorId) return res.status(400).json({ success: false, message: 'IDs inválidos.' });
 
   let connection;
   try {
     connection = await getConnection();
 
-    // 1. Verifica se a entrega existe E se o professor é o responsável
+    // Busca dados e verifica se o professor é dono da oferta
     const [rows] = await connection.query(`
       SELECT 
         e.caminho_arquivo,
-        e.nome_arquivo_original
+        e.nome_arquivo_original,
+        e.google_file_id
       FROM Entregas e
       JOIN Atividades a ON e.atividade_id = a.id
       JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id
@@ -339,29 +340,31 @@ router.get('/entregas/download/:id', async (req, res) => {
     `, [entregaId, professorId]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Entrega não encontrada ou você não tem permissão para baixá-la.' });
+      return res.status(404).json({ success: false, message: 'Não encontrado ou sem permissão.' });
     }
 
     const entrega = rows[0];
-    const caminhoAbsoluto = path.resolve(entrega.caminho_arquivo);
 
-    // 2. Verifica se o arquivo existe no disco
-    if (!fs.existsSync(caminhoAbsoluto)) {
-      return res.status(404).json({ success: false, message: 'Arquivo não encontrado no servidor.' });
+    // CENÁRIO 1: Drive (Retorna JSON)
+    if (entrega.google_file_id || (entrega.caminho_arquivo && entrega.caminho_arquivo.startsWith('http'))) {
+        return res.json({ 
+            success: true, 
+            isDrive: true, 
+            url: entrega.caminho_arquivo 
+        });
     }
 
-    // 3. Força o download com o nome original
-    const nomeOriginal = entrega.nome_arquivo_original || path.basename(entrega.caminho_arquivo);
-    
-    res.download(caminhoAbsoluto, nomeOriginal, (err) => {
-      if (err) {
-        console.error("Erro ao enviar arquivo para download (professor):", err);
-      }
-    });
+    // CENÁRIO 2: Local (Retorna Blob)
+    const caminhoAbsoluto = path.resolve(entrega.caminho_arquivo);
+    if (fs.existsSync(caminhoAbsoluto)) {
+      return res.download(caminhoAbsoluto, entrega.nome_arquivo_original);
+    } else {
+      return res.status(404).json({ success: false, message: 'Arquivo físico não encontrado.' });
+    }
 
   } catch (err) {
-    console.error('Erro ao processar download (professor):', err);
-    res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
+    console.error('Erro download prof:', err);
+    res.status(500).json({ success: false });
   } finally {
     if (connection) connection.release();
   }
