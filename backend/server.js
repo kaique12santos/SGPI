@@ -33,7 +33,10 @@ app.use(
           "'self'",
           "https://api.userway.org",
           "https://*.userway.org",
-          "https://cdn.jsdelivr.net"  
+          "https://cdn.jsdelivr.net",
+          "https://drive.google.com",              // <--- ADICIONAR
+          "https://*.googleusercontent.com",       // <--- ADICIONAR
+          "https://docs.google.com"  
         ],
         imgSrc: [
           "'self'",
@@ -41,7 +44,8 @@ app.use(
           "https://cdn.userway.org",
           "https://*.userway.org",
           "https://static.vecteezy.com",
-          "https://cdn.jsdelivr.net"
+          "https://cdn.jsdelivr.net",
+          "https://*.googleusercontent.com"
         ],
         fontSrc: [
           "'self'",
@@ -53,7 +57,8 @@ app.use(
         frameSrc: [
           "'self'",
           "https://cdn.userway.org",
-          "https://*.userway.org"
+          "https://*.userway.org",
+          "https://docs.google.com"
         ],
       },
     },
