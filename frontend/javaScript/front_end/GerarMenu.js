@@ -34,21 +34,30 @@ function gerarMenuMobile(tipoPerfil) {
     const itensMenu = getItensMenu();
 
     if (!itensMenu[tipoPerfil]) {
-    console.error('Tipo de perfil inválido:', tipoPerfil);
-    return;
+        console.error('Tipo de perfil inválido:', tipoPerfil);
+        return;
     }
 
     itensMenu[tipoPerfil].forEach(item => {
-    const link = document.createElement('a');
-    link.href = item.link || '#';
-    link.textContent = item.texto;
-    if (item.id) {
-        link.id = item.id;
-        if (item.id === 'logout-button') {
-            link.addEventListener('click', realizarLogout);
+        const link = document.createElement('a');
+        link.href = item.link || '#';
+        link.textContent = item.texto;
+
+        // --- ADICIONE ISTO AQUI ---
+        if (item.target) {
+            link.target = item.target;
+            // Boa prática de segurança para links externos
+            link.rel = "noopener noreferrer"; 
         }
-    }
-    menuItens.appendChild(link);
+        // --------------------------
+
+        if (item.id) {
+            link.id = item.id;
+            if (item.id === 'logout-button') {
+                link.addEventListener('click', realizarLogout);
+            }
+        }
+        menuItens.appendChild(link);
     });
 }
 
@@ -61,22 +70,31 @@ function gerarMenuDesktop(tipoPerfil) {
     const itensMenu = getItensMenu();
 
     if (!itensMenu[tipoPerfil]) {
-    console.error('Tipo de perfil inválido:', tipoPerfil);
-    return;
+        console.error('Tipo de perfil inválido:', tipoPerfil);
+        return;
     }
 
     itensMenu[tipoPerfil].forEach(item => {
-    const link = document.createElement('a');
-    link.href = item.link || '#';
-    link.textContent = item.texto;
-    link.className = 'menu-desktop-item';
-    if (item.id) {
-        link.id = item.id;
-        if (item.id === 'logout-button') {
-            link.addEventListener('click', realizarLogout);
+        const link = document.createElement('a');
+        link.href = item.link || '#';
+        link.textContent = item.texto;
+        link.className = 'menu-desktop-item';
+
+        // --- ADICIONE ISTO AQUI ---
+        if (item.target) {
+            link.target = item.target;
+            // Boa prática de segurança para links externos
+            link.rel = "noopener noreferrer";
         }
-    }
-    menuDesktop.appendChild(link);
+        // --------------------------
+
+        if (item.id) {
+            link.id = item.id;
+            if (item.id === 'logout-button') {
+                link.addEventListener('click', realizarLogout);
+            }
+        }
+        menuDesktop.appendChild(link);
     });
 }
 
@@ -86,7 +104,7 @@ function getItensMenu() {
 
     { texto: 'Próximas entregas', link: '/listaTarefas' },
     { texto: 'Avaliações', link: '/notas' },
-    { texto: 'Manual do Curso', link: '/uploads/manuais/Manual_de_Projetos_Interdisciplinares_para_o_CST_em_Desenvolvimento_de_Software Multiplataforma.pdf' },
+    { texto: 'Manual do Curso', link: 'https://drive.google.com/file/d/1xcY21Jn1IgjfqUWu3XM8JpxXLWKqcJC_/view?usp=sharing',target: '_blank' },
     {texto: 'Meu Perfil', link: '/perfil'},
     {texto: 'Sair', id:'logout-button'}
     ],

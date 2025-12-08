@@ -54,19 +54,18 @@ document.addEventListener("DOMContentLoaded", () => {
 async function handleDownload(entregaId, nomeOriginal) {
   const link = dom.linkDownload;
   const originalText = link.innerText;
-  
+
   try {
-    link.innerText = 'Baixando...';
-    link.style.pointerEvents = 'none'; // Desabilita o link temporariamente
-    
-    // 1. Pega o token (assumindo que você o salva no localStorage)
-    const token = localStorage.getItem('token'); 
+    link.innerText = 'Processando...';
+    link.style.pointerEvents = 'none';
+
+    const token = localStorage.getItem('token');
     if (!token) {
-      mostrarAlerta("Usuário não autenticado. Faça login novamente.", "erro");
+      ativar("Usuário não autenticado.", "erro"); // Usando sua função ativar
       return;
     }
 
-    // 2. Faz a requisição FETCH autenticada
+    // Faz o fetch para o SEU backend (permitido pelo CSP 'self')
     const response = await fetch(`/aluno/entregas/download/${entregaId}`, {
       method: 'GET',
       headers: {
@@ -74,37 +73,50 @@ async function handleDownload(entregaId, nomeOriginal) {
       }
     });
 
-    if (!response.ok) {
-      // Tenta ler a mensagem de erro que o backend enviou
-      const errData = await response.json();
-      throw new Error(errData.message || 'Falha no download');
+    // Verifica o tipo de conteúdo que o backend devolveu
+    const contentType = response.headers.get("content-type");
+
+    // CASO 1: Backend retornou JSON (Link do Drive ou Erro)
+    if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Erro ao baixar');
+        }
+
+        if (data.isDrive && data.url) {
+            // A MÁGICA: window.open não passa pelo CSP de conexão, é uma navegação
+            window.open(data.url, '_blank');
+        } else {
+            // Caso raro onde é JSON mas não é drive (ex: erro genérico)
+            ativar(data.message || "Erro desconhecido", "info");
+        }
+    } 
+    // CASO 2: Backend retornou Blob/Binário (Arquivo Local Antigo)
+    else {
+        if (!response.ok) throw new Error('Erro no download local');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = nomeOriginal; 
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
     }
-
-    // 3. Converte a resposta em um "Blob" (o arquivo)
-    const blob = await response.blob();
-
-    // 4. Cria um link "fantasma" na memória para forçar o download
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = nomeOriginal; // Usa o nome original que queremos!
-    document.body.appendChild(a);
-    
-    a.click(); // Simula o clique no link fantasma
-    
-    // 5. Limpa da memória
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
 
   } catch (err) {
     console.error("Erro no download:", err);
-    mostrarAlerta(`Erro ao baixar: ${err.message}`, "erro");
+    ativar(`Erro ao baixar: ${err.message}`, "erro");
   } finally {
     link.innerText = originalText;
-    link.style.pointerEvents = 'auto'; // Reabilita o link
+    link.style.pointerEvents = 'auto';
   }
 }
+
 async function carregarDetalhes() {
   mostrarLoading(true);
   try {

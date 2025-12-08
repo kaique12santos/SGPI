@@ -81,14 +81,13 @@ async function carregarEntregasRecebidas() {
 }
 
 /**
- * NOVA FUNÇÃO: Cuida do download de arquivos de forma autenticada.
- * (Copiada e adaptada da que fizemos para o aluno)
+ * NOVA FUNÇÃO: Cuida do download de arquivos de forma híbrida (Drive ou Local).
  */
 async function handleDownload(entregaId, nomeOriginal, baseEndpoint, link) {
   const originalText = link.innerText;
   
   try {
-    link.innerText = 'Baixando...';
+    link.innerText = 'Processando...'; // Mudamos para "Processando" pois pode não ser um download direto
     link.style.pointerEvents = 'none';
     
     const token = localStorage.getItem('token'); 
@@ -96,7 +95,7 @@ async function handleDownload(entregaId, nomeOriginal, baseEndpoint, link) {
       throw new Error("Usuário não autenticado.");
     }
 
-    // Usa o baseEndpoint para construir a URL correta
+    // 1. Faz a requisição ao backend
     const response = await fetch(`${baseEndpoint}/entregas/download/${entregaId}`, {
       method: 'GET',
       headers: {
@@ -104,26 +103,45 @@ async function handleDownload(entregaId, nomeOriginal, baseEndpoint, link) {
       }
     });
 
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.message || 'Falha no download');
-    }
+    // 2. Verifica o tipo de conteúdo que o backend devolveu
+    const contentType = response.headers.get("content-type");
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = nomeOriginal;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    // CASO A: Backend retornou JSON (Link do Drive ou Erro)
+    if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+
+        // Se houve erro HTTP (404, 500, etc)
+        if (!response.ok) {
+            throw new Error(data.message || 'Falha no download');
+        }
+
+        // Se for arquivo do Drive, abre em nova aba
+        if (data.isDrive && data.url) {
+            window.open(data.url, '_blank');
+        } else {
+            // Caso raro (JSON de sucesso mas sem URL)
+            alert(data.message || "Erro: Link não encontrado.");
+        }
+    } 
+    // CASO B: Backend retornou Blob (Arquivo Local - Legado)
+    else {
+        if (!response.ok) throw new Error('Falha no download do arquivo local');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = nomeOriginal;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
 
   } catch (err) {
     console.error("Erro no download:", err);
-    // Como não temos a função 'ativar' aqui, usamos o 'alert' padrão
-    alert(`Erro ao baixar: ${err.message}`);
+    alert(`Erro ao acessar arquivo: ${err.message}`);
   } finally {
     link.innerText = originalText;
     link.style.pointerEvents = 'auto';

@@ -167,8 +167,16 @@ async function abrirModalEdicao(div, atividade) {
   overlay.className = "div-zindex";
 
   const dataISO = new Date(prazo_entrega);
-  const dataFormatada = dataISO.toISOString().slice(0, 16);
 
+  const ano = dataISO.getFullYear();
+  const mes = String(dataISO.getMonth() + 1).padStart(2, '0');
+  const dia = String(dataISO.getDate()).padStart(2, '0');
+  const hora = String(dataISO.getHours()).padStart(2, '0');
+  const minuto = String(dataISO.getMinutes()).padStart(2, '0');
+  
+  const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+  
+  console.log(dataFormatada)
   const modal = document.createElement("div");
   modal.className = "div-mostrar modal-edicao";
   modal.innerHTML = `

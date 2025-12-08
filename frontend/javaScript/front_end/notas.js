@@ -13,31 +13,60 @@ function filtrarNotas() {
 }
 
 /* ---------- DOWNLOAD DEVOLUTIVA ---------- */
+
+
 async function handleDownloadDevolutiva(avaliacaoId, nomeOriginal, link) {
   const originalText = link.innerText;
+  
   try {
-    link.innerText = 'Baixando...';
+    link.innerText = 'Processando...'; // Mudado para "Processando" pois pode abrir aba
     link.style.pointerEvents = 'none';
 
     const token = localStorage.getItem('token');
     if (!token) throw new Error("Usuário não autenticado.");
 
+    // Faz a requisição ao seu backend
     const response = await fetch(`/aluno/avaliacoes/download/${avaliacaoId}`, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
-    if (!response.ok) throw new Error(`Erro ${response.status}: falha no download`);
+    // Verifica o tipo de conteúdo (JSON ou Arquivo)
+    const contentType = response.headers.get("content-type");
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nomeOriginal;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    // === CENÁRIO 1: Google Drive (JSON) ===
+    if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || `Erro ${response.status}`);
+        }
+
+        // Abre o link do Drive em nova aba (Sem bloqueio de CSP)
+        if (data.isDrive && data.url) {
+            window.open(data.url, '_blank');
+        } else {
+            ativar("Erro: Link do arquivo não encontrado.", 'erro', '');
+        }
+    } 
+    // === CENÁRIO 2: Arquivo Local (Blob) ===
+    else {
+        if (!response.ok) throw new Error(`Erro ${response.status}: falha no download`);
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = nomeOriginal;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
 
   } catch (err) {
+    console.error(err);
     ativar(`Erro ao baixar: ${err.message}`, 'erro', '');
   } finally {
     link.innerText = originalText;
