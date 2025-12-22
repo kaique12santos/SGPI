@@ -34,8 +34,8 @@ app.use(
           "https://api.userway.org",
           "https://*.userway.org",
           "https://cdn.jsdelivr.net",
-          "https://drive.google.com",              // <--- ADICIONAR
-          "https://*.googleusercontent.com",       // <--- ADICIONAR
+          "https://drive.google.com",             
+          "https://*.googleusercontent.com",       
           "https://docs.google.com"  
         ],
         imgSrc: [
@@ -87,6 +87,7 @@ const semestreRoutes = require('./routes/semestres.js');
 const atividadesProfessorRoutes = require ('./routes/atividadesProfessorRoutes.js')
 const configRoutes = require('./routes/configRoutes');
 const cleanupService = require('./services/cleanupService.js');
+const adminBackupRoutes = require('./routes/adminBackupRoutes');
 
 
 //importar as rotas de tratamento de erros
@@ -128,7 +129,7 @@ app.use('/aluno', authPerfil, alunoAtividadesRoutes);
 app.use('/', entregas);
 app.use('/',projetos);
 app.use('/config', configRoutes);
-
+app.use('/admin/backup', adminBackupRoutes);
 
 app.use('/coordenador',ListaProjetos);
 app.use('/coordenador',coordenadorRelatorios);
@@ -138,26 +139,12 @@ app.use('/semestres', semestreRoutes);
 
 
 
-// ROTA DINÂMICA PARA SERVIR OUTRAS PÁGINAS HTML DA PASTA 'views'
-// Ex: /avaliar vai servir frontend/views/avaliar.html
-// Ex: /TelaPrincipal vai servir frontend/views/TelaPrincipal.html
-// Esta rota deve vir DEPOIS de todas as suas rotas de API e rotas estáticas específicas.
-app.get('/:pageName', (req, res, next) => { // Adicionado 'next' para possível encadeamento
+
+app.get('/:pageName', (req, res, next) => { 
     const pageName = req.params.pageName;
 
-    // Lista de nomes de página válidos (opcional, mas recomendado para segurança e evitar conflitos)
-    // Se você não quiser manter uma lista, pode remover esta validação,
-    // mas a validação de caracteres abaixo é altamente recomendada.
-    // const validPages = ['TelaPrincipal', 'avaliar', 'criar-atividade', /* ... outros nomes de arquivo sem .html ... */];
-    // if (!validPages.includes(pageName)) {
-    //     return next(); // Passa para o próximo manipulador (o 404) se não for uma página conhecida
-    // }
-
-    // Validação para evitar que `pageName` contenha caracteres perigosos
-    // Permite apenas letras (maiúsculas e minúsculas), números, hífen e underscore.
     if (!/^[a-zA-Z0-9_-]+$/.test(pageName)) {
-        // Se o nome da página contiver caracteres inesperados, consideramos como não encontrado.
-        // Você pode enviar diretamente o 404 aqui ou chamar next() para o manipulador de 404 global.
+
         return res.status(404).sendFile(path.join(frontendPath, 'views', '404.html'), (err404) => {
             if (err404 && !res.headersSent) {
                 res.status(404).send('Página não encontrada (e 404.html personalizado também não).');
@@ -169,14 +156,12 @@ app.get('/:pageName', (req, res, next) => { // Adicionado 'next' para possível 
 
     res.sendFile(filePath, (err) => {
         if (err) {
-            // Se o arquivo não for encontrado ou outro erro ocorrer ao enviar
-            if (!res.headersSent) { // Verifica se a resposta já não foi iniciada
-                if (err.code === 'ENOENT') { // ENOENT = Error NO ENTry (arquivo ou diretório não encontrado)
-                    // O arquivo HTML específico não foi encontrado, então chamamos next()
-                    // para que o manipulador de 404 global seja acionado.
+           
+            if (!res.headersSent) { 
+                if (err.code === 'ENOENT') { 
+            
                     next();
                 } else {
-                    // Outro tipo de erro (ex: permissão de leitura)
                     console.error(`Erro ao servir o arquivo ${filePath}:`, err);
                     res.status(500).send('Ocorreu um erro no servidor ao tentar carregar a página.');
                 }
