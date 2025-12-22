@@ -86,6 +86,7 @@ const professoresDiciplinas = require('./routes/professoresDiciplinas.js')
 const semestreRoutes = require('./routes/semestres.js');
 const atividadesProfessorRoutes = require ('./routes/atividadesProfessorRoutes.js')
 const configRoutes = require('./routes/configRoutes');
+const cleanupService = require('./services/cleanupService.js');
 
 
 //importar as rotas de tratamento de erros
@@ -201,6 +202,8 @@ app.use(async (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
+
+cleanupService.iniciarAgendamento();
 
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}/`);
