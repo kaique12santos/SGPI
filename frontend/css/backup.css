@@ -1,0 +1,153 @@
+/* =========================================
+   ESTILOS DO PAINEL DE BACKUP
+   Arquivo: backup.css
+   ========================================= */
+
+/* Container Principal do Conteúdo */
+.backup-main {
+    flex: 1; /* Ocupa o espaço restante ao lado do menu */
+    padding: 40px;
+    background-color: #f8f9fa; /* Fundo suave */
+    overflow-y: auto; /* Scroll apenas no conteúdo se necessário */
+}
+
+.backup-header h1 {
+    color: #1e293b;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.backup-header p {
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+/* --- ESTILO DOS CARDS DE ANO --- */
+.backup-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 900px;
+}
+
+.year-card {
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 5px solid #eb2525; /* Azul destaque */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.year-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.year-info h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.year-info p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* --- BOTÕES --- */
+/* Botão Padrão (Download) */
+.btn-download {
+    background-color: #0f172a; /* Azul Escuro/Preto */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.btn-download:hover {
+    background-color: #1e293b;
+}
+
+.btn-download:disabled {
+    background-color: #94a3b8;
+    cursor: wait;
+}
+
+/* Botão Perigo (Excluir) */
+.btn-delete {
+    background-color: #dc2626; /* Vermelho Perigo */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #b91c1c; /* Vermelho mais escuro */
+}
+
+.btn-delete:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* --- ANIMAÇÃO DE LOADING (SPINNER) --- */
+.spinner {
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top: 3px solid white;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: none; /* Oculto por padrão */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .year-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .card-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

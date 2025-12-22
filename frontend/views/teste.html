@@ -1,17 +1,78 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/alerts.css">
-    
-  
+    <title>SGPI - Backup Anual</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/alertConfirm.css">
     <link rel="stylesheet" href="../css/alerts.css">
+    <style>
+        .btn-delete {
+    background-color: #dc2626; /* Vermelho */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    margin-left: 10px; /* Separar do botão de download */
+}
+
+.btn-delete:hover {
+    background-color: #b91c1c;
+}
+        .backup-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .year-card {
+            background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #2563eb;
+        }
+        .year-info h3 { margin: 0; color: #1e293b; font-size: 1.2rem; }
+        .year-info p { margin: 5px 0 0; color: #64748b; font-size: 0.9rem; }
+        .btn-download {
+            background-color: #0f172a; color: white; padding: 10px 20px;
+            border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 8px;
+            transition: background 0.2s; border: none; cursor: pointer; font-size: 0.95rem;
+        }
+        .btn-download:hover { background-color: #1e293b; }
+        .btn-download:disabled { background-color: #94a3b8; cursor: wait; }
+        
+        /* Loading Spinner simples */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white;
+            width: 16px; height: 16px; animation: spin 1s linear infinite; display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-   
+    <div id="menu-desktop"></div>
 
-     </body>
+    <div class="main-content">
+        <header>
+            <div class="user-info">
+                <span>Administrador</span>
+                <button id="logout-button" class="logout-btn">Sair</button>
+            </div>
+        </header>
+
+        <div class="backup-container">
+            <h1>💾 Backup e Arquivamento</h1>
+            <p>Selecione um ano letivo para gerar o arquivo ZIP completo contendo todos os projetos, entregas e avaliações.</p>
+            
+            <div id="lista-anos" style="margin-top: 30px;">
+                <p>Carregando anos disponíveis...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../javaScript/utils/navigation-buttons.js"></script>
+    <script type="module" src="../javaScript/front_end/backup.js"></script>
+</body>
 </html>

@@ -136,6 +136,7 @@ function getItensMenu() {
     administrador: [
         { texto: 'Gerenciar usuarios', link: '/gerenciar-usuarios' },
         { texto: 'Controle de Semestres', link: '/painelSemestre' },
+        { texto: 'Backup e Arquivamento', link: '/backup' },
         {texto: 'Meu Perfil', link: '/perfil'},
         {texto: 'Sair', id:'logout-button'}
     ]
