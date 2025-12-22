@@ -219,17 +219,14 @@ router.post('/entregas', upload.single('arquivo'), async (req, res) => {
   const atividadeId = parseInt(req.body.atividade_id, 10);
   const alunoId = req.user?.id; 
   const caminhoTemporario = req.file?.path;
-
+  
+  // Tratamento de nome UTF-8
   let nomeOriginal = req.file?.originalname;
-  try {
-      nomeOriginal = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
-  } catch (e) {
-      // Se der erro na conversão, mantém o original
-      nomeOriginal = req.file?.originalname;
+  if (nomeOriginal) {
+      try { nomeOriginal = Buffer.from(nomeOriginal, 'latin1').toString('utf8'); } catch (e) {}
   }
   const mimeType = req.file?.mimetype;
 
- 
   if (!caminhoTemporario) {
     return res.status(400).json({ success: false, message: 'Nenhum arquivo enviado.' });
   }
@@ -238,64 +235,50 @@ router.post('/entregas', upload.single('arquivo'), async (req, res) => {
   try {
     connection = await getConnection();
 
-    // 1. Busca dados da Atividade, Grupo e Semestre
-    // CORREÇÃO: Usamos s.periodo e s.ano conforme o seu Dump SQL
+    // 1. Busca dados da Atividade e Descobre o Grupo CORRETO
+    // A correção aqui é filtrar o grupo pela DISCIPLINA da oferta da atividade
     const [dados] = await connection.query(`
       SELECT 
         g.id as grupo_id, 
         g.nome as grupo_nome,
         s.ativo,
-        CONCAT(s.periodo, '/', s.ano) as semestre_nome, -- Corrigido para 'periodo'
+        CONCAT(s.periodo, '/', s.ano) as semestre_nome,
         a.prazo_entrega
       FROM Atividades a
       JOIN Disciplinas_Ofertas do_tbl ON a.oferta_id = do_tbl.id
       JOIN Semestres s ON do_tbl.semestre_id = s.id
       JOIN Aluno_Oferta ao ON do_tbl.id = ao.oferta_id
       JOIN Usuario_Grupo ug ON ao.aluno_id = ug.usuario_id
-      JOIN Grupos g ON ug.grupo_id = g.id AND g.semestre_id = do_tbl.semestre_id
+      -- CORREÇÃO CRÍTICA: O Join do grupo agora respeita a disciplina OU a origem geral
+      JOIN Grupos g ON ug.grupo_id = g.id 
+           AND g.semestre_id = do_tbl.semestre_id
+           AND (g.disciplina_id = do_tbl.disciplina_id OR g.disciplina_id IS NULL)
       WHERE a.id = ? AND ao.aluno_id = ?
+      LIMIT 1
     `, [atividadeId, alunoId]);
 
     // --- Validações ---
     if (dados.length === 0 || !dados[0].grupo_id) {
-      throw new Error('Grupo não encontrado ou aluno não matriculado nesta atividade.');
+      throw new Error('Grupo não encontrado. Verifique se você está matriculado e em um grupo para esta disciplina.');
     }
     const info = dados[0];
 
-    // O campo 'ativo' no banco é TinyInt (0 ou 1), então a comparação funciona
-    if (info.ativo !== 1) throw new Error('Semestre encerrado. Não é possível enviar atividades.');
-    
-    if (new Date(info.prazo_entrega) < new Date()) throw new Error('O prazo para esta atividade já encerrou.');
+    if (info.ativo !== 1) throw new Error('Semestre encerrado.');
+    if (new Date(info.prazo_entrega) < new Date()) throw new Error('Prazo encerrado.');
 
     // --- LÓGICA DE PASTAS DO DRIVE ---
-    // Parse do semestre (Ex: "1/2025" -> periodo="1", ano="2025")
     const [periodo, ano] = info.semestre_nome.split('/'); 
-    const nomePastaSemestre = `${ano}_${periodo}`; // Ex: "2025_1"
+    const nomePastaSemestre = `${ano}_${periodo}`;
 
-    // 1. Pasta Raiz (Do .env)
+    const DriveService = require('../services/googleDriveService');
     const rootId = process.env.DRIVE_ID_ACADEMIC;
-
-    // 2. Pasta do Ano (Cria ou pega existente)
     const anoFolder = await DriveService.createFolder(ano, rootId);
-
-    // 3. Pasta do Semestre (Dentro do Ano)
     const semestreFolder = await DriveService.createFolder(nomePastaSemestre, anoFolder.id);
-
-    // 4. Pasta de Categoria (Fixa para organização)
     const categoriaFolder = await DriveService.createFolder('Projetos_Integradores', semestreFolder.id);
-
-    // 5. Pasta do Grupo
     const grupoFolder = await DriveService.createFolder(info.grupo_nome, categoriaFolder.id);
 
     // --- UPLOAD PARA O DRIVE ---
-    console.log(`Iniciando upload para pasta do grupo: ${info.grupo_nome} (ID: ${grupoFolder.id})`);
-    
-    const driveFile = await DriveService.uploadFile(
-      caminhoTemporario, 
-      nomeOriginal, 
-      mimeType, 
-      grupoFolder.id
-    );
+    const driveFile = await DriveService.uploadFile(caminhoTemporario, nomeOriginal, mimeType, grupoFolder.id);
 
     // --- ATUALIZAÇÃO NO BANCO ---
     const [entregaExistente] = await connection.query(
@@ -304,51 +287,33 @@ router.post('/entregas', upload.single('arquivo'), async (req, res) => {
     );
 
     if (entregaExistente.length > 0) {
-      // Atualizar: Se tinha arquivo no Drive, deleta o antigo
       const antiga = entregaExistente[0];
-      
       if (antiga.google_file_id) {
-        // Tenta deletar da nuvem (catch erro silencioso para não parar o fluxo)
-        DriveService.deleteFile(antiga.google_file_id).catch(err => console.error('Aviso: Erro ao deletar arquivo antigo do Drive:', err.message));
-      } else if (antiga.caminho_arquivo && !antiga.caminho_arquivo.startsWith('http')) {
-        // Se era arquivo local antigo, deleta do disco
-        if (fs.existsSync(antiga.caminho_arquivo)) {
-            try { fs.unlinkSync(antiga.caminho_arquivo); } catch(e) {}
-        }
+        DriveService.deleteFile(antiga.google_file_id).catch(err => console.error('Erro delete drive:', err.message));
       }
-
+      
       await connection.query(
         `UPDATE Entregas SET 
-           caminho_arquivo = ?,         
-           google_file_id = ?,          
-           nome_arquivo_original = ?,
-           aluno_responsavel_id = ?, 
-           data_entrega = NOW(), 
-           status = 'Entregue' 
+           caminho_arquivo = ?, google_file_id = ?, nome_arquivo_original = ?,
+           aluno_responsavel_id = ?, data_entrega = NOW(), status = 'Entregue' 
          WHERE id = ?`,
         [driveFile.webViewLink, driveFile.id, nomeOriginal, alunoId, antiga.id]
       );
-      
-      res.json({ success: true, message: 'Entrega atualizada no Drive com sucesso!' });
-      
+      res.json({ success: true, message: 'Entrega atualizada com sucesso!' });
     } else {
-      // Inserir Nova
       await connection.query(
         `INSERT INTO Entregas 
            (atividade_id, grupo_id, aluno_responsavel_id, caminho_arquivo, google_file_id, nome_arquivo_original, status, data_entrega)
          VALUES (?, ?, ?, ?, ?, ?, 'Entregue', NOW())`,
         [atividadeId, info.grupo_id, alunoId, driveFile.webViewLink, driveFile.id, nomeOriginal]
       );
-      res.json({ success: true, message: 'Entrega enviada ao Drive com sucesso!' });
+      res.json({ success: true, message: 'Entrega enviada com sucesso!' });
     }
 
-    // Limpeza final do arquivo temporário
     if (fs.existsSync(caminhoTemporario)) fs.unlinkSync(caminhoTemporario);
 
   } catch (err) {
-    if (caminhoTemporario && fs.existsSync(caminhoTemporario)) {
-      fs.unlinkSync(caminhoTemporario);
-    }
+    if (caminhoTemporario && fs.existsSync(caminhoTemporario)) fs.unlinkSync(caminhoTemporario);
     console.error('Erro na entrega:', err);
     res.status(500).json({ success: false, message: err.message || 'Erro interno.' });
   } finally {
@@ -422,7 +387,6 @@ router.get('/entregas', async (req, res) => {
 // ====================================================================
 // ROTA 5: Download de Arquivo (HÍBRIDA - Local ou Drive)
 // ====================================================================
-// ROTA 5: Download de Arquivo
 router.get('/entregas/download/:id', async (req, res) => {
   const entregaId = parseInt(req.params.id, 10);
   const alunoId = req.user?.id;

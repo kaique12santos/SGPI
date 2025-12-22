@@ -76,20 +76,14 @@ router.get('/projetos/:projetoId/atividades', async (req, res) => {
     connection = await getConnection();
 
     // 1) Buscar o grupo_id do Projeto
-    const resultProjeto = await connection.execute(
-      `SELECT grupo_id FROM Projetos WHERE id = ?`,
-      [projetoId]
-    );
+    const [projetos] = await connection.query(`SELECT grupo_id FROM Projetos WHERE id = ?`, [projetoId]);
 
-    if (resultProjeto.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Projeto não encontrado.' });
-    }
-    const grupo_id = resultProjeto.rows[0].grupo_id;
-    if (!grupo_id) {
-       return res.status(404).json({ success: false, message: 'Projeto não está vinculado a um grupo.' });
-    }
+    if (projetos.length === 0) return res.status(404).json({ success: false, message: 'Projeto não encontrado.' });
+    
+    const grupo_id = projetos[0].grupo_id;
+    if (!grupo_id) return res.status(404).json({ success: false, message: 'Projeto não está vinculado a um grupo.' });
 
-    // 2) Execute a consulta validada com ALIASES EM MAIÚSCULO
+    // 2) Consulta Corrigida (Aliases padronizados e LEFT JOIN seguro)
     const sqlAtividades = `
       SELECT
         g.nome AS NOME_GRUPO,
@@ -107,6 +101,7 @@ router.get('/projetos/:projetoId/atividades', async (req, res) => {
           ON a.oferta_id = dof.id
       LEFT JOIN Usuarios u_prof 
           ON a.professor_id = u_prof.id
+      -- AQUI PODE ESTAR O PROBLEMA DO LEFT JOIN
       LEFT JOIN Entregas e 
           ON a.id = e.atividade_id AND e.grupo_id = g.id
       LEFT JOIN Avaliacoes av 
@@ -117,17 +112,14 @@ router.get('/projetos/:projetoId/atividades', async (req, res) => {
           a.titulo;
     `;
 
-    const resultAtividades = await connection.execute(sqlAtividades, [grupo_id]);
+    const [atividades] = await connection.query(sqlAtividades, [grupo_id]);
+    return res.json({ success: true, atividades: atividades });
     
-    return res.json({ success: true, atividades: resultAtividades.rows });
-
   } catch (err) {
-    console.error('Erro ao buscar atividades avaliadas do projeto:', err);
+    console.error('Erro ao buscar atividades:', err);
     return res.status(500).json({ success: false, message: 'Erro ao buscar atividades.' });
   } finally {
-    if (connection) {
-      try { await connection.release(); } catch (_) { /**/ }
-    }
+    if (connection) connection.release();
   }
 });
 module.exports = router;
